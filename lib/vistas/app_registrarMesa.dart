@@ -22,14 +22,13 @@ class _AppRegistroMesaState extends State<AppRegistroMesa> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text("Registrar mesa"),
+        title: const Text("Registrar mesa"),
         backgroundColor: Colors.blue,
       ),
       drawer: AppMenuDrawer(),
       body: Container(
         width: MediaQuery.of(context).size.width,
-        // color: Colors.green,
-        padding: EdgeInsets.only(top: 50),
+        padding: const EdgeInsets.only(top: 50),
         child: Column(
           children: [
             AppText(text: "Numero de mesa", width: 320),
@@ -53,8 +52,8 @@ class _AppRegistroMesaState extends State<AppRegistroMesa> {
                 await mesaCtrll.addMesa(myController.text);
 
                 final lista = await mesaCtrll.getMesas();
-                // Navigator.of(context).pop();
-                Navigator.of(context).pop(MaterialPageRoute(
+                Navigator.of(context).pop();
+                Navigator.of(context).push(MaterialPageRoute(
                     builder: (context) => AppListaMesa(lista)));
               },
             ),

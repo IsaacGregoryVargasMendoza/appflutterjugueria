@@ -1,4 +1,3 @@
-// import 'dart:html';
 import 'dart:convert';
 import 'package:app_jugueria/componentes/app_text.dart';
 import 'package:app_jugueria/componentes/app_buttons.dart';
@@ -10,10 +9,7 @@ import 'package:app_jugueria/controladores/productoController.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
-// import 'package:blobs/blobs.dart';
 import 'dart:io';
-// import 'dart:io';
-// import 'package:blobs/blobs.dart';
 
 class AppRegistroProducto extends StatefulWidget {
   List<CategoriaModel> listaCategorias;
@@ -68,7 +64,7 @@ class _AppRegistroProductoState extends State<AppRegistroProducto> {
                     setImagen(1);
                   },
                   child: Container(
-                    padding: EdgeInsets.all(20),
+                    padding: const EdgeInsets.all(20),
                     child: const Row(
                       children: [
                         Expanded(
@@ -87,7 +83,7 @@ class _AppRegistroProductoState extends State<AppRegistroProducto> {
                     setImagen(2);
                   },
                   child: Container(
-                    padding: EdgeInsets.all(20),
+                    padding: const EdgeInsets.all(20),
                     child: const Row(
                       children: [
                         Expanded(
@@ -136,7 +132,7 @@ class _AppRegistroProductoState extends State<AppRegistroProducto> {
                 AppText(text: "Categoria", width: 320),
                 Container(
                   width: 320,
-                  padding: EdgeInsets.fromLTRB(20, 5, 20, 0),
+                  padding: const EdgeInsets.fromLTRB(20, 5, 20, 0),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(15),
                     color: const Color.fromRGBO(217, 217, 217, 1),
@@ -238,9 +234,6 @@ class _AppRegistroProductoState extends State<AppRegistroProducto> {
                   funcion: () async {
                     List<int> bytes = await imagen!.readAsBytesSync();
                     String _imagen64 = base64.encode(bytes);
-                    // print(0);
-                    // print(idCategoria);
-                    // print(double.parse(tecCategoria.text));
 
                     ProductoController productoCtrll = ProductoController();
                     await productoCtrll.addProducto(

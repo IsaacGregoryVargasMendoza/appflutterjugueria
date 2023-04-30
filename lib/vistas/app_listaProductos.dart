@@ -50,7 +50,7 @@ class _AppListaProductoState extends State<AppListaProducto> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text("Lista de productos"),
+        title: const Text("Lista de productos"),
         backgroundColor: Colors.amber,
         actions: <Widget>[
           IconButton(
@@ -63,8 +63,7 @@ class _AppListaProductoState extends State<AppListaProducto> {
                   MaterialPageRoute(
                       builder: (context) => AppRegistroProducto(lista)));
             },
-            icon: FaIcon(FontAwesomeIcons.plus),
-            // hoverColor: Colors.black,
+            icon: const FaIcon(FontAwesomeIcons.plus),
           ),
         ],
       ),

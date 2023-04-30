@@ -49,8 +49,8 @@ class _AppLoginState extends State<AppLogin> {
                 const SizedBox(height: 15),
                 AppButtons(
                   textColor: Colors.black,
-                  backgroundColor: Color.fromRGBO(241, 241, 241, 1),
-                  borderColor: Color.fromRGBO(241, 241, 241, 1),
+                  backgroundColor: const Color.fromRGBO(241, 241, 241, 1),
+                  borderColor: const Color.fromRGBO(241, 241, 241, 1),
                   text: "Iniciar sesion",
                   fontSize: 15,
                   width: 130,

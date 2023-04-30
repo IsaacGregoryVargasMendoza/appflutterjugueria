@@ -15,34 +15,12 @@ class AppListaCategoria extends StatefulWidget {
 }
 
 class _AppListaCategoriaState extends State<AppListaCategoria> {
-  // List<CategoriaModel>? data;
-
-  // Future<List<CategoriaModel>> obtenerCategorias() async {
-  //   CategoriaController categoriaCtrll = CategoriaController();
-  //   final lista = categoriaCtrll.getCategorias();
-
-  //   return lista;
-  // }
-
-  // void initState() {
-  //   super.initState();
-  //   obtenerCategorias().then((value) => {
-  //         // data = List<CategoriaModel>;
-  //         setState(() {
-  //           // for (var elemento in value) {
-  //           //   data elemento);
-  //           // }
-  //           data = value;
-  //         })
-  //       });
-  // }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text("Lista de categorias"),
+        title: const Text("Lista de categorias"),
         backgroundColor: Colors.amber,
         actions: <Widget>[
           IconButton(
@@ -53,20 +31,14 @@ class _AppListaCategoriaState extends State<AppListaCategoria> {
                   MaterialPageRoute(
                       builder: (context) => AppRegistroCategoria()));
             },
-            icon: FaIcon(FontAwesomeIcons.plus),
-            // hoverColor: Colors.black,
+            icon: const FaIcon(FontAwesomeIcons.plus),
           ),
         ],
       ),
       drawer: AppMenuDrawer(),
       body: Stack(children: <Widget>[
         ListView.builder(
-          // gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          //   crossAxisCount: 1, // Dos columnas
-          //   mainAxisSpacing: 10, // Espacio vertical entre los elementos
-          //   crossAxisSpacing: 10, // Espacio horizontal entre los elementos
-          // ),
-          padding: EdgeInsets.all(20),
+          padding: const EdgeInsets.all(20),
           itemCount: widget.data.length,
           itemBuilder: (context, index) {
             return GestureDetector(
@@ -77,7 +49,6 @@ class _AppListaCategoriaState extends State<AppListaCategoria> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
-                  // Flexible(
                   Container(
                     width: MediaQuery.of(context).size.width,
                     padding:
@@ -99,43 +70,15 @@ class _AppListaCategoriaState extends State<AppListaCategoria> {
                           ),
                           textAlign: TextAlign.start,
                         ),
-                        // FaIcon(FontAwesomeIcons.pencil)
                       ],
                     ),
                   ),
-                  // ),
-                  // SizedBox(height: 5),
-                  // Text(
-                  //   "Producto ${data![index].nombreCategoria}",
-                  //   style: const TextStyle(
-                  //     fontSize: 16,
-                  //     fontWeight: FontWeight.bold,
-                  //   ),
-                  //   textAlign: TextAlign.center,
-                  // ),
-                  // SizedBox(height: 15),
                 ],
               ),
             );
           },
         ),
       ]),
-
-      // body: Container(
-      //   color: Colors.white,
-      //   child: ListView.builder(
-      //     itemCount: data!.length,
-      //     itemBuilder: (BuildContext context, int index) {
-      //       return Container(
-      //         color: Colors.amber,
-      //         child: Text(
-      //           data![index].nombreCategoria,
-      //           style: TextStyle(fontSize: 30),
-      //         ),
-      //       );
-      //     },
-      //   ),
-      // ),
     );
   }
 }

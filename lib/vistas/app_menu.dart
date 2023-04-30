@@ -19,14 +19,7 @@ class _AppMenuState extends State<AppMenu> {
       drawer: AppMenuDrawer(),
       body: Container(
         color: Colors.white,
-        // decoration: const BoxDecoration(
-        //   image: DecorationImage(
-        //     image: AssetImage("assets/frutas_fondo1.jpg"),
-        //     opacity: 0.9,
-        //     fit: BoxFit.cover,
-        //   ),
-        // ),
-        child: Center(child: const Text("Pantalla principal")),
+        child: const Center(child: Text("Pantalla principal")),
       ),
     );
   }

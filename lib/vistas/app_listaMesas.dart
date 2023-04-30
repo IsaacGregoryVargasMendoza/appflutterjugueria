@@ -20,7 +20,7 @@ class _AppListaMesaState extends State<AppListaMesa> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text("Mesas"),
+        title: const Text("Mesas"),
         backgroundColor: Colors.amber,
         actions: <Widget>[
           IconButton(
@@ -29,7 +29,7 @@ class _AppListaMesaState extends State<AppListaMesa> {
               Navigator.push(context,
                   MaterialPageRoute(builder: (context) => AppRegistroMesa()));
             },
-            icon: FaIcon(FontAwesomeIcons.plus),
+            icon: const FaIcon(FontAwesomeIcons.plus),
             // hoverColor: Colors.black,
           ),
         ],
@@ -42,7 +42,7 @@ class _AppListaMesaState extends State<AppListaMesa> {
           crossAxisSpacing: 10, // Espacio horizontal entre los elementos
         ),
         itemCount: widget.data.length,
-        padding: EdgeInsets.all(20),
+        padding: const EdgeInsets.all(20),
         itemBuilder: (context, index) {
           return GestureDetector(
             onTap: () {
@@ -62,7 +62,7 @@ class _AppListaMesaState extends State<AppListaMesa> {
                   //   fit: BoxFit.cover,
                   // ),
                 ),
-                SizedBox(height: 5),
+                const SizedBox(height: 5),
                 Text(
                   widget.data[index].numeroMesa,
                   style: const TextStyle(
