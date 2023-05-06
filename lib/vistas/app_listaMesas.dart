@@ -21,7 +21,7 @@ class _AppListaMesaState extends State<AppListaMesa> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text("Mesas"),
-        backgroundColor: Colors.amber,
+        backgroundColor: Colors.green.shade900,
         actions: <Widget>[
           IconButton(
             onPressed: () {

@@ -27,6 +27,6 @@ class ProductoModel {
         json['descripcionProducto'].toString(),
         json['precioProducto'] as double,
         json['imagenProducto'].toString(),
-        CategoriaModel(json['id'] as int, ""));
+        CategoriaModel(json['idCategoria'] as int, ""));
   }
 }

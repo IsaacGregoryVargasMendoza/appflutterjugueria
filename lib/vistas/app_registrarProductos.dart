@@ -111,7 +111,7 @@ class _AppRegistroProductoState extends State<AppRegistroProducto> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text("Registro producto"),
-        backgroundColor: Colors.blue,
+        backgroundColor: Colors.green.shade900,
       ),
       drawer: AppMenuDrawer(),
       body: ListView(

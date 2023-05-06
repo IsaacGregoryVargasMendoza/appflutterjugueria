@@ -39,7 +39,11 @@ dependencies:
   font_awesome_flutter: ^10.4.0
   image_picker: ^0.8.7+4
   blobs: ^2.0.0
-  tflite_flutter: ^0.9.4
+  tflite_flutter: 
+  camera: ^0.10.4
+  tflite_flutter_helper: ^0.2.1
+  image: ^3.3.0
+  # tflite: 
 
 dev_dependencies:
   flutter_test:
@@ -69,6 +73,9 @@ flutter:
     - assets/frutas_fondo1.jpg
     - assets/mesa.jpg
     - assets/producto_sin_foto.png
+    - assets/frutas2.jpg
+    - assets/ok.png
+    - assets/model.tflite
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

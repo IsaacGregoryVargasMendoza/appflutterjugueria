@@ -21,49 +21,70 @@ class _AppLoginState extends State<AppLogin> {
         decoration: const BoxDecoration(
           image: DecorationImage(
             image: AssetImage("assets/frutas_fondo1.jpg"),
-            opacity: 0.9,
+            // opacity: 0.9,
             fit: BoxFit.cover,
           ),
         ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Column(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                AppText(text: "Correo electronico", width: 320),
-                AppTextFieldRound(
-                  width: 320,
-                  isPassword: false,
-                  funcion: () {},
-                  myController: TextEditingController(),
-                ),
-                const SizedBox(height: 15),
-                AppText(text: "Contraseña", width: 320),
-                AppTextFieldRound(
-                  width: 320,
-                  isPassword: true,
-                  funcion: () {},
-                  myController: TextEditingController(),
-                ),
-                const SizedBox(height: 15),
-                AppButtons(
-                  textColor: Colors.black,
-                  backgroundColor: const Color.fromRGBO(241, 241, 241, 1),
-                  borderColor: const Color.fromRGBO(241, 241, 241, 1),
-                  text: "Iniciar sesion",
-                  fontSize: 15,
-                  width: 130,
-                  height: 50,
-                  funcion: () {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => AppMenu()));
-                  },
-                ),
-                const SizedBox(height: 50),
-              ],
-            ),
-          ],
+        child: Container(
+          color: Colors.black.withOpacity(0.5),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Container(
+                    margin: const EdgeInsets.all(0),
+                    padding: const EdgeInsets.all(0),
+                    width: 320,
+                    height: 20,
+                    child: const Text(
+                      "Correo electronico",
+                      style: TextStyle(fontSize: 14, color: Colors.white),
+                    ),
+                  ),
+                  AppTextFieldRound(
+                    width: 320,
+                    isPassword: false,
+                    funcion: () {},
+                    myController: TextEditingController(),
+                  ),
+                  const SizedBox(height: 15),
+                  Container(
+                    margin: const EdgeInsets.all(0),
+                    padding: const EdgeInsets.all(0),
+                    width: 320,
+                    height: 20,
+                    child: const Text(
+                      "Contraseña",
+                      style: TextStyle(fontSize: 14, color: Colors.white),
+                    ),
+                  ),
+                  AppTextFieldRound(
+                    width: 320,
+                    isPassword: true,
+                    funcion: () {},
+                    myController: TextEditingController(),
+                  ),
+                  const SizedBox(height: 15),
+                  AppButtons(
+                    textColor: Colors.black,
+                    backgroundColor: const Color.fromRGBO(241, 241, 241, 1),
+                    borderColor: const Color.fromRGBO(241, 241, 241, 1),
+                    text: "Iniciar sesion",
+                    fontSize: 15,
+                    width: 130,
+                    height: 50,
+                    funcion: () {
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (context) => AppMenu()));
+                    },
+                  ),
+                  const SizedBox(height: 50),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );

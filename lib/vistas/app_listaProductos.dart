@@ -51,7 +51,7 @@ class _AppListaProductoState extends State<AppListaProducto> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text("Lista de productos"),
-        backgroundColor: Colors.amber,
+        backgroundColor: Colors.green.shade900,
         actions: <Widget>[
           IconButton(
             onPressed: () async {

@@ -14,7 +14,7 @@ class _AppMenuState extends State<AppMenu> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.amber,
+        backgroundColor: Colors.green.shade900,
       ),
       drawer: AppMenuDrawer(),
       body: Container(

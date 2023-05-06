@@ -23,7 +23,7 @@ class _AppRegistroCategoriaState extends State<AppRegistroCategoria> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text("Registro Categoria"),
-        backgroundColor: Colors.blue,
+        backgroundColor: Colors.green.shade900,
       ),
       drawer: AppMenuDrawer(),
       body: Container(

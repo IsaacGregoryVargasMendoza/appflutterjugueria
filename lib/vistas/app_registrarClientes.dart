@@ -31,7 +31,7 @@ class _AppRegistroClienteState extends State<AppRegistroCliente> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text("Registro cliente"),
-        backgroundColor: Colors.blue,
+        backgroundColor: Colors.green.shade900,
       ),
       drawer: AppMenuDrawer(),
       body: ListView(
@@ -57,12 +57,53 @@ class _AppRegistroClienteState extends State<AppRegistroCliente> {
                   myController: tecApellido,
                 ),
                 const SizedBox(height: 15),
-                AppText(text: "Telefono", width: 320),
-                AppTextFieldRound(
+                Container(
                   width: 320,
-                  isPassword: false,
-                  funcion: () {},
-                  myController: tecTelefono,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Container(
+                        child: Column(
+                          children: [
+                            AppText(text: "Telefono", width: 150),
+                            Container(
+                              margin: const EdgeInsets.all(0),
+                              padding: const EdgeInsets.all(0),
+                              width: 150,
+                              height: 45,
+                              decoration: BoxDecoration(
+                                color: const Color.fromRGBO(217, 217, 217, 1),
+                                borderRadius: BorderRadius.circular(15),
+                                border: Border.all(
+                                  color: const Color.fromRGBO(217, 217, 217, 1),
+                                ),
+                              ),
+                              child: Scrollbar(
+                                controller: ScrollController(),
+                                child: TextField(
+                                  scrollController: ScrollController(),
+                                  keyboardType: TextInputType.number,
+                                  enableSuggestions: false,
+                                  autocorrect: false,
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    height: 2,
+                                    fontWeight: FontWeight.normal,
+                                    color: Colors.black,
+                                  ),
+                                  decoration: const InputDecoration(
+                                      contentPadding: EdgeInsets.symmetric(
+                                          horizontal: 20, vertical: 0),
+                                      border: InputBorder.none),
+                                  controller: tecTelefono,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
                 const SizedBox(height: 15),
                 AppText(text: "Email", width: 320),

@@ -21,7 +21,7 @@ class _AppListaCategoriaState extends State<AppListaCategoria> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text("Lista de categorias"),
-        backgroundColor: Colors.amber,
+        backgroundColor: Colors.green.shade900,
         actions: <Widget>[
           IconButton(
             onPressed: () {

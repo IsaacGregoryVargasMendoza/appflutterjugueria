@@ -21,7 +21,7 @@ class _AppListaClienteState extends State<AppListaCliente> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text("Lista de clientes"),
-        backgroundColor: Colors.amber,
+        backgroundColor: Colors.green.shade900,
         actions: <Widget>[
           IconButton(
             onPressed: () {

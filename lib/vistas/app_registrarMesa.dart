@@ -23,7 +23,7 @@ class _AppRegistroMesaState extends State<AppRegistroMesa> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text("Registrar mesa"),
-        backgroundColor: Colors.blue,
+        backgroundColor: Colors.green.shade900,
       ),
       drawer: AppMenuDrawer(),
       body: Container(
