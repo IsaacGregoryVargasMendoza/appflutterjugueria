@@ -180,32 +180,79 @@ class _AppSeleccionarProductoState extends State<AppSeleccionarProducto> {
                   ),
                   GestureDetector(
                     onTap: () async {
-                      print("Probando");
+                      var height = _interpreter.getInputTensor(0).shape[1];
+                      var width = _interpreter.getInputTensor(0).shape[2];
+                      print(
+                          "Probando comparacion de imagen con el modelo de IA");
                       List<int> imageBytes = await _cameraController
                           .takePicture()
                           .then((XFile image) => image.readAsBytes());
-                      final inputShape = _interpreter.getInputTensor(0).shape;
-                      // final inputData = preProcessInputData(image, inputShape);
 
+                      //final bytes = await imageFile.readAsBytes();
                       var image = img.decodeImage(imageBytes);
-                      image = img.copyResize(image!,
-                          width: inputShape[2], height: inputShape[1]);
-                      image = img.grayscale(image);
-                      var inputData = imageToByteListFloat32(
-                          image, inputShape[2], inputShape[1], inputShape[3],
-                          mean: [0.485, 0.456, 0.406],
-                          std: [0.229, 0.224, 0.225]);
+
+                      // Convertir la imagen en un objeto ByteData
+                      var resizedImage =
+                          img.copyResize(image!, width: width, height: height);
+                      var inputImage = ByteData.view(resizedImage.data.buffer);
+
+                      // Normalizar los valores de píxeles de la imagen
+                      // final inputList = Float32List(
+                      //     resizedImage.width * resizedImage.height * 3);
+
+                      var inputList = Float32List.view(resizedImage.data.buffer)
+                          .map((pixel) => pixel / 255.0)
+                          .toList();
+                      print(inputList.length);
+
+                      for (int i = 0; i < inputList.length; i++) {
+                        inputList[i] = inputImage.getFloat32(i * 4) / 255.0;
+                      }
+
+                      // Crear el tensor de entrada con la forma correcta
+                      var tensorBuffer = TensorBuffer.createFixedSize(
+                          [1, height, width, 1], TfLiteType.float32);
+
+                      // print(inputList.length);
+                      // print(resizedImage.height);
+                      // print("");
+                      // print(resizedImage.width);
+                      // print("");
+                      // print(_interpreter.getInputTensor(0).shape[1]);
+                      // print("");
+                      // print(_interpreter.getInputTensor(0).shape[2]);
+
+                      // Copiar los valores normalizados de píxeles en el tensor de entrada
+                      tensorBuffer
+                          .loadList(inputList, shape: [1, height, width, 1]);
+
+                      // var image = img.decodeImage(imageBytes);
+                      // final imageResize =
+                      //     img.copyResize(image!, width: 224, height: 224);
+                      // final inputImage = ByteData.view(imageResize.data.buffer);
+
+                      // final inputList = Float32List(
+                      //     imageResize.width * imageResize.height * 3);
+                      // for (int i = 0; i < inputList.length; i++) {
+                      //   inputList[i] = inputImage.getFloat32(i * 4) / 255.0;
+                      // }
+
+                      // final tensorBuffer = TensorBuffer.createFixedSize(
+                      //     [1, 224, 224, 3], TfLiteType.float32);
+
+                      // tensorBuffer.loadList(inputList, shape: [1, 224, 224, 3]);
+
                       final outputShape = _interpreter.getOutputTensor(0).shape;
-                      print("INPUT DATA");
-                      print(inputData.length);
+
                       final outputData =
                           List.filled(outputShape.reduce((a, b) => a * b), 0)
                               .reshape(outputShape);
-                      print("Antes del RUN");
-                      print("INPUT DATA");
-                      print(outputData.length);
-                      _interpreter.run(inputData, outputData);
-                      print("Se termino todo el proceso bien.");
+
+                      _interpreter.run(tensorBuffer, outputData);
+                      // _interpreter.run([tensorBuffer.buffer]);
+                      print(_interpreter.getInputTensor(0).shape.length);
+                      print(tensorBuffer.shape.length);
+                      print("Se finalizo el proceso con exito.");
                     },
                     child: const Text(
                       "Confirmar",
