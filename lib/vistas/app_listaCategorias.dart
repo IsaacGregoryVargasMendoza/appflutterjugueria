@@ -1,13 +1,15 @@
+import 'package:app_jugueria/controladores/adicionalController.dart';
 import 'package:app_jugueria/vistas/app_registrarCategorias.dart';
 import 'package:app_jugueria/componentes/app_drawer.dart';
 import 'package:app_jugueria/modelos/categoriaModel.dart';
+import 'package:app_jugueria/controladores/categoriaController.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class AppListaCategoria extends StatefulWidget {
-  List<CategoriaModel> data;
+  List<CategoriaModel>? data;
 
-  AppListaCategoria(this.data, {Key? key}) : super(key: key);
+  AppListaCategoria({this.data, Key? key}) : super(key: key);
   @override
   State<AppListaCategoria> createState() {
     return _AppListaCategoriaState();
@@ -26,10 +28,7 @@ class _AppListaCategoriaState extends State<AppListaCategoria> {
           IconButton(
             onPressed: () {
               Navigator.of(context).pop();
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => AppRegistroCategoria()));
+              Navigator.pushNamed(context, '/registrar-categoria');
             },
             icon: const FaIcon(FontAwesomeIcons.plus),
           ),
@@ -39,41 +38,125 @@ class _AppListaCategoriaState extends State<AppListaCategoria> {
       body: Stack(children: <Widget>[
         ListView.builder(
           padding: const EdgeInsets.all(20),
-          itemCount: widget.data.length,
+          itemCount: widget.data!.length,
           itemBuilder: (context, index) {
             return GestureDetector(
               onTap: () {
-                print(widget.data[index].id);
-                print(widget.data[index].nombreCategoria);
+                CategoriaModel categoriaModel = CategoriaModel(
+                    id: widget.data![index].id,
+                    nombreCategoria: widget.data![index].nombreCategoria,
+                    letraCategoria: widget.data![index].letraCategoria);
+                Navigator.pushNamed(
+                  context,
+                  '/editar-categoria',
+                  arguments: categoriaModel,
+                );
               },
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
-                  Container(
-                    width: MediaQuery.of(context).size.width,
-                    padding:
-                        const EdgeInsetsDirectional.fromSTEB(20, 10, 0, 10),
-                    decoration: const BoxDecoration(
-                      color: Colors.white,
-                      border: BorderDirectional(
-                        bottom: BorderSide(width: 1),
+              child: Container(
+                margin: EdgeInsets.fromLTRB(0, 0, 0, 20),
+                padding: EdgeInsets.fromLTRB(0, 0, 10, 0),
+                decoration: BoxDecoration(
+                    color: Colors.green.shade100,
+                    borderRadius: BorderRadius.all(Radius.circular(10))),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    Container(
+                      width: MediaQuery.of(context).size.width,
+                      padding:
+                          const EdgeInsetsDirectional.fromSTEB(20, 10, 0, 10),
+                      decoration: const BoxDecoration(
+                        color: Colors.transparent,
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "${widget.data![index].nombreCategoria}",
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                softWrap: true,
+                                textAlign: TextAlign.start,
+                              ),
+                              Text(
+                                "Letra: ${widget.data![index].letraCategoria}",
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                ),
+                                softWrap: true,
+                                textAlign: TextAlign.start,
+                              ),
+                            ],
+                          ),
+                          Container(
+                            child: Column(
+                              children: [
+                                ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    // shadowColor: Colors.red,
+                                    primary: Colors.green.shade600,
+                                  ),
+                                  onPressed: () async {
+                                    int idCategoria = widget.data![index].id!;
+                                    CategoriaModel categoria = CategoriaModel(
+                                        id: idCategoria,
+                                        nombreCategoria:
+                                            widget.data![index].nombreCategoria,
+                                        letraCategoria:
+                                            widget.data![index].letraCategoria);
+                                    AdicionalController adicionalCtrll =
+                                        AdicionalController();
+                                    final adicionales =
+                                        await adicionalCtrll.getAdicionales();
+                                    final adicionalesAsignados =
+                                        await adicionalCtrll
+                                            .getAdicionalesPorCategoria(
+                                                idCategoria);
+                                    Navigator.pushNamed(
+                                      context,
+                                      '/asignar-adicionales',
+                                      arguments: {
+                                        'categoria': categoria,
+                                        'adicionales': adicionales,
+                                        'adicionalesAsignados':
+                                            adicionalesAsignados
+                                      },
+                                    );
+                                  },
+                                  child: FaIcon(FontAwesomeIcons.pepperHot),
+                                ),
+                                ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    // shadowColor: Colors.red,
+                                    primary: Colors.red.shade600,
+                                  ),
+                                  onPressed: () async {
+                                    CategoriaController categoriaCtrll =
+                                        CategoriaController();
+                                    await categoriaCtrll.deleteCategoria(
+                                        widget.data![index].id!);
+                                    List<CategoriaModel> lista =
+                                        await categoriaCtrll.getCategorias();
+                                    setState(() {
+                                      widget.data = lista;
+                                    });
+                                  },
+                                  child: FaIcon(FontAwesomeIcons.trash),
+                                ),
+                              ],
+                            ),
+                          )
+                        ],
                       ),
                     ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Text(
-                          "ID: ${widget.data[index].id} \nCategoria: ${widget.data[index].nombreCategoria}",
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          textAlign: TextAlign.start,
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             );
           },

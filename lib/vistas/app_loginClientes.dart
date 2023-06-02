@@ -1,22 +1,20 @@
 import 'package:app_jugueria/modelos/tipoDocumentoModel.dart';
 import 'package:app_jugueria/modelos/usuarioModel.dart';
-import 'package:app_jugueria/modelos/administradorModel.dart';
 import 'package:flutter/material.dart';
 import 'package:app_jugueria/componentes/app_buttons.dart';
 import 'package:app_jugueria/componentes/app_textFieldRound.dart';
 import 'package:app_jugueria/componentes/info_global.dart';
-import 'package:app_jugueria/controladores/administradorController.dart';
+import 'package:app_jugueria/modelos/clienteModel.dart';
+import 'package:app_jugueria/controladores/clienteController.dart';
 
-import 'package:app_jugueria/vistas/app_menu.dart';
-
-class AppLogin extends StatefulWidget {
+class AppLoginCliente extends StatefulWidget {
   @override
-  State<AppLogin> createState() {
-    return _AppLoginState();
+  State<AppLoginCliente> createState() {
+    return AppLoginClienteState();
   }
 }
 
-class _AppLoginState extends State<AppLogin> {
+class AppLoginClienteState extends State<AppLoginCliente> {
   final nombreUsuario = TextEditingController();
   final contraseniaUsuario = TextEditingController();
 
@@ -24,12 +22,7 @@ class _AppLoginState extends State<AppLogin> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      //appBar: AppBar(),
       body: Container(
-        width: MediaQuery.of(context).size.width,
-        height: MediaQuery.of(context).size.height,
-        margin: EdgeInsets.all(0),
-        padding: EdgeInsets.all(0),
         decoration: const BoxDecoration(
           image: DecorationImage(
             image: AssetImage("assets/frutas_fondo1.jpg"),
@@ -40,9 +33,7 @@ class _AppLoginState extends State<AppLogin> {
         child: ListView(
           children: [
             Container(
-              width: MediaQuery.of(context).size.width,
               height: MediaQuery.of(context).size.height,
-              margin: EdgeInsets.all(0),
               color: Colors.black.withOpacity(0.5),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -91,7 +82,19 @@ class _AppLoginState extends State<AppLogin> {
                           funcion: () {},
                           myController: contraseniaUsuario,
                         ),
-                        const SizedBox(height: 20),
+                        const SizedBox(height: 15),
+                        Container(
+                          width: 320,
+                          child: GestureDetector(
+                            onTap: () {},
+                            child: const Text(
+                              "¿Olvidaste tu contraseña?",
+                              style:
+                                  TextStyle(fontSize: 14, color: Colors.white),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 15),
                         AppButtons(
                           textColor: Colors.black,
                           backgroundColor:
@@ -103,43 +106,42 @@ class _AppLoginState extends State<AppLogin> {
                           height: 50,
                           funcion: () async {
                             try {
-                              AdministradorController administradorCtrl =
-                                  AdministradorController();
+                              ClienteController clienteCtrll =
+                                  ClienteController();
 
                               UsuarioModel usuarioModel = UsuarioModel(
                                   nombreUsuario: nombreUsuario.text,
                                   contraseniaUsuario: contraseniaUsuario.text);
 
-                              AdministradorModel administradorModel =
-                                  AdministradorModel();
+                              ClienteModel clienteModel = ClienteModel();
 
-                              List<AdministradorModel> respuesta =
-                                  await administradorCtrl
-                                      .validarLogin(usuarioModel);
+                              List<ClienteModel> respuesta =
+                                  await clienteCtrll.validarLogin(usuarioModel);
 
                               if (respuesta.length == 1) {
-                                administradorModel.nombreAdministrador =
-                                    respuesta[0].nombreAdministrador;
-                                administradorModel.apellidoAdministrador =
-                                    respuesta[0].apellidoAdministrador;
-                                administradorModel.numeroDocumento =
+                                clienteModel.nombreCliente =
+                                    respuesta[0].nombreCliente;
+                                clienteModel.apellidoCliente =
+                                    respuesta[0].apellidoCliente;
+                                clienteModel.numeroDocumento =
                                     respuesta[0].numeroDocumento;
-                                administradorModel.tipoDocumentoModel =
+                                clienteModel.tipoDocumentoModel =
                                     TipoDocumentoModel(
                                         id: respuesta[0]
                                             .tipoDocumentoModel!
                                             .id);
-                                administradorModel.telefonoAdministrador =
-                                    respuesta[0].telefonoAdministrador;
-                                administradorModel.emailAdministrador =
-                                    respuesta[0].emailAdministrador;
+                                clienteModel.telefonoCliente =
+                                    respuesta[0].telefonoCliente;
+                                clienteModel.emailCliente =
+                                    respuesta[0].emailCliente;
 
                                 usuarioModel.id = respuesta[0].usuario!.id;
-                                administradorModel.usuario = usuarioModel;
-                                InfoGlobal.administradorModel =
-                                    administradorModel;
+                                clienteModel.usuario = usuarioModel;
+
+                                InfoGlobal.clienteModel = clienteModel;
+
                                 Navigator.pushNamed(
-                                    context, '/menu-administrador');
+                                    context, '/seleccionar-mesas');
                               } else {
                                 mostrarAlerta(context, "Mensaje",
                                     "Usuario y/o contraseña incorrecto.");
@@ -150,13 +152,37 @@ class _AppLoginState extends State<AppLogin> {
                             }
                           },
                         ),
-                        const SizedBox(height: 15),
+                        const SizedBox(height: 20),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            //Text("¿No tengo cuenta?"),
+                            const Text(
+                              "¿No tengo cuenta?",
+                              style:
+                                  TextStyle(fontSize: 14, color: Colors.white),
+                            ),
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.pushNamed(
+                                    context, '/registrar-cliente-login');
+                              },
+                              child: const Text(
+                                "Registrarme",
+                                style:
+                                    TextStyle(fontSize: 14, color: Colors.blue),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 20),
                         Container(
                           padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
                           width: 150,
                           child: Image.asset("assets/devesoft-blanco.png"),
                         ),
-                        const SizedBox(height: 50),
+                        const SizedBox(height: 30),
+                        //const SizedBox(height: 50),
                       ],
                     ),
                   ),

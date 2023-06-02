@@ -1,31 +1,23 @@
 import 'dart:convert';
-import 'package:app_jugueria/componentes/app_text.dart';
-import 'package:app_jugueria/componentes/app_buttons.dart';
-import 'package:app_jugueria/componentes/app_textFieldRound.dart';
 import 'package:app_jugueria/componentes/app_drawer.dart';
-import 'package:app_jugueria/modelos/categoriaModel.dart';
 import 'package:app_jugueria/modelos/productoModel.dart';
-import 'package:app_jugueria/vistas/app_listaProductos.dart';
 import 'package:app_jugueria/controladores/productoController.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
-import 'dart:typed_data';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image/image.dart' as img;
-// import 'dart:image';
-// import 'package:tflite/tflite.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:tflite_flutter/tflite_flutter.dart';
-import 'package:tflite_flutter_helper/tflite_flutter_helper.dart';
 import 'package:camera/camera.dart';
+import 'package:app_jugueria/classifier/classifier.dart';
 import 'dart:io';
 import 'dart:async';
 
 late List<CameraDescription> _cameras;
 
 class AppSeleccionarProducto extends StatefulWidget {
-  List<CategoriaModel> data;
+  List<ProductoModel>? listaProductos;
 
-  AppSeleccionarProducto(this.data, {Key? key}) : super(key: key);
+  AppSeleccionarProducto({this.listaProductos, Key? key}) : super(key: key);
   @override
   State<AppSeleccionarProducto> createState() {
     return _AppSeleccionarProductoState();
@@ -34,23 +26,217 @@ class AppSeleccionarProducto extends StatefulWidget {
 
 enum WidgetState { NONE, LOADING, LOADED, ERROR }
 
+enum _ResultStatus {
+  notStarted,
+  notFound,
+  found,
+}
+
+const kAnalyzingTextStyle = TextStyle(
+    fontFamily: 'Roboto',
+    fontSize: 20.0,
+    color: Colors.black,
+    decoration: TextDecoration.none);
+
+const kPreguntaTextStyle = TextStyle(
+    fontFamily: 'Roboto',
+    fontSize: 20.0,
+    fontWeight: FontWeight.bold,
+    color: Colors.red,
+    decoration: TextDecoration.none);
+
 class _AppSeleccionarProductoState extends State<AppSeleccionarProducto> {
   WidgetState _widgetState = WidgetState.NONE;
   late List<CameraDescription> _camaras;
   late CameraController _cameraController;
-  late Interpreter _interpreter;
-  List<String> preguntas = ["¿Que producto desea?", "¿Que cantidad desea?"];
+  List<String> preguntas = ["¿QUE PRODUCTO DESEA?", "¿QUE CANTIDAD DESEA?"];
   CameraImage? cameraImage;
-  late List<int> _inputShape;
-  late dynamic _inputDataType;
-  late List<int> _outputShape;
-  late dynamic _outputDataType;
+
+  //Nueva forma de leer la imagen
+  late Classifier _classifierLetras;
+  late Classifier _classifierNumeros;
+  _ResultStatus _resultStatus = _ResultStatus.notStarted;
+  final String _labelsFileName = 'assets/labels.txt';
+  final String _modelFileName = 'model.tflite';
+  final String _labelsFileNameNumeros = 'assets/labels_numeros.txt';
+  final String _modelFileNameNumeros = 'model_numeros.tflite';
+  final picker = ImagePicker();
+  File? _selectedImageFile;
+  String _plantLabel = ''; // Name of Error Message
+  double _accuracy = 0.0;
+  String _letra = "";
+  bool _isAnalyzing = false;
+  ProductoModel? _producto;
+  File? imagen;
+  List<ProductoModel> listaProductos = [];
+  List<int> listaCantidades = [];
+  List<double> listaSubtotales = [];
+  double total = 0;
+  int indice = -1;
+  String preguntaActual = "¿QUE PRODUCTO DESEA?";
 
   @override
   void initState() {
     super.initState();
-    loadModel();
+    //loadModel();
+    _loadClassifier();
     inicializarCamara();
+  }
+
+  void _setAnalyzing(bool flag) {
+    setState(() {
+      _isAnalyzing = flag;
+    });
+  }
+
+  void _analyzeImageProducto(File image) async {
+    _setAnalyzing(true);
+
+    final imageInput = img.decodeImage(image.readAsBytesSync())!;
+    //final imageInput = imgds;
+
+    final resultCategory = _classifierLetras.predict(imageInput);
+
+    final result = resultCategory.score >= 0.6
+        ? _ResultStatus.found
+        : _ResultStatus.notFound;
+    final plantLabel = resultCategory.label;
+    final accuracy = resultCategory.score;
+
+    print("Producto");
+    print(plantLabel);
+    print(accuracy);
+
+    ProductoController productoCtrll = ProductoController();
+
+    var producto = await productoCtrll.getProductoWithLetter(plantLabel);
+
+    if (producto.length > 0) {
+      if (listaProductos.length > 0) {
+        int index = listaProductos.indexWhere((p) => p.id == producto[0].id);
+
+        if (index > -1) {
+          indice = index;
+          _producto = listaProductos[indice];
+        } else {
+          _producto = producto[0];
+          listaProductos.add(_producto!);
+          listaCantidades.add(1);
+          listaSubtotales.add(_producto!.precioProducto! * 1);
+        }
+      } else {
+        _producto = producto[0];
+        listaProductos.add(_producto!);
+        listaCantidades.add(1);
+        listaSubtotales.add(_producto!.precioProducto! * 1);
+      }
+
+      total = listaSubtotales
+          .reduce((valorAnterior, valorActual) => valorAnterior + valorActual);
+
+      _setAnalyzing(false);
+      setState(() {
+        preguntaActual = "¿QUE CANTIDAD DESEA?";
+        _resultStatus = result;
+        _plantLabel = plantLabel;
+        _accuracy = accuracy;
+        _letra = plantLabel;
+      });
+    } else {
+      _setAnalyzing(false);
+    }
+  }
+
+  void _analyzeImageCantidad(File image) async {
+    final imageInput = img.decodeImage(image.readAsBytesSync())!;
+
+    final resultCategory = _classifierNumeros.predict(imageInput);
+
+    final plantLabel = resultCategory.label;
+    final accuracy = resultCategory.score;
+
+    print("Cantidad");
+    print(plantLabel);
+    print(accuracy);
+
+    int cantidad = 0;
+
+    switch (plantLabel) {
+      case "UNO":
+        cantidad = 1;
+        break;
+      case "DOS":
+        cantidad = 2;
+        break;
+      case "TRES":
+        cantidad = 3;
+        break;
+      case "CUATRO":
+        cantidad = 4;
+        break;
+      case "CINCO":
+        cantidad = 5;
+        break;
+      case "SEIS":
+        cantidad = 6;
+        break;
+      case "SIETE":
+        cantidad = 7;
+        break;
+      case "OCHO":
+        cantidad = 8;
+        break;
+      case "NUEVE":
+        cantidad = 9;
+        break;
+      default:
+        cantidad = 1;
+        break;
+    }
+
+    if (indice > -1) {
+      listaCantidades[indice] = cantidad;
+      listaSubtotales[indice] = _producto!.precioProducto! * cantidad;
+      indice = -1;
+    } else {
+      listaCantidades[listaCantidades.length - 1] = cantidad;
+      listaSubtotales[listaSubtotales.length - 1] =
+          _producto!.precioProducto! * cantidad;
+    }
+
+    total = listaSubtotales
+        .reduce((valorAnterior, valorActual) => valorAnterior + valorActual);
+
+    _setAnalyzing(false);
+    setState(() {
+      preguntaActual = "¿QUE PRODUCTO DESEA?";
+      _producto = null;
+      //_resultStatus = result;
+      _plantLabel = plantLabel;
+      _accuracy = accuracy;
+      _letra = plantLabel;
+    });
+  }
+
+  Future<void> _loadClassifier() async {
+    debugPrint(
+      'Start loading of Classifier with '
+      'labels at $_labelsFileName, '
+      'model at $_modelFileName',
+    );
+
+    final classifierLetras = await Classifier.loadWith(
+      labelsFileName: _labelsFileName,
+      modelFileName: _modelFileName,
+    );
+
+    final classifierNumeros = await Classifier.loadWith(
+      labelsFileName: _labelsFileNameNumeros,
+      modelFileName: _modelFileNameNumeros,
+    );
+
+    _classifierLetras = classifierLetras!;
+    _classifierNumeros = classifierNumeros!;
   }
 
   @override
@@ -65,207 +251,157 @@ class _AppSeleccionarProductoState extends State<AppSeleccionarProducto> {
             ));
       case WidgetState.LOADED:
         return _buildScaffold(
-            context,
-            Container(
-              width: MediaQuery.of(context).size.width,
-              height: MediaQuery.of(context).size.height,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Text(
-                    "${preguntas[0]}",
-                    style: TextStyle(fontSize: 18),
-                  ),
-                  Container(
-                    // width: 200,
-                    height: MediaQuery.of(context).size.height / 3,
-                    color: Colors.amber,
-                    // padding: const EdgeInsets.only(top: 50),
-                    margin: EdgeInsets.fromLTRB(0, 0, 0, 10),
-                    child: Transform.scale(
-                      scale:
-                          1, // Escala de 0.5 para reducir el tamaño a la mitad
-                      child: CameraPreview(_cameraController),
-                    ),
-                    // child: CameraPreview(_cameraController),
-                  ),
-                  const Text(
-                    "Pedido:",
-                    style: TextStyle(fontSize: 20),
-                  ),
-                  Container(
-                    width: MediaQuery.of(context).size.width,
-                    height: 150,
-                    margin: EdgeInsets.fromLTRB(5, 5, 5, 0),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      color: Colors.grey.shade100,
-                    ),
-                    child: Stack(children: <Widget>[
-                      ListView.builder(
-                        padding: const EdgeInsets.all(20),
-                        itemCount: widget.data.length,
-                        itemBuilder: (context, index) {
-                          return GestureDetector(
-                            onTap: () {
-                              print(widget.data[index].id);
-                              print(widget.data[index].nombreCategoria);
-                            },
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: <Widget>[
-                                Container(
-                                  width: MediaQuery.of(context).size.width,
-                                  padding: const EdgeInsetsDirectional.fromSTEB(
-                                      20, 10, 20, 10),
-                                  decoration: const BoxDecoration(
-                                      // color: Colors.white,
-                                      // border: BorderDirectional(
-                                      //   bottom: BorderSide(width: 0.5),
-                                      // ),
-                                      ),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                        "${widget.data[index].nombreCategoria}",
-                                        style: const TextStyle(
-                                          fontSize: 16,
-                                          // fontWeight: FontWeight.bold,
-                                        ),
-                                        textAlign: TextAlign.start,
-                                      ),
-                                      const Text(
-                                        "10",
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          // fontWeight: FontWeight.bold,
-                                        ),
-                                        textAlign: TextAlign.end,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          );
-                        },
-                      ),
-                    ]),
-                  ),
-                  Container(
-                    width: MediaQuery.of(context).size.width,
-                    padding: EdgeInsets.fromLTRB(0, 5, 25, 0),
-                    child: const Text(
-                      "Total: S/.100.00",
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      textAlign: TextAlign.end,
-                    ),
-                  ),
-                  Container(
-                    width: 100,
-                    height: 100,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(50),
-                      image: const DecorationImage(
-                        image: AssetImage("assets/ok.png"),
-                        fit: BoxFit.cover,
+          context,
+          Container(
+            width: MediaQuery.of(context).size.width,
+            height: MediaQuery.of(context).size.height,
+            child: ListView(
+              children: [
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    /*
+                        Container(
+                          // width: 200,
+                          height: MediaQuery.of(context).size.height / 4,
+                          color: Colors.amber,
+                          // padding: const EdgeInsets.only(top: 50),
+                          margin: const EdgeInsets.fromLTRB(0, 0, 0, 10),
+                          child: Transform.scale(
+                            scale:
+                                1, // Escala de 0.5 para reducir el tamaño a la mitad
+                            child: CameraPreview(_cameraController),
+                          ),
+                          // child: CameraPreview(_cameraController),
+                        ),*/
+                    InkWell(
+                      onTap: () {
+                        opciones(context);
+                      },
+                      child: Container(
+                        width: 180,
+                        height: 200,
+                        child: imagen == null
+                            ? const Image(
+                                image:
+                                    AssetImage("assets/producto_sin_foto.png"))
+                            : Image.file(imagen!),
                       ),
                     ),
-                  ),
-                  GestureDetector(
-                    onTap: () async {
-                      var height = _interpreter.getInputTensor(0).shape[1];
-                      var width = _interpreter.getInputTensor(0).shape[2];
-                      print(
-                          "Probando comparacion de imagen con el modelo de IA");
-                      List<int> imageBytes = await _cameraController
-                          .takePicture()
-                          .then((XFile image) => image.readAsBytes());
-
-                      //final bytes = await imageFile.readAsBytes();
-                      var image = img.decodeImage(imageBytes);
-
-                      // Convertir la imagen en un objeto ByteData
-                      var resizedImage =
-                          img.copyResize(image!, width: width, height: height);
-                      var inputImage = ByteData.view(resizedImage.data.buffer);
-
-                      // Normalizar los valores de píxeles de la imagen
-                      // final inputList = Float32List(
-                      //     resizedImage.width * resizedImage.height * 3);
-
-                      var inputList = Float32List.view(resizedImage.data.buffer)
-                          .map((pixel) => pixel / 255.0)
-                          .toList();
-                      print(inputList.length);
-
-                      for (int i = 0; i < inputList.length; i++) {
-                        inputList[i] = inputImage.getFloat32(i * 4) / 255.0;
-                      }
-
-                      // Crear el tensor de entrada con la forma correcta
-                      var tensorBuffer = TensorBuffer.createFixedSize(
-                          [1, height, width, 1], TfLiteType.float32);
-
-                      // print(inputList.length);
-                      // print(resizedImage.height);
-                      // print("");
-                      // print(resizedImage.width);
-                      // print("");
-                      // print(_interpreter.getInputTensor(0).shape[1]);
-                      // print("");
-                      // print(_interpreter.getInputTensor(0).shape[2]);
-
-                      // Copiar los valores normalizados de píxeles en el tensor de entrada
-                      tensorBuffer
-                          .loadList(inputList, shape: [1, height, width, 1]);
-
-                      // var image = img.decodeImage(imageBytes);
-                      // final imageResize =
-                      //     img.copyResize(image!, width: 224, height: 224);
-                      // final inputImage = ByteData.view(imageResize.data.buffer);
-
-                      // final inputList = Float32List(
-                      //     imageResize.width * imageResize.height * 3);
-                      // for (int i = 0; i < inputList.length; i++) {
-                      //   inputList[i] = inputImage.getFloat32(i * 4) / 255.0;
-                      // }
-
-                      // final tensorBuffer = TensorBuffer.createFixedSize(
-                      //     [1, 224, 224, 3], TfLiteType.float32);
-
-                      // tensorBuffer.loadList(inputList, shape: [1, 224, 224, 3]);
-
-                      final outputShape = _interpreter.getOutputTensor(0).shape;
-
-                      final outputData =
-                          List.filled(outputShape.reduce((a, b) => a * b), 0)
-                              .reshape(outputShape);
-
-                      _interpreter.run(tensorBuffer, outputData);
-                      // _interpreter.run([tensorBuffer.buffer]);
-                      print(_interpreter.getInputTensor(0).shape.length);
-                      print(tensorBuffer.shape.length);
-                      print("Se finalizo el proceso con exito.");
-                    },
-                    child: const Text(
-                      "Confirmar",
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      textAlign: TextAlign.end,
+                    Container(
+                      //color: Colors.grey.shade300,
+                      margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
+                      height: 180,
+                      width: MediaQuery.of(context).size.height,
+                      child: CarouselSlider.builder(
+                          options: CarouselOptions(
+                            //height: 200.0,
+                            enlargeCenterPage: true,
+                            autoPlay: true,
+                            autoPlayInterval: Duration(seconds: 3),
+                            viewportFraction: 0.5,
+                            autoPlayAnimationDuration:
+                                const Duration(milliseconds: 800),
+                            autoPlayCurve: Curves.fastOutSlowIn,
+                          ),
+                          itemCount: widget.listaProductos!.length,
+                          itemBuilder:
+                              (BuildContext context, int index, int realIndex) {
+                            return ProductCard(
+                                producto: widget.listaProductos![index]);
+                          }),
                     ),
-                  ),
-                ],
-              ),
-            ));
+                    Text(
+                      "${preguntaActual}",
+                      style: kPreguntaTextStyle,
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    (!_isAnalyzing)
+                        ? Text(
+                            (_producto != null)
+                                ? '${_producto!.nombreProducto}'
+                                : '',
+                            style: kAnalyzingTextStyle)
+                        : const Text('Analizando...',
+                            style: kAnalyzingTextStyle),
+                    const Text(
+                      "Pedido:",
+                      style: TextStyle(fontSize: 20),
+                    ),
+                    DetallePedido(
+                        listaProductos: listaProductos,
+                        listaCantidades: listaCantidades),
+                    Container(
+                      width: MediaQuery.of(context).size.width,
+                      padding: const EdgeInsets.fromLTRB(0, 5, 25, 0),
+                      child: Text(
+                        "Total: S/.${total.toDouble()}",
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.end,
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () async {
+                        if (listaProductos.isNotEmpty) {
+                          Navigator.pushNamed(
+                              context, '/seleccionar-adicionales', arguments: {
+                            'productos': listaProductos,
+                            'cantidades': listaCantidades,
+                            'total': total
+                          });
+                        } else {
+                          print("La lista de productos esta vacia.");
+                        }
+                      },
+                      child: Container(
+                        width: 100,
+                        height: 100,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(50),
+                          image: const DecorationImage(
+                            image: AssetImage("assets/ok.png"),
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () async {
+                        /*
+                            var file = await _cameraController.takePicture();
+                            final File newImage = File(file.path);
+
+                            if (preguntaActual == "¿QUE PRODUCTO DESEA?") {
+                              _analyzeImageProducto(newImage);
+                            } else {
+                              _analyzeImageCantidad(newImage);
+                            }
+
+                            print("Se finalizo el proceso con exito.");
+                            */
+                      },
+                      child: const Text(
+                        "Confirmar",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.end,
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 20),
+              ],
+            ),
+          ),
+        );
 
       case WidgetState.ERROR:
         return _buildScaffold(
@@ -280,17 +416,12 @@ class _AppSeleccionarProductoState extends State<AppSeleccionarProducto> {
   Widget _buildScaffold(BuildContext context, Widget body) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: const Text("Pedido de productos"),
-        backgroundColor: Colors.green.shade900,
-      ),
+      // appBar: AppBar(
+      //   title: const Text("Pedido de productos"),
+      //   backgroundColor: Colors.green.shade800,
+      // ),
       drawer: AppMenuDrawer(),
       body: body,
-      // body: Container(
-      //   width: MediaQuery.of(context).size.width,
-      //   padding: const EdgeInsets.only(top: 50),
-      //   child: CameraPreview(_cameraController),
-      // ),
     );
   }
 
@@ -299,23 +430,15 @@ class _AppSeleccionarProductoState extends State<AppSeleccionarProducto> {
 
     if (mounted) {
       setState(
-        () {
-          // _cameraController.startImageStream(
-          //   (image) => {
-          //     if (true)
-          //       {
-          //         cameraImage = image,
-          //         //applymodelonimages(),
-          //       }
-          //   },
-          // );
-        },
+        () {},
       );
     }
 
     _camaras = await availableCameras();
     _cameraController =
-        new CameraController(_camaras[0], ResolutionPreset.medium);
+        new CameraController(_camaras[0], ResolutionPreset.ultraHigh);
+
+    _cameraController.setFlashMode(FlashMode.off);
 
     await _cameraController.initialize();
 
@@ -332,83 +455,215 @@ class _AppSeleccionarProductoState extends State<AppSeleccionarProducto> {
     }
   }
 
-  loadModel() async {
-    print('Interpreter loaded successfully');
-    _interpreter = await Interpreter.fromAsset('model.tflite');
-    print('Interpreter loaded successfully');
-    //_inputShape = _interpreter.getInputTensor(0).shape;
-    // preProcessInputData();
-    // _inputDataType = _interpreter.getInputTensor(0).data;
-    // _outputShape = _interpreter.getOutputTensor(0).shape;
-    // _outputDataType = _interpreter.getOutputTensor(0).dataType;
-  }
+  Future setImagen(opcion) async {
+    var pickedFile;
 
-  List<double> imageToByteListFloat32(
-      img.Image image, int width, int height, int numChannels,
-      {List<double>? mean, List<double>? std}) {
-    var convertedBytes = Float32List(width * height * numChannels);
-    var buffer = Float32List.view(convertedBytes.buffer);
-
-    var imageChannels = image.channels;
-
-    for (int y = 0; y < height; y++) {
-      for (int x = 0; x < width; x++) {
-        var pixel = image.getPixel(x, y);
-
-        for (int c = 0; c < numChannels; c++) {
-          if (imageChannels == 1) {
-            var val = (img.getRed(pixel) - (mean != null ? mean[c] : 0.0)) /
-                (std != null ? std[c] : 1.0);
-            buffer[numChannels * (y * width + x) + c] = val;
-          } else {
-            var val = (img.getRed(pixel) - (mean != null ? mean[c] : 0.0)) /
-                (std != null ? std[c] : 1.0);
-            buffer[numChannels * (y * width + x) + c] = val;
-          }
-        }
-      }
+    if (opcion == 1) {
+      pickedFile = await picker.pickImage(source: ImageSource.camera);
+    } else {
+      pickedFile = await picker.pickImage(source: ImageSource.gallery);
     }
 
-    return convertedBytes;
+    // imagen = File(pickedFile.path);
+    // if (preguntaActual == "¿QUE PRODUCTO DESEA?") {
+    //   _analyzeImageProducto(imagen!);
+    // } else {
+    //   _analyzeImageCantidad(imagen!);
+    // }
+
+    print("Se finalizo el proceso con exito.");
+
+    setState(() {
+      if (pickedFile != null) {
+        imagen = File(pickedFile.path);
+        if (preguntaActual == "¿QUE PRODUCTO DESEA?") {
+          _analyzeImageProducto(imagen!);
+        } else {
+          _analyzeImageCantidad(imagen!);
+        }
+      } else {
+        print("No seleccionaste ninguna foto");
+      }
+    });
+
+    Navigator.of(context).pop();
   }
 
-  applymodelonimages() async {
-    // if (cameraImage != null) {
-    //   cameraImage.readAsBytes();
-    //   final inputData = preProcessInputData(cameraImage, _inputShape);
-    // var predictions = await Tflite.runModelOnFrame(
-    //     bytesList: cameraImage!.planes.map(
-    //       (plane) {
-    //         return plane.bytes;
-    //       },
-    //     ).toList(),
-    //     imageHeight: cameraImage!.height,
-    //     imageWidth: cameraImage!.width,
-    //     imageMean: 127.5,
-    //     imageStd: 127.5,
-    //     rotation: 90,
-    //     numResults: 3,
-    //     threshold: 0.1,
-    //     asynch: true);
+  opciones(context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          contentPadding: const EdgeInsets.all(0),
+          content: SingleChildScrollView(
+            child: Column(
+              children: [
+                InkWell(
+                  onTap: () {
+                    setImagen(1);
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.all(20),
+                    child: const Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            "Tomar una foto",
+                            style: TextStyle(fontSize: 16),
+                          ),
+                        ),
+                        FaIcon(FontAwesomeIcons.camera),
+                      ],
+                    ),
+                  ),
+                ),
+                InkWell(
+                  onTap: () {
+                    setImagen(2);
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.all(20),
+                    child: const Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            "Seleccionar una foto",
+                            style: TextStyle(fontSize: 16),
+                          ),
+                        ),
+                        FaIcon(FontAwesomeIcons.image),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
 
-    // answer = '';
+class DetallePedido extends StatelessWidget {
+  final List<ProductoModel> listaProductos;
+  final List<int> listaCantidades;
 
-    //   predictions!.forEach(
-    //     (prediction) {
-    //       answer +=
-    //           prediction['label'].toString().substring(0, 1).toUpperCase() +
-    //               prediction['label'].toString().substring(1) +
-    //               " " +
-    //               (prediction['confidence'] as double).toStringAsFixed(3) +
-    //               '\n';
-    //     },
-    //   );
+  DetallePedido({required this.listaProductos, required this.listaCantidades});
 
-    //   setState(
-    //     () {
-    //       answer = answer;
-    //     },
-    //   );
-    // }
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: MediaQuery.of(context).size.width,
+      height: 150,
+      //margin: const EdgeInsets.fromLTRB(5, 5, 5, 0),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10),
+        color: Colors.grey.shade100,
+      ),
+      child: Stack(children: <Widget>[
+        ListView.builder(
+          padding: const EdgeInsets.all(2),
+          itemCount: listaProductos.length,
+          itemBuilder: (context, index) {
+            return GestureDetector(
+              onTap: () {
+                print(listaProductos[index].id);
+                print(listaProductos[index].nombreProducto);
+              },
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  Container(
+                    width: MediaQuery.of(context).size.width,
+                    padding:
+                        const EdgeInsetsDirectional.fromSTEB(20, 10, 20, 10),
+                    decoration: const BoxDecoration(
+                        // color: Colors.white,
+                        // border: BorderDirectional(
+                        //   bottom: BorderSide(width: 0.5),
+                        // ),
+                        ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Container(
+                          width: 170, // Ancho máximo permitido
+                          child: Text(
+                            "${listaProductos[index].nombreProducto}",
+                            style: const TextStyle(
+                              fontSize: 16,
+                              // fontWeight: FontWeight.bold,
+                            ),
+                            textAlign: TextAlign.start,
+                            overflow: TextOverflow
+                                .ellipsis, // Recorta el texto y muestra puntos suspensivos al final
+                            maxLines: 1, // Limita el texto a una sola línea
+                          ),
+                        ),
+                        Text(
+                          ((listaCantidades[index] != null)
+                              ? "S/.${listaProductos[index].precioProducto} x ${listaCantidades[index]} = S/.${listaProductos[index].precioProducto! * listaCantidades[index]}"
+                              : "0"),
+                          style: const TextStyle(
+                            fontSize: 16,
+                            // fontWeight: FontWeight.bold,
+                          ),
+                          textAlign: TextAlign.end,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
+      ]),
+    );
+  }
+}
+
+class ProductCard extends StatelessWidget {
+  final ProductoModel producto;
+
+  ProductCard({required this.producto});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.all(5),
+      width: MediaQuery.of(context).size.width / 2,
+      decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          color: Colors.amber.shade100),
+      child: Column(
+        children: [
+          Expanded(
+            child: Container(
+              width: 100,
+              height: 100,
+              margin: EdgeInsets.all(5),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(50),
+                //color: Colors.amber,
+                image: DecorationImage(
+                  image: MemoryImage(
+                    base64.decode(
+                      producto.imagenProducto!,
+                    ),
+                  ),
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+          ),
+          // SizedBox(height: 10),
+          Text(producto.nombreProducto!, style: TextStyle(fontSize: 14)),
+
+          Text(producto.letraProducto!, style: TextStyle(fontSize: 25)),
+        ],
+      ),
+    );
   }
 }

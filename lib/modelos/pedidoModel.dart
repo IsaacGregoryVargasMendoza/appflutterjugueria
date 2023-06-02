@@ -1,56 +1,87 @@
-import 'package:app_jugueria/modelos/categoriaModel.dart';
+import 'package:app_jugueria/modelos/adicionalModel.dart';
 import 'package:app_jugueria/modelos/clienteModel.dart';
 import 'package:app_jugueria/modelos/mesaModel.dart';
 import 'package:app_jugueria/modelos/productoModel.dart';
 
 class PedidoModel {
-  int? _id;
-  final ClienteModel _cliente;
-  final MesaModel _mesa;
-  final String _fechaPedido;
-  final double _totalPedido;
-  List<DetallePedidoModel>? _detallePedido;
+  int? id;
+  ClienteModel? cliente;
+  MesaModel? mesa;
+  String? fechaPedido;
+  double? totalPedido;
+  List<DetallePedidoModel>? detallePedido;
 
-  PedidoModel(this._id, this._cliente, this._mesa, this._fechaPedido,
-      this._totalPedido);
-
-  int? get id => _id;
-  ClienteModel get cliente => _cliente;
-  MesaModel get mesa => _mesa;
-  String get fechaPedido => _fechaPedido;
-  double get totalPedido => _totalPedido;
-  List<DetallePedidoModel>? get detallePedido => _detallePedido;
+  PedidoModel(
+      {this.id,
+      this.cliente,
+      this.mesa,
+      this.fechaPedido,
+      this.totalPedido,
+      this.detallePedido});
 
   factory PedidoModel.fromJson(Map<String, dynamic> json) {
     return PedidoModel(
-        json['id'] as int,
-        ClienteModel(json['cliente'], "", "", "", ""),
-        MesaModel(json['mesa'], ""),
-        json['fechaPedido'] as String,
-        json['totalPedido'] as double);
+        id: json['id'],
+        cliente: ClienteModel(
+            id: json['idCliente'] as int,
+            numeroDocumento: json['numeroDocumento'] as String,
+            nombreCliente: json['nombreCliente'] as String,
+            apellidoCliente: json['apellidoCliente'] as String,
+            telefonoCliente: json['telefonoCliente'] as String),
+        mesa: MesaModel(id: json['idMesa']),
+        fechaPedido: json['fechaPedido'] as String,
+        totalPedido: json['totalPedido'] as double);
   }
 }
 
 class DetallePedidoModel {
-  final PedidoModel _pedido;
-  final ProductoModel _producto;
-  final double _cantidadDetalle;
-  final double _precioDetalle;
+  int? id;
+  PedidoModel? pedido;
+  ProductoModel? producto;
+  int? cantidadDetalle;
+  double? precioDetalle;
+  String? observacion;
+  List<DetalleProductoModel>? lista;
 
   DetallePedidoModel(
-      this._pedido, this._producto, this._cantidadDetalle, this._precioDetalle);
-
-  PedidoModel get pedido => _pedido;
-  ProductoModel get producto => _producto;
-  double get cantidadDetalle => _cantidadDetalle;
-  double get precioDetalle => _precioDetalle;
+      {this.id,
+      this.pedido,
+      this.producto,
+      this.cantidadDetalle,
+      this.precioDetalle,
+      this.observacion,
+      this.lista});
 
   factory DetallePedidoModel.fromJson(Map<String, dynamic> json) {
     return DetallePedidoModel(
-        PedidoModel(json['idPedido'], ClienteModel(0, "", "", "", ""),
-            MesaModel(0, ""), "", 0),
-        ProductoModel(json["idProducto"], "", "", 0, "", CategoriaModel(0, "")),
-        json["cantidadDetalle"] as double,
-        json["precioDetalle"] as double);
+        id: json['id'] as int,
+        pedido: PedidoModel(id: json['idDetallePedido']),
+        producto: ProductoModel(
+            id: json["idProducto"],
+            nombreProducto: json["nombreProducto"] as String,
+            descripcionProducto: json["descripcionProducto"].toString(),
+            imagenProducto: json["imagenProducto"].toString(),
+            letraProducto: json["letraProducto"] as String),
+        cantidadDetalle: json["cantidadDetalle"] as int,
+        precioDetalle: json["precioDetalle"] as double,
+        observacion: "");
+  }
+}
+
+class DetalleProductoModel {
+  int? id;
+  DetallePedidoModel? detallePedido;
+  ProductoModel? producto;
+  AdicionalModel? adicional;
+
+  DetalleProductoModel(
+      {this.id, this.detallePedido, this.producto, this.adicional});
+
+  factory DetalleProductoModel.fromJson(Map<String, dynamic> json) {
+    return DetalleProductoModel(
+        id: json['id'],
+        detallePedido: DetallePedidoModel(id: json['idDetallePedido'] as int),
+        producto: ProductoModel(id: json['idProducto'] as int),
+        adicional: AdicionalModel(id: json['idAdicional'] as int));
   }
 }

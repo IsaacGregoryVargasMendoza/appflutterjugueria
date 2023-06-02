@@ -43,6 +43,9 @@ dependencies:
   camera: ^0.10.4
   tflite_flutter_helper: ^0.2.1
   image: ^3.3.0
+  path_provider: ^2.0.15
+  carousel_slider: ^4.2.1
+  intl: ^0.18.1
   # tflite: 
 
 dev_dependencies:
@@ -75,7 +78,12 @@ flutter:
     - assets/producto_sin_foto.png
     - assets/frutas2.jpg
     - assets/ok.png
+    - assets/logo.png
     - assets/model.tflite
+    - assets/labels.txt
+    - assets/model_numeros.tflite
+    - assets/labels_numeros.txt
+    - assets/devesoft-blanco.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

@@ -1,21 +1,19 @@
 import 'package:mysql1/mysql1.dart';
 
 class CategoriaModel {
-  int? _id;
-  final String _nombreCategoria;
+  int? id;
+  String? nombreCategoria;
+  String? letraCategoria;
 
-  CategoriaModel(this._id, this._nombreCategoria);
-
-  String get nombreCategoria => _nombreCategoria;
-
-  int? get id => _id;
+  CategoriaModel({this.id, this.nombreCategoria, this.letraCategoria});
 
   factory CategoriaModel.fromJson(Map<String, dynamic> json) {
-    return CategoriaModel(json['id'] as int, json['nombreCategoria'] as String);
+    return CategoriaModel(
+        id: json['id'] as int,
+        nombreCategoria: json['nombreCategoria'] as String,
+        letraCategoria: json['letraCategoria'] as String);
   }
 }
-
-
 
 // final conn = MySqlConnection.connect(ConnectionSettings(
 //   host: '34.176.109.9',

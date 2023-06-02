@@ -1,12 +1,10 @@
-import 'package:app_jugueria/vistas/app_listaMesas.dart';
 import 'package:flutter/material.dart';
 import 'package:app_jugueria/controladores/categoriaController.dart';
 import 'package:app_jugueria/controladores/productoController.dart';
 import 'package:app_jugueria/controladores/mesaController.dart';
 import 'package:app_jugueria/controladores/clienteController.dart';
-import 'package:app_jugueria/vistas/app_listaCategorias.dart';
-import 'package:app_jugueria/vistas/app_listaProductos.dart';
-import 'package:app_jugueria/vistas/app_listaClientes.dart';
+import 'package:app_jugueria/controladores/pedidoController.dart';
+import 'package:app_jugueria/componentes/info_global.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class AppMenuDrawer extends StatelessWidget {
@@ -47,25 +45,38 @@ class AppMenuDrawer extends StatelessWidget {
                       Container(
                         margin: const EdgeInsets.symmetric(
                             vertical: 0, horizontal: 15),
-                        child: const Column(
+                        child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
                             Text(
-                              "Isaac Vargas Mendoza",
-                              style: TextStyle(
+                              "${InfoGlobal.administradorModel!.nombreAdministrador} \n${InfoGlobal.administradorModel!.apellidoAdministrador}",
+                              style: const TextStyle(
                                 color: Colors.black,
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
                             Text(
-                              "Editar perfil",
-                              style: TextStyle(
+                              "${InfoGlobal.administradorModel!.numeroDocumento}",
+                              style: const TextStyle(
                                 color: Colors.black,
-                                fontSize: 11,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
                               ),
                             ),
+                            GestureDetector(
+                              onTap: () {
+                                print("click en editar.");
+                              },
+                              child: const Text(
+                                "Editar perfil",
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 11,
+                                ),
+                              ),
+                            )
                           ],
                         ),
                       ),
@@ -84,10 +95,11 @@ class AppMenuDrawer extends StatelessWidget {
                 MesaController mesaCtrll = MesaController();
                 final lista = await mesaCtrll.getMesas();
                 Navigator.of(context).pop();
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => AppListaMesa(lista)));
+                Navigator.pushNamed(
+                  context,
+                  '/lista-mesas',
+                  arguments: lista,
+                );
               },
             ),
             ListTile(
@@ -100,10 +112,11 @@ class AppMenuDrawer extends StatelessWidget {
                 CategoriaController categoriaCtrll = CategoriaController();
                 final lista = await categoriaCtrll.getCategorias();
                 Navigator.of(context).pop();
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => AppListaCategoria(lista)));
+                Navigator.pushNamed(
+                  context,
+                  '/lista-categorias',
+                  arguments: lista,
+                );
               },
             ),
             ListTile(
@@ -116,10 +129,11 @@ class AppMenuDrawer extends StatelessWidget {
                 ProductoController productoCtrll = ProductoController();
                 final lista = await productoCtrll.getProductos();
                 Navigator.of(context).pop();
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => AppListaProducto(lista)));
+                Navigator.pushNamed(
+                  context,
+                  '/lista-productos',
+                  arguments: lista,
+                );
               },
             ),
             ListTile(
@@ -132,10 +146,11 @@ class AppMenuDrawer extends StatelessWidget {
                 ClienteController productoCtrll = ClienteController();
                 final lista = await productoCtrll.getClientes();
                 Navigator.of(context).pop();
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => AppListaCliente(lista)));
+                Navigator.pushNamed(
+                  context,
+                  '/lista-clientes',
+                  arguments: lista,
+                );
               },
             ),
             ListTile(
@@ -144,7 +159,16 @@ class AppMenuDrawer extends StatelessWidget {
                 'Pedidos',
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
               ),
-              onTap: () {},
+              onTap: () async {
+                PedidoController pedidoCtrll = PedidoController();
+                final lista = await pedidoCtrll.getPedidos();
+                //Navigator.of(context).pop();
+                Navigator.pushNamed(
+                  context,
+                  '/lista-pedidos',
+                  arguments: lista,
+                );
+              },
             ),
             ListTile(
               leading: const FaIcon(FontAwesomeIcons.signOut),

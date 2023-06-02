@@ -59,10 +59,15 @@ class _AppRegistrarProductoConSeniasState
               CategoriaController categoriaCtrll = CategoriaController();
               final lista = await categoriaCtrll.getCategorias();
               Navigator.of(context).pop();
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => AppRegistroProducto(lista)));
+              // Navigator.push(
+              //     context,
+              //     MaterialPageRoute(
+              //         builder: (context) => AppRegistroProducto(lista)));
+              Navigator.pushNamed(
+                context,
+                '/registrar-producto',
+                arguments: {'lista': lista},
+              );
             },
             icon: const FaIcon(FontAwesomeIcons.cartShopping),
             // icon: const FaIcon(FontAwesomeIcons.cartShopping,
@@ -127,7 +132,7 @@ class _AppRegistrarProductoConSeniasState
                       borderRadius: BorderRadius.circular(15),
                       items: widget.listaCategorias.map((categoria) {
                         return DropdownMenuItem(
-                            child: Text(categoria.nombreCategoria),
+                            child: Text(categoria.nombreCategoria!),
                             value: categoria.id);
                       }).toList(),
                       onChanged: (value) {
@@ -137,9 +142,9 @@ class _AppRegistrarProductoConSeniasState
                           // }
                           List<ProductoModel> nuevaLista = [];
                           for (var producto in widget.data) {
-                            print(producto.categoria.id);
+                            print(producto.categoria!.id);
                             // print(producto.categoria.id == value);
-                            if (producto.categoria.id == value) {
+                            if (producto.categoria!.id == value) {
                               nuevaLista.add(producto);
                             }
                           }
@@ -161,7 +166,6 @@ class _AppRegistrarProductoConSeniasState
             child: Container(
               width: MediaQuery.of(context).size.width,
               height: MediaQuery.of(context).size.height - 280,
-              // color: Colors.pink,
               child: ListView.builder(
                 itemCount: widget.listAuxProductos!.length,
                 itemBuilder: (context, index) {
@@ -189,7 +193,7 @@ class _AppRegistrarProductoConSeniasState
                                         image: MemoryImage(
                                           base64.decode(
                                             widget.listAuxProductos![index]
-                                                .imagenProducto,
+                                                .imagenProducto!,
                                           ),
                                         ),
                                         fit: BoxFit.cover,
@@ -332,13 +336,6 @@ class _AppRegistrarProductoConSeniasState
                                   )
                                 ],
                               ),
-                              // child: Text(
-                              //   'Contenido del modal ${widget.data[index].nombreProducto}',
-                              //   style: TextStyle(
-                              //     fontSize: 20.0,
-                              //     fontWeight: FontWeight.bold,
-                              //   ),
-                              // ),
                             ),
                           );
                         },
@@ -383,24 +380,15 @@ class _AppRegistrarProductoConSeniasState
                                 image: MemoryImage(
                                   base64.decode(
                                     widget.listAuxProductos![index]
-                                        .imagenProducto,
+                                        .imagenProducto!,
                                   ),
                                 ),
                                 fit: BoxFit.cover,
                               ),
                             ),
-                            // child: Expanded(
-                            //   child: Image.memory(
-                            //     base64.decode(
-                            //       widget.data[index].imagenProducto,
-                            //     ),
-                            //   ),
-                            // ),
                           ),
-                          // const SizedBox(width: 10),
                           Container(
                             width: MediaQuery.of(context).size.width - 181,
-                            // color: Colors.red,
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               mainAxisAlignment: MainAxisAlignment.center,
@@ -413,13 +401,6 @@ class _AppRegistrarProductoConSeniasState
                                       fontWeight: FontWeight.bold),
                                   textAlign: TextAlign.start,
                                 ),
-                                // Text(
-                                //   "Detalle: ${widget.data[index].descripcionProducto}",
-                                //   style: const TextStyle(
-                                //     fontSize: 15,
-                                //   ),
-                                //   textAlign: TextAlign.start,
-                                // ),
                                 Text(
                                   "Precio: ${widget.listAuxProductos![index].precioProducto.toString()}",
                                   style: const TextStyle(

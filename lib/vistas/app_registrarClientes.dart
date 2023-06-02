@@ -1,18 +1,18 @@
-import 'dart:convert';
 import 'package:app_jugueria/componentes/app_text.dart';
 import 'package:app_jugueria/componentes/app_buttons.dart';
 import 'package:app_jugueria/componentes/app_textFieldRound.dart';
 import 'package:app_jugueria/componentes/app_drawer.dart';
-import 'package:app_jugueria/modelos/categoriaModel.dart';
-import 'package:app_jugueria/vistas/app_listaClientes.dart';
+import 'package:app_jugueria/modelos/clienteModel.dart';
+import 'package:app_jugueria/modelos/tipoDocumentoModel.dart';
 import 'package:app_jugueria/controladores/clienteController.dart';
+import 'package:app_jugueria/modelos/usuarioModel.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:image_picker/image_picker.dart';
-import 'dart:io';
 
 class AppRegistroCliente extends StatefulWidget {
-  AppRegistroCliente({Key? key}) : super(key: key);
+  List<TipoDocumentoModel>? listaTipoDocumento;
+  ClienteModel? clienteModel;
+  AppRegistroCliente({this.listaTipoDocumento, this.clienteModel, Key? key})
+      : super(key: key);
   @override
   State<AppRegistroCliente> createState() {
     return _AppRegistroClienteState();
@@ -20,17 +20,59 @@ class AppRegistroCliente extends StatefulWidget {
 }
 
 class _AppRegistroClienteState extends State<AppRegistroCliente> {
-  final tecNombre = TextEditingController();
-  final tecApellido = TextEditingController();
-  final tecTelefono = TextEditingController();
-  final tecEmail = TextEditingController();
+  late TextEditingController tecNombre;
+  late TextEditingController tecNumeroDocumento;
+  late TextEditingController tecApellido;
+  late TextEditingController tecTelefono;
+  late TextEditingController tecEmail;
+  late TextEditingController tecNombreUsuario;
+  late TextEditingController tecContraseniaUsuario;
+  int idTipoDocumento = 0;
+  bool _buttonDisabled = false;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.clienteModel != null) {
+      tecNombre =
+          TextEditingController(text: widget.clienteModel!.nombreCliente);
+      tecNumeroDocumento =
+          TextEditingController(text: widget.clienteModel!.numeroDocumento);
+      tecApellido =
+          TextEditingController(text: widget.clienteModel!.apellidoCliente);
+      tecTelefono =
+          TextEditingController(text: widget.clienteModel!.telefonoCliente);
+      tecEmail = TextEditingController(text: widget.clienteModel!.emailCliente);
+      tecNombreUsuario = TextEditingController(
+          text: widget.clienteModel!.usuario!.nombreUsuario);
+      tecContraseniaUsuario = TextEditingController(
+          text: widget.clienteModel!.usuario!.contraseniaUsuario);
+      idTipoDocumento = widget.clienteModel!.tipoDocumentoModel!.id!;
+    } else {
+      tecNombre = TextEditingController();
+      tecNumeroDocumento = TextEditingController();
+      tecApellido = TextEditingController();
+      tecTelefono = TextEditingController();
+      tecEmail = TextEditingController();
+      tecNombreUsuario = TextEditingController();
+      tecContraseniaUsuario = TextEditingController();
+    }
+  }
+
+  void _disableButton() {
+    setState(() {
+      _buttonDisabled = true;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text("Registro cliente"),
+        title: (widget.clienteModel != null)
+            ? const Text("Editar cliente")
+            : const Text("Registro cliente"),
         backgroundColor: Colors.green.shade900,
       ),
       drawer: AppMenuDrawer(),
@@ -41,6 +83,51 @@ class _AppRegistroClienteState extends State<AppRegistroCliente> {
             padding: const EdgeInsets.only(top: 50),
             child: Column(
               children: [
+                AppText(text: "Documento", width: 320),
+                Container(
+                  width: 320,
+                  padding: const EdgeInsets.fromLTRB(20, 5, 20, 0),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(15),
+                    color: const Color.fromRGBO(217, 217, 217, 1),
+                  ),
+                  child: (idTipoDocumento != 0)
+                      ? DropdownButtonFormField(
+                          value: idTipoDocumento,
+                          decoration:
+                              const InputDecoration(border: InputBorder.none),
+                          borderRadius: BorderRadius.circular(15),
+                          items:
+                              widget.listaTipoDocumento!.map((tipoDocumento) {
+                            return DropdownMenuItem(
+                                child: Text(tipoDocumento.nombreDocumento!),
+                                value: tipoDocumento.id);
+                          }).toList(),
+                          onChanged: (value) {
+                            idTipoDocumento = value!;
+                          })
+                      : DropdownButtonFormField(
+                          decoration:
+                              const InputDecoration(border: InputBorder.none),
+                          value: 1,
+                          borderRadius: BorderRadius.circular(15),
+                          items:
+                              widget.listaTipoDocumento!.map((tipoDocumento) {
+                            return DropdownMenuItem(
+                                child: Text(tipoDocumento.nombreDocumento!),
+                                value: tipoDocumento.id);
+                          }).toList(),
+                          onChanged: (value) {
+                            idTipoDocumento = value!;
+                          }),
+                ),
+                AppText(text: "N° documento", width: 320),
+                AppTextFieldRound(
+                  width: 320,
+                  isPassword: false,
+                  funcion: () {},
+                  myController: tecNumeroDocumento,
+                ),
                 AppText(text: "Nombres", width: 320),
                 AppTextFieldRound(
                   width: 320,
@@ -114,25 +201,93 @@ class _AppRegistroClienteState extends State<AppRegistroCliente> {
                   myController: tecEmail,
                 ),
                 const SizedBox(height: 15),
+                AppText(text: "Usuario", width: 320),
+                AppTextFieldRound(
+                  width: 320,
+                  isPassword: false,
+                  funcion: () {},
+                  myController: tecNombreUsuario,
+                ),
+                const SizedBox(height: 15),
+                AppText(text: "Contraseña", width: 320),
+                AppTextFieldRound(
+                  width: 320,
+                  isPassword: true,
+                  funcion: () {},
+                  myController: tecContraseniaUsuario,
+                ),
+                const SizedBox(height: 15),
                 AppButtons(
                   textColor: Colors.white,
                   backgroundColor: Colors.blue,
                   borderColor: Colors.blue,
-                  text: "Registrar",
+                  text: (widget.clienteModel != null)
+                      ? "Guardar Cambios"
+                      : "Registrar",
                   fontSize: 15,
-                  width: 130,
+                  width: 140,
                   height: 50,
                   funcion: () async {
-                    ClienteController clienteCtrll = ClienteController();
-                    await clienteCtrll.addCliente(tecNombre.text,
-                        tecApellido.text, tecTelefono.text, tecEmail.text);
+                    if (_buttonDisabled) {
+                      print("No hare nada porque ya precionaste una vez.");
+                    } else {
+                      _disableButton();
+                      if (widget.clienteModel != null) {
+                        ClienteController clienteCtrll = ClienteController();
 
-                    final lista = await clienteCtrll.getClientes();
-                    Navigator.of(context).pop();
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => AppListaCliente(lista)));
+                        UsuarioModel usuarioModel = UsuarioModel(
+                            nombreUsuario: tecNombreUsuario.text,
+                            contraseniaUsuario: tecContraseniaUsuario.text);
+
+                        ClienteModel clienteModel = ClienteModel(
+                            id: widget.clienteModel!.id,
+                            tipoDocumentoModel:
+                                TipoDocumentoModel(id: idTipoDocumento),
+                            numeroDocumento: tecNumeroDocumento.text,
+                            nombreCliente: tecNombre.text,
+                            apellidoCliente: tecApellido.text,
+                            telefonoCliente: tecTelefono.text,
+                            emailCliente: tecEmail.text,
+                            usuario: usuarioModel);
+                        await clienteCtrll.updateCliente(clienteModel);
+
+                        final lista = await clienteCtrll.getClientes();
+                        Navigator.of(context).pop();
+                        Navigator.pushNamed(
+                          context,
+                          '/lista-clientes',
+                          arguments: lista,
+                        );
+                      } else {
+                        ClienteController clienteCtrll = ClienteController();
+
+                        UsuarioModel usuarioModel = UsuarioModel(
+                            nombreUsuario: tecNombreUsuario.text,
+                            contraseniaUsuario: tecContraseniaUsuario.text);
+
+                        ClienteModel clienteModel = ClienteModel(
+                            tipoDocumentoModel:
+                                TipoDocumentoModel(id: idTipoDocumento),
+                            numeroDocumento: tecNumeroDocumento.text,
+                            nombreCliente: tecNombre.text,
+                            apellidoCliente: tecApellido.text,
+                            telefonoCliente: tecTelefono.text,
+                            emailCliente: tecEmail.text,
+                            usuario: usuarioModel);
+                        await clienteCtrll.addCliente(clienteModel);
+
+                        final lista = await clienteCtrll.getClientes();
+                        Navigator.of(context).pop();
+                        Navigator.pushNamed(
+                          context,
+                          '/lista-clientes',
+                          arguments: lista,
+                        );
+                      }
+                    }
                   },
                 ),
+                const SizedBox(height: 15),
               ],
             ),
           ),

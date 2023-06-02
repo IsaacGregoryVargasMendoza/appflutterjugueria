@@ -14,9 +14,19 @@ class MesaController {
 
   Future<void> addMesa(String numero) async {
     final conn = await MySqlConnection.connect(Configuracion.instancia);
-    final result =
-        await conn.query('insert into mesa (numeroMesa) values (?)', [numero]);
-    print("New user's id: ${result.insertId}");
-    // await _personService.addCategoria(newCategoria);
+    await conn.query(
+        'insert into mesa (numeroMesa, ocupadoMesa, estadoMesa) values (?, 0, true)',
+        [numero]);
+  }
+
+  Future<void> updateMesa(MesaModel mesa) async {
+    final conn = await MySqlConnection.connect(Configuracion.instancia);
+    await conn.query(
+        'update mesa set numeroMesa=? where id=?;', [mesa.numeroMesa, mesa.id]);
+  }
+
+  Future<void> deleteMesa(int id) async {
+    final conn = await MySqlConnection.connect(Configuracion.instancia);
+    await conn.query('update mesa set estadoMesa=false where id=?', [id]);
   }
 }

@@ -9,13 +9,15 @@ class AppTextFieldRound extends StatelessWidget {
   double width;
   final VoidCallback funcion;
   final TextEditingController myController;
+  String? texto;
 
   AppTextFieldRound(
       {Key? key,
       required this.width,
       required this.isPassword,
       required this.funcion,
-      required this.myController})
+      required this.myController,
+      this.texto})
       : super(key: key);
 
   @override
@@ -60,6 +62,7 @@ class AppTextFieldRound extends StatelessWidget {
                 autocorrect: false,
                 style: TextStyle(
                   fontSize: fontSize,
+
                   height: 2,
                   fontWeight: FontWeight.normal,
                   // backgroundColor: Colors.blue,
