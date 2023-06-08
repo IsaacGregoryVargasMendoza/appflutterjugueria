@@ -2,12 +2,18 @@ import 'package:app_jugueria/modelos/adicionalModel.dart';
 import 'package:app_jugueria/modelos/clienteModel.dart';
 import 'package:app_jugueria/modelos/mesaModel.dart';
 import 'package:app_jugueria/modelos/productoModel.dart';
+import 'package:app_jugueria/modelos/comprobanteModel.dart';
 
 class PedidoModel {
   int? id;
   ClienteModel? cliente;
   MesaModel? mesa;
+  ComprobanteModel? comprobante;
   String? fechaPedido;
+  String? seriePedido;
+  String? correlativoPedido;
+  double? subTotalPedido;
+  double? igvPedido;
   double? totalPedido;
   List<DetallePedidoModel>? detallePedido;
 
@@ -15,7 +21,12 @@ class PedidoModel {
       {this.id,
       this.cliente,
       this.mesa,
+      this.comprobante,
       this.fechaPedido,
+      this.seriePedido,
+      this.correlativoPedido,
+      this.subTotalPedido,
+      this.igvPedido,
       this.totalPedido,
       this.detallePedido});
 
@@ -28,8 +39,17 @@ class PedidoModel {
             nombreCliente: json['nombreCliente'] as String,
             apellidoCliente: json['apellidoCliente'] as String,
             telefonoCliente: json['telefonoCliente'] as String),
-        mesa: MesaModel(id: json['idMesa']),
+        mesa: MesaModel(
+            id: json['idMesa'] as int,
+            numeroMesa: json['numeroMesa'] as String),
+        comprobante: ComprobanteModel(
+            id: json['idComprobante'],
+            nombreComprobante: json['nombreComprobante']),
         fechaPedido: json['fechaPedido'] as String,
+        seriePedido: json['seriePedido'] as String,
+        correlativoPedido: json['correlativoPedido'] as String,
+        subTotalPedido: json['subTotalPedido'] as double,
+        igvPedido: json['igvPedido'] as double,
         totalPedido: json['totalPedido'] as double);
   }
 }

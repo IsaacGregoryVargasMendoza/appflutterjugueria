@@ -8,7 +8,7 @@ class ClienteController {
   Future<List<ClienteModel>> getClientes() async {
     final conn = await MySqlConnection.connect(Configuracion.instancia);
     final result = await conn.query(
-        'select * from cliente c inner join usuario u on c.idUsuario = u.id where c.estadoCliente = true;');
+        'select c.id ,c.idTipoDocumento,c.numeroDocumento,c.idUsuario,c.nombreCliente,c.apellidoCliente,c.telefonoCliente,c.emailCliente, c.estadoCliente, u.nombreUsuario,u.contraseniaUsuario from cliente c inner join usuario u on c.idUsuario = u.id where c.estadoCliente = true;');
 
     final clientes =
         result.map((result) => ClienteModel.fromJson(result.fields)).toList();
@@ -18,12 +18,23 @@ class ClienteController {
   Future<List<ClienteModel>> validarLogin(UsuarioModel usuario) async {
     final conn = await MySqlConnection.connect(Configuracion.instancia);
     final result = await conn.query(
-        'select * from cliente c inner join usuario u on c.idUsuario = u.id where u.nombreUsuario = ? and u.contraseniaUsuario = ? and c.estadoCliente = true;',
+        'select c.id ,c.idTipoDocumento,c.numeroDocumento,c.idUsuario,c.nombreCliente,c.apellidoCliente,c.telefonoCliente,c.emailCliente, c.estadoCliente, u.nombreUsuario,u.contraseniaUsuario from cliente c inner join usuario u on c.idUsuario = u.id where u.nombreUsuario = ? and u.contraseniaUsuario = ? and c.estadoCliente = true;',
         [usuario.nombreUsuario, usuario.contraseniaUsuario]);
 
     final respuesta =
         result.map((result) => ClienteModel.fromJson(result.fields)).toList();
     return respuesta;
+  }
+
+  Future<ClienteModel> obtenerClientesVarios() async {
+    final conn = await MySqlConnection.connect(Configuracion.instancia);
+    final result = await conn.query(
+      'select c.id ,c.idTipoDocumento,c.numeroDocumento,c.idUsuario,c.nombreCliente,c.apellidoCliente,c.telefonoCliente,c.emailCliente, c.estadoCliente, u.nombreUsuario,u.contraseniaUsuario from cliente c inner join usuario u on c.idUsuario = u.id where nombreCliente = "Clientes varios";',
+    );
+
+    final respuesta =
+        result.map((result) => ClienteModel.fromJson(result.fields)).toList();
+    return respuesta[0];
   }
 
   Future<List<TipoDocumentoModel>> getTipoDocumentos() async {
@@ -59,11 +70,12 @@ class ClienteController {
   Future<void> updateCliente(ClienteModel cliente) async {
     final conn = await MySqlConnection.connect(Configuracion.instancia);
     await conn.query(
-        'update usuario set nombreUsuario=?, contrasenia=? where id=?;', [
-      cliente.usuario!.nombreUsuario,
-      cliente.usuario!.contraseniaUsuario,
-      cliente.usuario!.id
-    ]);
+        'update usuario set nombreUsuario=?, contraseniaUsuario=? where id=?;',
+        [
+          cliente.usuario!.nombreUsuario,
+          cliente.usuario!.contraseniaUsuario,
+          cliente.usuario!.id
+        ]);
 
     await conn.query(
         'update cliente set idTipoDocumento=?, numeroDocumento=?, nombreCliente=?, apellidoCliente=?, telefonoCliente=?, emailCliente=? where id=?;',

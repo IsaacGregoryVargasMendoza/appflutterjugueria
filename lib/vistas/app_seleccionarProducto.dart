@@ -55,7 +55,6 @@ class _AppSeleccionarProductoState extends State<AppSeleccionarProducto> {
   //Nueva forma de leer la imagen
   late Classifier _classifierLetras;
   late Classifier _classifierNumeros;
-  _ResultStatus _resultStatus = _ResultStatus.notStarted;
   final String _labelsFileName = 'assets/labels.txt';
   final String _modelFileName = 'model.tflite';
   final String _labelsFileNameNumeros = 'assets/labels_numeros.txt';
@@ -137,7 +136,6 @@ class _AppSeleccionarProductoState extends State<AppSeleccionarProducto> {
       _setAnalyzing(false);
       setState(() {
         preguntaActual = "¿QUE CANTIDAD DESEA?";
-        _resultStatus = result;
         _plantLabel = plantLabel;
         _accuracy = accuracy;
         _letra = plantLabel;
@@ -261,20 +259,6 @@ class _AppSeleccionarProductoState extends State<AppSeleccionarProducto> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    /*
-                        Container(
-                          // width: 200,
-                          height: MediaQuery.of(context).size.height / 4,
-                          color: Colors.amber,
-                          // padding: const EdgeInsets.only(top: 50),
-                          margin: const EdgeInsets.fromLTRB(0, 0, 0, 10),
-                          child: Transform.scale(
-                            scale:
-                                1, // Escala de 0.5 para reducir el tamaño a la mitad
-                            child: CameraPreview(_cameraController),
-                          ),
-                          // child: CameraPreview(_cameraController),
-                        ),*/
                     InkWell(
                       onTap: () {
                         opciones(context);
@@ -290,7 +274,6 @@ class _AppSeleccionarProductoState extends State<AppSeleccionarProducto> {
                       ),
                     ),
                     Container(
-                      //color: Colors.grey.shade300,
                       margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
                       height: 180,
                       width: MediaQuery.of(context).size.height,
@@ -371,29 +354,13 @@ class _AppSeleccionarProductoState extends State<AppSeleccionarProducto> {
                         ),
                       ),
                     ),
-                    GestureDetector(
-                      onTap: () async {
-                        /*
-                            var file = await _cameraController.takePicture();
-                            final File newImage = File(file.path);
-
-                            if (preguntaActual == "¿QUE PRODUCTO DESEA?") {
-                              _analyzeImageProducto(newImage);
-                            } else {
-                              _analyzeImageCantidad(newImage);
-                            }
-
-                            print("Se finalizo el proceso con exito.");
-                            */
-                      },
-                      child: const Text(
-                        "Confirmar",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        textAlign: TextAlign.end,
+                    const Text(
+                      "Confirmar",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
                       ),
+                      textAlign: TextAlign.end,
                     ),
                   ],
                 ),
@@ -405,11 +372,12 @@ class _AppSeleccionarProductoState extends State<AppSeleccionarProducto> {
 
       case WidgetState.ERROR:
         return _buildScaffold(
-            context,
-            const Center(
-              child: Text(
-                  "La camara no se pudo inicializar, Reinicia la aplicacion."),
-            ));
+          context,
+          const Center(
+            child: Text(
+                "La camara no se pudo inicializar, Reinicia la aplicacion."),
+          ),
+        );
     }
   }
 

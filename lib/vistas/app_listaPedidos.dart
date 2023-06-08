@@ -4,6 +4,8 @@ import 'package:app_jugueria/modelos/adicionalModel.dart';
 import 'package:app_jugueria/modelos/pedidoModel.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+//import 'package:flutter_charts/flutter_charts.dart' as;
+import 'package:fl_chart/fl_chart.dart';
 
 class AppListaPedido extends StatefulWidget {
   List<PedidoModel>? data;
@@ -16,6 +18,78 @@ class AppListaPedido extends StatefulWidget {
 }
 
 class AppListaPedidoState extends State<AppListaPedido> {
+  List<PieChartSectionData> sectionsChart = [];
+
+  final List<FlSpot> data = [
+    FlSpot(0, 5),
+    FlSpot(1, 10),
+    FlSpot(2, 15),
+    FlSpot(3, 7),
+    FlSpot(4, 20),
+  ];
+  final List<String> months = [
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec'
+  ];
+
+  void cargarDatosPastel() {
+    var tickets = widget.data!
+        .where((element) => element.comprobante!.nombreComprobante! == "TICKET")
+        .toList();
+    var boletas = widget.data!
+        .where((element) => element.comprobante!.nombreComprobante! == "BOLETA")
+        .toList();
+    var facturas = widget.data!
+        .where(
+            (element) => element.comprobante!.nombreComprobante! == "FACTURA")
+        .toList();
+
+    var ticketsPastel = PieChartSectionData(
+      value: tickets.length.toDouble(),
+      title: "${tickets.length.toDouble()}%",
+      showTitle: true,
+      color: Colors.orange,
+      radius: 100,
+    );
+    var boletasPastel = PieChartSectionData(
+      value: boletas.length.toDouble(),
+      title: "${boletas.length.toDouble()}%",
+      showTitle: true,
+      color: Colors.blue,
+      radius: 100,
+    );
+    var facturasPastel = PieChartSectionData(
+      value: facturas.length.toDouble(),
+      title: "${facturas.length.toDouble()}%",
+      showTitle: true,
+      color: Colors.red,
+      radius: 100,
+    );
+
+    setState(() {
+      sectionsChart.add(ticketsPastel);
+      sectionsChart.add(boletasPastel);
+      sectionsChart.add(facturasPastel);
+    });
+  }
+
+  @override
+  void initState() {
+    //cargarDatosPastel();
+    super.initState();
+    cargarDatosPastel();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -23,18 +97,6 @@ class AppListaPedidoState extends State<AppListaPedido> {
       appBar: AppBar(
         title: const Text("Lista de pedidos"),
         backgroundColor: Colors.green.shade900,
-        actions: <Widget>[
-          IconButton(
-            onPressed: () async {
-              // ClienteController clienteCtrll = ClienteController();
-              // final lista = await clienteCtrll.getTipoDocumentos();
-              // Navigator.of(context).pop();
-              // Navigator.pushNamed(context, '/registrar-cliente',
-              //     arguments: lista);
-            },
-            icon: const FaIcon(FontAwesomeIcons.plus),
-          ),
-        ],
       ),
       drawer: AppMenuDrawer(),
       body: Stack(children: <Widget>[
@@ -74,37 +136,105 @@ class AppListaPedidoState extends State<AppListaPedido> {
                         mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            "Codigo: ${widget.data![index].id}",
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            textAlign: TextAlign.start,
+                          Row(
+                            children: [
+                              const Text(
+                                "Comprobante: ",
+                                style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.red),
+                                textAlign: TextAlign.start,
+                              ),
+                              Text(
+                                "${widget.data![index].comprobante!.nombreComprobante}",
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  //fontWeight: FontWeight.bold,
+                                ),
+                                textAlign: TextAlign.start,
+                              ),
+                            ],
                           ),
-                          Text(
-                            "Fecha: ${widget.data![index].fechaPedido}",
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            textAlign: TextAlign.start,
+                          Row(
+                            children: [
+                              const Text(
+                                "Serie: ",
+                                style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.red),
+                                textAlign: TextAlign.start,
+                              ),
+                              Text(
+                                "${widget.data![index].seriePedido}-${widget.data![index].correlativoPedido}",
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  //fontWeight: FontWeight.bold,
+                                ),
+                                textAlign: TextAlign.start,
+                              ),
+                            ],
                           ),
-                          Text(
-                            "Cliente: ${widget.data![index].cliente!.nombreCliente} ${widget.data![index].cliente!.apellidoCliente}",
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            textAlign: TextAlign.start,
+                          Row(
+                            children: [
+                              const Text(
+                                "Fecha: ",
+                                style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.red),
+                                textAlign: TextAlign.start,
+                              ),
+                              Text(
+                                "${widget.data![index].fechaPedido}",
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  //fontWeight: FontWeight.bold,
+                                ),
+                                textAlign: TextAlign.start,
+                              ),
+                            ],
                           ),
-                          Text(
-                            "Total: ${widget.data![index].totalPedido}",
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            textAlign: TextAlign.start,
+                          Row(
+                            children: [
+                              const Text(
+                                "Cliente: ",
+                                style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.red),
+                                textAlign: TextAlign.start,
+                              ),
+                              Text(
+                                "${widget.data![index].cliente!.nombreCliente} ${widget.data![index].cliente!.apellidoCliente}",
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  //fontWeight: FontWeight.bold,
+                                ),
+                                textAlign: TextAlign.start,
+                              ),
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              const Text(
+                                "Total: ",
+                                style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.red),
+                                textAlign: TextAlign.start,
+                              ),
+                              Text(
+                                "${widget.data![index].totalPedido}",
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  //fontWeight: FontWeight.bold,
+                                ),
+                                textAlign: TextAlign.start,
+                              ),
+                            ],
                           ),
                         ],
                       ),
@@ -241,4 +371,11 @@ class Detalle extends StatelessWidget {
       ),
     );
   }
+}
+
+class Point {
+  final int x;
+  final int y;
+
+  Point(this.x, this.y);
 }

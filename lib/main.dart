@@ -13,6 +13,7 @@ import 'package:app_jugueria/vistas/app_confirmarPedido.dart';
 import 'package:app_jugueria/vistas/app_asignarAdicionales.dart';
 import 'package:app_jugueria/vistas/app_listaAdicionales.dart';
 import 'package:app_jugueria/vistas/app_listaPedidos.dart';
+import 'package:app_jugueria/vistas/app_dashboardVentas.dart';
 import 'package:app_jugueria/vistas/app_seleccionarAdicionales.dart';
 import 'package:app_jugueria/vistas/app_seleccionarProducto.dart';
 import 'package:flutter/material.dart';
@@ -146,11 +147,10 @@ void main() {
                 clienteModel: clienteModel),
           );
         case '/editar-mesa':
-          // final ClienteModel cliente = settings.arguments as ClienteModel;
-          // return MaterialPageRoute(
-          //   builder: (context) => AppRegistroCliente(clienteModel: cliente),
-          // );
-          break;
+          final MesaModel mesaModel = settings.arguments as MesaModel;
+          return MaterialPageRoute(
+            builder: (context) => AppRegistroMesa(mesaModel: mesaModel),
+          );
         case '/editar-producto':
           final args = settings.arguments as Map<String, dynamic>;
           final List<CategoriaModel> listaCategorias =
@@ -201,6 +201,10 @@ void main() {
               settings.arguments as List<PedidoModel>;
           return MaterialPageRoute(
             builder: (context) => AppListaPedido(data: lista),
+          );
+        case '/dashboard-pedidos':
+          return MaterialPageRoute(
+            builder: (context) => AppDashboardPedido(),
           );
         default:
           break;
@@ -278,7 +282,7 @@ class _MyAppState extends State<MyApp> {
               Container(
                 padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
                 width: 150,
-                child: Image.asset("assets/devesoft-blanco.png"),
+                child: Image.asset("assets/devesoft_blanco.png"),
               ),
               const SizedBox(height: 50),
             ],

@@ -48,7 +48,7 @@ class _AppListaMesaState extends State<AppListaMesa> {
               Navigator.pushNamed(
                 context,
                 '/editar-mesa',
-                //arguments: mesaModel,
+                arguments: widget.data![index],
               );
               // print(data![index]);
             },

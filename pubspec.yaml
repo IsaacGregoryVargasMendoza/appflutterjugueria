@@ -46,6 +46,10 @@ dependencies:
   path_provider: ^2.0.15
   carousel_slider: ^4.2.1
   intl: ^0.18.1
+  fl_chart: ^0.62.0
+  flutter_charts: ^0.5.1
+  collection: ^1.17.1
+  
   # tflite: 
 
 dev_dependencies:
@@ -83,7 +87,7 @@ flutter:
     - assets/labels.txt
     - assets/model_numeros.tflite
     - assets/labels_numeros.txt
-    - assets/devesoft-blanco.png
+    - assets/devesoft_blanco.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

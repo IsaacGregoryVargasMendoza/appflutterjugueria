@@ -1,7 +1,9 @@
+import 'package:app_jugueria/controladores/mesaController.dart';
 import 'package:mysql1/mysql1.dart';
 import 'package:app_jugueria/modelos/productoModel.dart';
 import 'package:app_jugueria/modelos/adicionalModel.dart';
 import 'package:app_jugueria/modelos/pedidoModel.dart';
+import 'package:app_jugueria/modelos/comprobanteModel.dart';
 import 'package:app_jugueria/controladores/conexion.dart';
 import 'package:intl/intl.dart';
 
@@ -9,11 +11,47 @@ class PedidoController {
   Future<List<PedidoModel>> getPedidos() async {
     final conn = await MySqlConnection.connect(Configuracion.instancia);
     final result = await conn.query(//'select * from pedido;');
-        'select p.id, p.fechaPedido, p.totalPedido, p.estadoPedido, p.idCliente, c.numeroDocumento, c.nombreCliente, c.apellidoCliente, c.telefonoCliente, c.emailCliente, p.idMesa ,m.numeroMesa  from pedido p inner join cliente c on p.idCliente = c.id inner join mesa m on m.id = p.idMesa where estadoPedido = true;');
+        'select p.id, p.fechaPedido,p.seriePedido, p.correlativoPedido,p.subTotalPedido, p.igvPedido, p.totalPedido, p.estadoPedido, p.idCliente, c.numeroDocumento, c.nombreCliente, c.apellidoCliente, c.telefonoCliente, c.emailCliente, p.idMesa ,m.numeroMesa, c2.nombreComprobante from pedido p inner join cliente c on p.idCliente = c.id inner join mesa m on m.id = p.idMesa inner join comprobante c2 on c2.id = p.idComprobante where estadoPedido = true;');
 
     final pedidos =
         result.map((result) => PedidoModel.fromJson(result.fields)).toList();
     return pedidos;
+  }
+
+  Future<List<ComprobanteModel>> getComprobantes() async {
+    final conn = await MySqlConnection.connect(Configuracion.instancia);
+    final result = await conn.query('select * from comprobante;');
+
+    final comprobantes = result
+        .map((result) => ComprobanteModel.fromJson(result.fields))
+        .toList();
+    return comprobantes;
+  }
+
+  Future<ComprobanteModel> getComprobante(int idComprobante) async {
+    final conn = await MySqlConnection.connect(Configuracion.instancia);
+    final result = await conn
+        .query('select * from comprobante where id = ?;', [idComprobante]);
+
+    final comprobantes = result
+        .map((result) => ComprobanteModel.fromJson(result.fields))
+        .toList();
+    return comprobantes[0];
+  }
+
+  Future<void> updateComprobante(int idComprobante) async {
+    final conn = await MySqlConnection.connect(Configuracion.instancia);
+    await conn.query(
+        'update comprobante set correlativoComprobante = correlativoComprobante + 1 where id = ?;',
+        [idComprobante]);
+  }
+
+  List<PedidoModel> formatearFechas(List<PedidoModel> lista) {
+    for (var i = 0; i < lista.length; i++) {
+      lista[i].fechaPedido = lista[i].fechaPedido!.split(" ")[0].toString();
+    }
+
+    return lista;
   }
 
   Future<List<DetallePedidoModel>> getListDetalleOfPedido(int id) async {
@@ -55,38 +93,77 @@ class PedidoController {
     return listaAdicionales;
   }
 
-  //select a.id, a.nombreAdicional,a.letraAdicional from detalleProducto dp2 inner join adicional a on dp2.idAdicional = a.id where dp2.idDetallePedido = ? and dp2.idProducto = ?;
-
-  Future<void> addPedido(
+  PedidoModel llenarPedido(
+      PedidoModel pedidoModel,
       List<ProductoModel> listaProductos,
       List<List<AdicionalModel>> listaAdicionales,
-      List<int> listaCantidades,
-      double total) async {
+      List<int> listaCantidades) {
+    List<DetallePedidoModel> listaDetallePedido = [];
+
+    for (int i = 0; i < listaProductos.length; i++) {
+      DetallePedidoModel detallePedidoModel = DetallePedidoModel(
+          producto: listaProductos[i],
+          cantidadDetalle: listaCantidades[i],
+          observacion: "",
+          precioDetalle: listaProductos[i].precioProducto);
+
+      List<DetalleProductoModel> listaDetalleProducto = [];
+      for (int j = 0; j < listaAdicionales[i].length; j++) {
+        DetalleProductoModel detalleProductoModel = DetalleProductoModel(
+            producto: listaProductos[i], adicional: listaAdicionales[i][j]);
+        listaDetalleProducto.add(detalleProductoModel);
+      }
+
+      detallePedidoModel.lista = listaDetalleProducto;
+
+      listaDetallePedido.add(detallePedidoModel);
+    }
+
+    pedidoModel.detallePedido = listaDetallePedido;
+    return pedidoModel;
+  }
+
+  Future<void> addPedido(PedidoModel pedidoModel) async {
     final conn = await MySqlConnection.connect(Configuracion.instancia);
     final results = await conn.query(
-        'insert into pedido (idCliente, idMesa, fechaPedido, totalPedido, estadoPedido) values (2,1,?,?,true);',
-        [DateFormat('dd/MM/yyyy hh:mm:ss').format(DateTime.now()), total]);
+        'insert into pedido (idCliente, idMesa, idComprobante,fechaPedido,seriePedido,correlativoPedido, subTotalPedido, igvPedido,totalPedido, estadoPedido) values (?,?,?,?,?,?,?,?,?,true);',
+        [
+          pedidoModel.cliente!.id,
+          pedidoModel.mesa!.id,
+          pedidoModel.comprobante!.id,
+          pedidoModel.fechaPedido,
+          pedidoModel.seriePedido,
+          pedidoModel.correlativoPedido,
+          pedidoModel.subTotalPedido,
+          pedidoModel.igvPedido,
+          pedidoModel.totalPedido
+        ]);
+
+    MesaController mesaCtrll = MesaController();
+    await mesaCtrll.occupyMesa(pedidoModel.mesa!);
+
+    await updateComprobante(pedidoModel.comprobante!.id!);
 
     final pedidoId = results.insertId;
     print('ID del registro insertado: $pedidoId');
 
-    for (int i = 0; i < listaProductos.length; i++) {
+    for (int i = 0; i < pedidoModel.detallePedido!.length; i++) {
       final resultadoDetalle = await conn.query(
           'insert into detallePedido (idDetallePedido, idProducto, cantidadDetalle , precioDetalle , observacion, estadoDetalle) values (?,?,?,?,?,true);',
           [
             pedidoId,
-            listaProductos[i].id,
-            listaCantidades[i],
-            listaProductos[i].precioProducto,
+            pedidoModel.detallePedido![i].producto!.id,
+            pedidoModel.detallePedido![i].cantidadDetalle,
+            pedidoModel.detallePedido![i].producto!.precioProducto,
             "",
           ]);
-      for (int j = 0; j < listaAdicionales[i].length; j++) {
+      for (int j = 0; j < pedidoModel.detallePedido![i].lista!.length; j++) {
         await conn.query(
             'insert into detalleProducto (idDetallePedido,idProducto, idAdicional, estadoDetalle) values (?,?,?,true);',
             [
               resultadoDetalle.insertId,
-              listaProductos[i].id,
-              listaAdicionales[i][j].id,
+              pedidoModel.detallePedido![i].lista![j].producto!.id,
+              pedidoModel.detallePedido![i].lista![j].adicional!.id,
             ]);
       }
     }

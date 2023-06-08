@@ -25,6 +25,11 @@ class MesaController {
         'update mesa set numeroMesa=? where id=?;', [mesa.numeroMesa, mesa.id]);
   }
 
+  Future<void> occupyMesa(MesaModel mesa) async {
+    final conn = await MySqlConnection.connect(Configuracion.instancia);
+    await conn.query('update mesa set ocupadoMesa=1 where id=?;', [mesa.id]);
+  }
+
   Future<void> deleteMesa(int id) async {
     final conn = await MySqlConnection.connect(Configuracion.instancia);
     await conn.query('update mesa set estadoMesa=false where id=?', [id]);

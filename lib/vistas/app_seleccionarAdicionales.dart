@@ -314,10 +314,6 @@ class AppSeleccionarAdicionalState extends State<AppSeleccionarAdicional> {
                       listaDetalle: listaDetalle,
                       listaCantidades: widget.cantidades!,
                     ),
-                    // CarruselProductos(
-                    //   listaProductos: widget.productos!,
-                    //   listaCantidades: widget.cantidades!,
-                    // ),
                     Container(
                       width: MediaQuery.of(context).size.width,
                       padding: const EdgeInsets.fromLTRB(0, 5, 25, 0),

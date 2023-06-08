@@ -2,6 +2,7 @@ import 'package:app_jugueria/controladores/clienteController.dart';
 import 'package:app_jugueria/componentes/app_drawer.dart';
 import 'package:app_jugueria/modelos/clienteModel.dart';
 import 'package:app_jugueria/modelos/tipoDocumentoModel.dart';
+import 'package:app_jugueria/modelos/usuarioModel.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
@@ -48,16 +49,21 @@ class _AppListaClienteState extends State<AppListaCliente> {
                 final listaTipoDocumento =
                     await clienteCtrl.getTipoDocumentos();
                 ClienteModel cliente = ClienteModel(
-                  id: widget.data![index].id,
-                  tipoDocumentoModel: TipoDocumentoModel(
-                    id: widget.data![index].tipoDocumentoModel!.id,
-                  ),
-                  numeroDocumento: widget.data![index].numeroDocumento,
-                  nombreCliente: widget.data![index].nombreCliente,
-                  apellidoCliente: widget.data![index].apellidoCliente,
-                  telefonoCliente: widget.data![index].telefonoCliente,
-                  emailCliente: widget.data![index].emailCliente,
-                );
+                    id: widget.data![index].id,
+                    tipoDocumentoModel: TipoDocumentoModel(
+                      id: widget.data![index].tipoDocumentoModel!.id,
+                    ),
+                    numeroDocumento: widget.data![index].numeroDocumento,
+                    nombreCliente: widget.data![index].nombreCliente,
+                    apellidoCliente: widget.data![index].apellidoCliente,
+                    telefonoCliente: widget.data![index].telefonoCliente,
+                    emailCliente: widget.data![index].emailCliente,
+                    usuario: UsuarioModel(
+                        id: widget.data![index].usuario!.id,
+                        nombreUsuario:
+                            widget.data![index].usuario!.nombreUsuario,
+                        contraseniaUsuario:
+                            widget.data![index].usuario!.contraseniaUsuario));
                 Navigator.pushNamed(
                   context,
                   '/editar-cliente',
