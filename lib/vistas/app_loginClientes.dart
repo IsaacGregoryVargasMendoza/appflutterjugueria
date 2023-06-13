@@ -164,6 +164,7 @@ class AppLoginClienteState extends State<AppLoginCliente> {
               ),
             ),
             child: ListView(
+              padding: EdgeInsets.all(0),
               children: [
                 Container(
                   height: MediaQuery.of(context).size.height,

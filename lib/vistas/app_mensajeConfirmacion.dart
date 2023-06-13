@@ -130,6 +130,7 @@ class AppMensajeConfirmacionState extends State<AppMensajeConfirmacion> {
                         Navigator.pop(context);
                         Navigator.pop(context);
                         Navigator.pop(context);
+                        Navigator.pop(context);
                         Navigator.pushNamed(context, '/seleccionar-mesas');
                       },
                       child: Container(

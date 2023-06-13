@@ -50,7 +50,6 @@ dependencies:
   flutter_charts: ^0.5.1
   collection: ^1.17.1
   http: ^1.0.0
-  
   # tflite: 
 
 dev_dependencies:
@@ -84,6 +83,7 @@ flutter:
     - assets/frutas2.jpg
     - assets/ok.png
     - assets/logo.png
+    - assets/usuario_administrador.png
     - assets/model.tflite
     - assets/labels.txt
     - assets/model_numeros.tflite

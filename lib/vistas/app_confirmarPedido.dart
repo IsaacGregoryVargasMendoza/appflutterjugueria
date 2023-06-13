@@ -96,33 +96,40 @@ class AppConfirmarPedidoState extends State<AppConfirmarPedido> {
     });
 
     try {
-      PedidoController pedidoCtrll = PedidoController();
-      PedidoModel pedidoModel = PedidoModel(
-        cliente: InfoGlobal.clienteModel,
-        mesa: InfoGlobal.mesaModel,
-        numeroDocumento: numeroDocumentoController.text,
-        denominacionCliente: denominacionClienteController.text,
-        direccionCliente: direccionClienteController.text,
-        comprobante: ComprobanteModel(id: idComprobante),
-        fechaPedido: DateFormat('dd/MM/yyyy hh:mm:ss').format(DateTime.now()),
-        seriePedido: _serie.split("-")[0],
-        correlativoPedido: _serie.split("-")[1],
-        subTotalPedido: widget.total / 1.18,
-        igvPedido: widget.total / 1.18 * 0.18,
-        totalPedido: widget.total,
-      );
+      if (idComprobante != 0) {
+        PedidoController pedidoCtrll = PedidoController();
+        PedidoModel pedidoModel = PedidoModel(
+          cliente: InfoGlobal.clienteModel,
+          mesa: InfoGlobal.mesaModel,
+          numeroDocumento: numeroDocumentoController.text,
+          denominacionCliente: denominacionClienteController.text,
+          direccionCliente: direccionClienteController.text,
+          comprobante: ComprobanteModel(id: idComprobante),
+          fechaPedido: DateFormat('dd/MM/yyyy hh:mm:ss').format(DateTime.now()),
+          seriePedido: _serie.split("-")[0],
+          correlativoPedido: _serie.split("-")[1],
+          subTotalPedido: widget.total / 1.18,
+          igvPedido: widget.total / 1.18 * 0.18,
+          totalPedido: widget.total,
+        );
 
-      pedidoModel = pedidoCtrll.llenarPedido(pedidoModel, widget.productos!,
-          widget.listaDetalle!, widget.cantidades!);
+        pedidoModel = pedidoCtrll.llenarPedido(pedidoModel, widget.productos!,
+            widget.listaDetalle!, widget.cantidades!);
 
-      var pedidoConfirmado = await pedidoCtrll.addPedido(pedidoModel);
+        var pedidoConfirmado = await pedidoCtrll.addPedido(pedidoModel);
 
-      Navigator.pushNamed(context, '/mensaje-confirmacion',
-          arguments: pedidoConfirmado);
-      print("Se registro los datos con exito.");
-      setState(() {
-        _widgetState = WidgetState.LOADED;
-      });
+        Navigator.pushNamed(context, '/mensaje-confirmacion',
+            arguments: pedidoConfirmado);
+        print("Se registro los datos con exito.");
+        setState(() {
+          _widgetState = WidgetState.LOADED;
+        });
+      } else {
+        mostrarAlerta(context, "Mensaje", "Debe seleccionar un comprobante.");
+        setState(() {
+          _widgetState = WidgetState.LOADED;
+        });
+      }
     } catch (e) {
       mostrarAlerta(context, "Error!", "No se pudo registrar la compra.");
       print("Excepcion capturada");
