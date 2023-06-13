@@ -6,6 +6,7 @@ class AppTextField extends StatelessWidget {
   final Color backgroundColor;
   final Color borderColor;
   final String text;
+  TextEditingController? controlador;
   double fontSize;
   double width;
   double height;
@@ -20,7 +21,8 @@ class AppTextField extends StatelessWidget {
       required this.fontSize,
       required this.width,
       required this.height,
-      required this.funcion})
+      required this.funcion,
+      this.controlador})
       : super(key: key);
 
   @override
@@ -51,8 +53,10 @@ class AppTextField extends StatelessWidget {
         decoration: InputDecoration(
           hintText: text,
         ),
-        // controller: TextEditingController(),
+        controller:
+            (controlador == null) ? TextEditingController() : controlador,
       ),
+
       // child: TextButton(
       //   onPressed: funcion,
       //   child: Center(

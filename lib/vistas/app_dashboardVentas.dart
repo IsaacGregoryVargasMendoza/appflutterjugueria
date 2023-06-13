@@ -150,13 +150,16 @@ class AppDashboardPedidoState extends State<AppDashboardPedido> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Colors.white,
-        appBar: AppBar(
-          title: const Text("Dashboard ventas"),
-          backgroundColor: Colors.green.shade900,
-        ),
-        drawer: AppMenuDrawer(),
-        body: Container(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        title: const Text("Dashboard ventas"),
+        backgroundColor: Colors.green.shade900,
+      ),
+      drawer: AppMenuDrawer(),
+      body: ListView(
+        //padding: ,
+        children: [
+          Container(
             height: MediaQuery.of(context).size.height,
             width: MediaQuery.of(context).size.width,
             child: Column(
@@ -311,74 +314,76 @@ class AppDashboardPedidoState extends State<AppDashboardPedido> {
                             ]),
                       ),
                 Container(
-                    padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
-                    height: 250,
-                    width: MediaQuery.of(context).size.width,
-                    child: Column(
-                      children: [
-                        Container(
-                          padding: EdgeInsets.fromLTRB(0, 70, 0, 0),
-                          height: 150,
-                          width: 150,
-                          child: PieChart(
-                            PieChartData(
-                                borderData: FlBorderData(
-                                  show: false,
-                                ),
-                                sectionsSpace: 0,
-                                centerSpaceRadius: 0,
-                                sections: sectionsChart),
+                  padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
+                  height: 250,
+                  width: MediaQuery.of(context).size.width,
+                  child: Column(
+                    children: [
+                      Container(
+                        padding: EdgeInsets.fromLTRB(0, 70, 0, 0),
+                        height: 150,
+                        width: 150,
+                        child: PieChart(
+                          PieChartData(
+                              borderData: FlBorderData(
+                                show: false,
+                              ),
+                              sectionsSpace: 0,
+                              centerSpaceRadius: 0,
+                              sections: sectionsChart),
+                        ),
+                      ),
+                      Row(
+                        children: [
+                          Container(
+                            height: 20,
+                            width: 20,
+                            color: Colors.blue,
                           ),
-                        ),
-                        Row(
-                          children: [
-                            Container(
-                              height: 20,
-                              width: 20,
-                              color: Colors.blue,
-                            ),
-                            const Text(
-                              " Boletas",
-                              style:
-                                  TextStyle(fontSize: 18, color: Colors.black),
-                              textAlign: TextAlign.start,
-                            ),
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            Container(
-                              height: 20,
-                              width: 20,
-                              color: Colors.red,
-                            ),
-                            const Text(
-                              " Facturas",
-                              style:
-                                  TextStyle(fontSize: 18, color: Colors.black),
-                              textAlign: TextAlign.start,
-                            ),
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            Container(
-                              height: 20,
-                              width: 20,
-                              color: Colors.orange,
-                            ),
-                            const Text(
-                              " Tickets",
-                              style:
-                                  TextStyle(fontSize: 18, color: Colors.black),
-                              textAlign: TextAlign.start,
-                            ),
-                          ],
-                        )
-                      ],
-                    )),
+                          const Text(
+                            " Boletas",
+                            style: TextStyle(fontSize: 18, color: Colors.black),
+                            textAlign: TextAlign.start,
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Container(
+                            height: 20,
+                            width: 20,
+                            color: Colors.red,
+                          ),
+                          const Text(
+                            " Facturas",
+                            style: TextStyle(fontSize: 18, color: Colors.black),
+                            textAlign: TextAlign.start,
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Container(
+                            height: 20,
+                            width: 20,
+                            color: Colors.orange,
+                          ),
+                          const Text(
+                            " Tickets",
+                            style: TextStyle(fontSize: 18, color: Colors.black),
+                            textAlign: TextAlign.start,
+                          ),
+                        ],
+                      )
+                    ],
+                  ),
+                ),
               ],
-            )));
+            ),
+          )
+        ],
+      ),
+    );
   }
 
   abrirModalDetalle(List<DetallePedidoModel> lista,

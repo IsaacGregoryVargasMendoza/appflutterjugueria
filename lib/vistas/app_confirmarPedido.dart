@@ -1,10 +1,12 @@
+import 'dart:convert';
+
 import 'package:app_jugueria/componentes/info_global.dart';
 import 'package:app_jugueria/controladores/pedidoController.dart';
 import 'package:app_jugueria/modelos/pedidoModel.dart';
 import 'package:app_jugueria/modelos/productoModel.dart';
 import 'package:app_jugueria/modelos/adicionalModel.dart';
 import 'package:app_jugueria/modelos/comprobanteModel.dart';
-import 'package:app_jugueria/controladores/productoController.dart';
+import 'package:app_jugueria/componentes/app_textField.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:camera/camera.dart';
@@ -49,6 +51,9 @@ class AppConfirmarPedidoState extends State<AppConfirmarPedido> {
   WidgetState _widgetState = WidgetState.LOADED;
   CameraImage? cameraImage;
   File? imagen;
+  TextEditingController numeroDocumentoController = TextEditingController();
+  TextEditingController denominacionClienteController = TextEditingController();
+  TextEditingController direccionClienteController = TextEditingController();
 
   final picker = ImagePicker();
   int indice = -1;
@@ -95,6 +100,9 @@ class AppConfirmarPedidoState extends State<AppConfirmarPedido> {
       PedidoModel pedidoModel = PedidoModel(
         cliente: InfoGlobal.clienteModel,
         mesa: InfoGlobal.mesaModel,
+        numeroDocumento: numeroDocumentoController.text,
+        denominacionCliente: denominacionClienteController.text,
+        direccionCliente: direccionClienteController.text,
         comprobante: ComprobanteModel(id: idComprobante),
         fechaPedido: DateFormat('dd/MM/yyyy hh:mm:ss').format(DateTime.now()),
         seriePedido: _serie.split("-")[0],
@@ -107,16 +115,14 @@ class AppConfirmarPedidoState extends State<AppConfirmarPedido> {
       pedidoModel = pedidoCtrll.llenarPedido(pedidoModel, widget.productos!,
           widget.listaDetalle!, widget.cantidades!);
 
-      await pedidoCtrll.addPedido(pedidoModel);
+      var pedidoConfirmado = await pedidoCtrll.addPedido(pedidoModel);
+
+      Navigator.pushNamed(context, '/mensaje-confirmacion',
+          arguments: pedidoConfirmado);
       print("Se registro los datos con exito.");
-      Navigator.pop(context);
-      Navigator.pop(context);
-      Navigator.pop(context);
-      Navigator.pop(context);
       setState(() {
         _widgetState = WidgetState.LOADED;
       });
-      Navigator.pushNamed(context, '/seleccionar-mesas');
     } catch (e) {
       mostrarAlerta(context, "Error!", "No se pudo registrar la compra.");
       print("Excepcion capturada");
@@ -193,36 +199,202 @@ class AppConfirmarPedidoState extends State<AppConfirmarPedido> {
                       width: MediaQuery.of(context).size.width,
                       padding: const EdgeInsets.fromLTRB(20, 5, 20, 5),
                       margin: const EdgeInsets.fromLTRB(5, 0, 5, 0),
-                      //color: Colors.blue,
-                      child: Row(
+                      // color: Colors.blue,
+                      child: Column(
                         children: [
-                          const Text(
-                            "Comprobante: ",
-                            style: kPreguntaTextStyle,
-                            textAlign: TextAlign.left,
+                          Row(
+                            children: [
+                              const Text(
+                                "Comprobante: ",
+                                style: kPreguntaTextStyle,
+                                textAlign: TextAlign.left,
+                              ),
+                              Container(
+                                width: 150,
+                                child: DropdownButtonFormField(
+                                    decoration: const InputDecoration(
+                                        border: InputBorder.none),
+                                    //value: 1,
+                                    borderRadius: BorderRadius.circular(15),
+                                    items: comprobantes!.map((comprobante) {
+                                      return DropdownMenuItem(
+                                          child: Text(
+                                              comprobante.nombreComprobante!),
+                                          value: comprobante.id);
+                                    }).toList(),
+                                    onChanged: (value) async {
+                                      idComprobante = value!;
+                                      numeroDocumentoController.text = "";
+                                      denominacionClienteController.text = "";
+                                      direccionClienteController.text = "";
+                                      PedidoController pedidoCtrll =
+                                          PedidoController();
+                                      var comprobante = await pedidoCtrll
+                                          .getComprobante(value);
+                                      _obtenerSerieyCorrelativo(comprobante);
+                                    }),
+                              )
+                            ],
                           ),
-                          Container(
-                            width: 150,
-                            child: DropdownButtonFormField(
-                                decoration: const InputDecoration(
-                                    border: InputBorder.none),
-                                //value: 1,
-                                borderRadius: BorderRadius.circular(15),
-                                items: comprobantes!.map((comprobante) {
-                                  return DropdownMenuItem(
-                                      child:
-                                          Text(comprobante.nombreComprobante!),
-                                      value: comprobante.id);
-                                }).toList(),
-                                onChanged: (value) async {
-                                  idComprobante = value!;
-                                  PedidoController pedidoCtrll =
-                                      PedidoController();
-                                  var comprobante =
-                                      await pedidoCtrll.getComprobante(value);
-                                  _obtenerSerieyCorrelativo(comprobante);
-                                }),
-                          )
+                          (idComprobante > 1)
+                              ? Container(
+                                  child: Column(
+                                    children: [
+                                      const Row(
+                                        children: [
+                                          Text(
+                                            "Datos del comprobante:",
+                                            style: kPreguntaTextStyle,
+                                            //textAlign: TextAlign.left,
+                                          ),
+                                        ],
+                                      ),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            (idComprobante == 2)
+                                                ? "DNI: "
+                                                : (idComprobante == 3)
+                                                    ? "RUC: "
+                                                    : "NINGUNO: ",
+                                            style: kPreguntaTextStyle,
+                                          ),
+                                          AppTextField(
+                                            backgroundColor: Colors.white,
+                                            borderColor: const Color.fromRGBO(
+                                                255, 255, 255, 1),
+                                            fontSize: 14,
+                                            height: 30,
+                                            width: 150,
+                                            funcion: () {},
+                                            text: "",
+                                            textColor: Colors.black,
+                                            controlador:
+                                                numeroDocumentoController,
+                                          ),
+                                          Container(
+                                            margin: EdgeInsets.all(0),
+                                            padding: EdgeInsets.all(0),
+                                            decoration: BoxDecoration(
+                                              color: Colors.green,
+                                              borderRadius:
+                                                  BorderRadius.circular(5),
+                                            ),
+                                            child: TextButton(
+                                              onPressed: () async {
+                                                PedidoController pedidoCtrll =
+                                                    PedidoController();
+                                                if (idComprobante == 2) {
+                                                  String jsonString =
+                                                      await pedidoCtrll.getPersona(
+                                                          numeroDocumentoController
+                                                              .text);
+                                                  var json =
+                                                      jsonDecode(jsonString);
+                                                  denominacionClienteController
+                                                          .text =
+                                                      "${json["apellidoPaterno"]} ${json["apellidoMaterno"]} ${json["nombres"]}";
+                                                  // " " +
+                                                  // json["apellidoMaterno"] +
+                                                  // " " +
+                                                  // json["nombres"];
+                                                } else if (idComprobante == 3) {
+                                                  String jsonString =
+                                                      await pedidoCtrll.getEmpresa(
+                                                          numeroDocumentoController
+                                                              .text);
+                                                  var json =
+                                                      jsonDecode(jsonString);
+                                                  denominacionClienteController
+                                                          .text =
+                                                      json["razonSocial"];
+                                                }
+                                              },
+                                              child: const Center(
+                                                child: Text(
+                                                  "Buscar",
+                                                  style: TextStyle(
+                                                      color: Colors.white,
+                                                      fontSize: 12,
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            (idComprobante == 2)
+                                                ? "Nombre: "
+                                                : (idComprobante == 3)
+                                                    ? "Razon Social: "
+                                                    : "NINGUNO: ",
+                                            style: kPreguntaTextStyle,
+                                            textAlign: TextAlign.left,
+                                          ),
+                                          AppTextField(
+                                            backgroundColor: Colors.white,
+                                            borderColor: const Color.fromRGBO(
+                                                255, 255, 255, 1),
+                                            fontSize: 12,
+                                            height: 30,
+                                            width: 200,
+                                            funcion: () {},
+                                            text: "",
+                                            textColor: Colors.black,
+                                            controlador:
+                                                denominacionClienteController,
+                                          )
+                                        ],
+                                      ),
+                                      (idComprobante > 2)
+                                          ? Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.start,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.center,
+                                              children: [
+                                                const Text(
+                                                  "Direccion: ",
+                                                  style: kPreguntaTextStyle,
+                                                  textAlign: TextAlign.left,
+                                                ),
+                                                AppTextField(
+                                                  backgroundColor: Colors.white,
+                                                  borderColor:
+                                                      const Color.fromRGBO(
+                                                          255, 255, 255, 1),
+                                                  fontSize: 14,
+                                                  height: 30,
+                                                  width: 200,
+                                                  funcion: () {},
+                                                  text: "",
+                                                  textColor: Colors.black,
+                                                  controlador:
+                                                      direccionClienteController,
+                                                )
+                                              ],
+                                            )
+                                          : const SizedBox(
+                                              height: 0,
+                                            )
+                                    ],
+                                  ),
+                                )
+                              : const SizedBox(
+                                  height: 0,
+                                )
                         ],
                       ),
                     ),

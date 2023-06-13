@@ -9,6 +9,9 @@ class PedidoModel {
   ClienteModel? cliente;
   MesaModel? mesa;
   ComprobanteModel? comprobante;
+  String? numeroDocumento;
+  String? denominacionCliente;
+  String? direccionCliente;
   String? fechaPedido;
   String? seriePedido;
   String? correlativoPedido;
@@ -22,6 +25,9 @@ class PedidoModel {
       this.cliente,
       this.mesa,
       this.comprobante,
+      this.numeroDocumento,
+      this.denominacionCliente,
+      this.direccionCliente,
       this.fechaPedido,
       this.seriePedido,
       this.correlativoPedido,
@@ -45,6 +51,15 @@ class PedidoModel {
         comprobante: ComprobanteModel(
             id: json['idComprobante'],
             nombreComprobante: json['nombreComprobante']),
+        numeroDocumento: (json['numeroDocumento'] == null)
+            ? ""
+            : json['numeroDocumento'] as String,
+        denominacionCliente: (json['denominacionCliente'] == null)
+            ? ""
+            : json['denominacionCliente'] as String,
+        direccionCliente: (json['direccionCliente'] == null)
+            ? ""
+            : json['direccionCliente'] as String,
         fechaPedido: json['fechaPedido'] as String,
         seriePedido: json['seriePedido'] as String,
         correlativoPedido: json['correlativoPedido'] as String,

@@ -139,6 +139,26 @@ class AppListaPedidoState extends State<AppListaPedido> {
                           Row(
                             children: [
                               const Text(
+                                "N° Pedido: ",
+                                style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.red),
+                                textAlign: TextAlign.start,
+                              ),
+                              Text(
+                                "${widget.data![index].id}",
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  //fontWeight: FontWeight.bold,
+                                ),
+                                textAlign: TextAlign.start,
+                              ),
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              const Text(
                                 "Comprobante: ",
                                 style: TextStyle(
                                     fontSize: 18,

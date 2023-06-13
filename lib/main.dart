@@ -1,4 +1,3 @@
-import 'package:app_jugueria/controladores/mesaController.dart';
 import 'package:app_jugueria/modelos/adicionalModel.dart';
 import 'package:app_jugueria/modelos/categoriaModel.dart';
 import 'package:app_jugueria/modelos/productoModel.dart';
@@ -7,8 +6,8 @@ import 'package:app_jugueria/modelos/clienteModel.dart';
 import 'package:app_jugueria/modelos/administradorModel.dart';
 import 'package:app_jugueria/modelos/tipoDocumentoModel.dart';
 import 'package:app_jugueria/modelos/pedidoModel.dart';
-import 'package:app_jugueria/controladores/productoController.dart';
 import 'package:app_jugueria/vistas/app_seleccionarMesa.dart';
+import 'package:app_jugueria/vistas/app_mensajeConfirmacion.dart';
 import 'package:app_jugueria/vistas/app_confirmarPedido.dart';
 import 'package:app_jugueria/vistas/app_asignarAdicionales.dart';
 import 'package:app_jugueria/vistas/app_listaAdicionales.dart';
@@ -47,6 +46,7 @@ void main() {
       '/registrar-adicional': (context) => AppRegistroAdicional(),
       //'/registrar-cliente': (context) => AppRegistroCliente(),
       '/registrar-mesa': (context) => AppRegistroMesa(),
+      //'/mensaje-confirmacion': (context) => AppMensajeConfirmacion(),
       //'/seleccionar-productos': (context) => AppSeleccionarProducto(),
       // '/registrar-producto': (context) => AppRegistroProducto(),
       // '/principal': (context) => AppMenu(),
@@ -55,6 +55,13 @@ void main() {
     },
     onGenerateRoute: (settings) {
       switch (settings.name) {
+        case '/mensaje-confirmacion':
+          final PedidoModel pedidoModel = settings.arguments as PedidoModel;
+          return MaterialPageRoute(
+            builder: (context) => AppMensajeConfirmacion(
+              pedidoModel: pedidoModel,
+            ),
+          );
         case '/confirmar-pedido':
           final args = settings.arguments as Map<String, dynamic>;
           final List<ProductoModel> listaProductos =

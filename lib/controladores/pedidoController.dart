@@ -5,13 +5,51 @@ import 'package:app_jugueria/modelos/adicionalModel.dart';
 import 'package:app_jugueria/modelos/pedidoModel.dart';
 import 'package:app_jugueria/modelos/comprobanteModel.dart';
 import 'package:app_jugueria/controladores/conexion.dart';
-import 'package:intl/intl.dart';
+import 'package:http/http.dart' as http;
 
 class PedidoController {
+  Future<String> getEmpresa(String ruc) async {
+    var url = Uri.parse(
+        'https://dniruc.apisperu.com/api/v1/ruc/${ruc}?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6ImlzYWFjY2Fwcmljb3JuaW8xMkBnbWFpbC5jb20ifQ.wg_CLoG-c6fKOQnstptacoM7AM8zlhXMy_wuBZXht7A');
+
+    print(url);
+    var response = await http.get(url);
+    if (response.statusCode == 200) {
+      // La solicitud fue exitosa
+      var data = response.body;
+      // Haz algo con los datos obtenidos
+      print(data);
+      return data;
+    } else {
+      // La solicitud falló
+      print('Error: ${response.statusCode}');
+      return "";
+    }
+  }
+
+  Future<String> getPersona(String dni) async {
+    var url = Uri.parse(
+        'https://dniruc.apisperu.com/api/v1/dni/${dni}?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6ImlzYWFjY2Fwcmljb3JuaW8xMkBnbWFpbC5jb20ifQ.wg_CLoG-c6fKOQnstptacoM7AM8zlhXMy_wuBZXht7A');
+
+    print(url);
+    var response = await http.get(url);
+    if (response.statusCode == 200) {
+      // La solicitud fue exitosa
+      var data = response.body;
+      // Haz algo con los datos obtenidos
+      print(data);
+      return data;
+    } else {
+      // La solicitud falló
+      print('Error: ${response.statusCode}');
+      return "";
+    }
+  }
+
   Future<List<PedidoModel>> getPedidos() async {
     final conn = await MySqlConnection.connect(Configuracion.instancia);
     final result = await conn.query(//'select * from pedido;');
-        'select p.id, p.fechaPedido,p.seriePedido, p.correlativoPedido,p.subTotalPedido, p.igvPedido, p.totalPedido, p.estadoPedido, p.idCliente, c.numeroDocumento, c.nombreCliente, c.apellidoCliente, c.telefonoCliente, c.emailCliente, p.idMesa ,m.numeroMesa, c2.nombreComprobante from pedido p inner join cliente c on p.idCliente = c.id inner join mesa m on m.id = p.idMesa inner join comprobante c2 on c2.id = p.idComprobante where estadoPedido = true;');
+        'select p.id, p.fechaPedido,p.seriePedido, p.correlativoPedido, p.numeroDocumento, p.denominacionCliente, p.direccionCliente,p.subTotalPedido, p.igvPedido, p.totalPedido, p.estadoPedido, p.idCliente, c.numeroDocumento, c.nombreCliente, c.apellidoCliente, c.telefonoCliente, c.emailCliente, p.idMesa ,m.numeroMesa, c2.nombreComprobante from pedido p inner join cliente c on p.idCliente = c.id inner join mesa m on m.id = p.idMesa inner join comprobante c2 on c2.id = p.idComprobante where estadoPedido = true;');
 
     final pedidos =
         result.map((result) => PedidoModel.fromJson(result.fields)).toList();
@@ -123,7 +161,7 @@ class PedidoController {
     return pedidoModel;
   }
 
-  Future<void> addPedido(PedidoModel pedidoModel) async {
+  Future<PedidoModel> addPedido(PedidoModel pedidoModel) async {
     final conn = await MySqlConnection.connect(Configuracion.instancia);
     final results = await conn.query(
         'insert into pedido (idCliente, idMesa, idComprobante,fechaPedido,seriePedido,correlativoPedido, subTotalPedido, igvPedido,totalPedido, estadoPedido) values (?,?,?,?,?,?,?,?,?,true);',
@@ -145,6 +183,7 @@ class PedidoController {
     await updateComprobante(pedidoModel.comprobante!.id!);
 
     final pedidoId = results.insertId;
+    pedidoModel.id = pedidoId;
     print('ID del registro insertado: $pedidoId');
 
     for (int i = 0; i < pedidoModel.detallePedido!.length; i++) {
@@ -167,6 +206,8 @@ class PedidoController {
             ]);
       }
     }
+
+    return pedidoModel;
 
     // for (int i = 0; i < listaAdicionales.length; i++) {
     //   for (int j = 0; j < listaAdicionales[i].length; j++) {
