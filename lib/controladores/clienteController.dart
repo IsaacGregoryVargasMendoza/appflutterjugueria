@@ -47,24 +47,32 @@ class ClienteController {
     return tipodocumentos;
   }
 
-  Future<void> addCliente(ClienteModel cliente) async {
-    final conn = await MySqlConnection.connect(Configuracion.instancia);
-    final usuario = await conn.query(
-        'insert into usuario (idRol, nombreUsuario, contraseniaUsuario) values (1, ?, ?);',
-        [cliente.usuario!.nombreUsuario, cliente.usuario!.contraseniaUsuario]);
+  Future<bool> addCliente(ClienteModel cliente) async {
+    try {
+      final conn = await MySqlConnection.connect(Configuracion.instancia);
+      final usuario = await conn.query(
+          'insert into usuario (idRol, nombreUsuario, contraseniaUsuario) values (1, ?, ?);',
+          [
+            cliente.usuario!.nombreUsuario,
+            cliente.usuario!.contraseniaUsuario
+          ]);
 
-    final usuarioId = usuario.insertId;
-    await conn.query(
-        'insert into cliente (idUsuario, idTipoDocumento, numeroDocumento,nombrecliente, apellidoCliente, telefonoCliente, emailCliente, estadoCliente) values (?,?,?,?,?,?,?,true)',
-        [
-          usuarioId,
-          cliente.tipoDocumentoModel!.id,
-          cliente.numeroDocumento,
-          cliente.nombreCliente,
-          cliente.apellidoCliente,
-          cliente.telefonoCliente,
-          cliente.emailCliente
-        ]);
+      final usuarioId = usuario.insertId;
+      await conn.query(
+          'insert into cliente (idUsuario, idTipoDocumento, numeroDocumento,nombrecliente, apellidoCliente, telefonoCliente, emailCliente, estadoCliente) values (?,?,?,?,?,?,?,true)',
+          [
+            usuarioId,
+            cliente.tipoDocumentoModel!.id,
+            cliente.numeroDocumento,
+            cliente.nombreCliente,
+            cliente.apellidoCliente,
+            cliente.telefonoCliente,
+            cliente.emailCliente
+          ]);
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 
   Future<void> updateCliente(ClienteModel cliente) async {

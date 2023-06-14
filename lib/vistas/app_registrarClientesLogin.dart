@@ -29,11 +29,22 @@ class AppRegistrarClienteLoginState extends State<AppRegistrarClienteLogin> {
   int idTipoDocumento = 0;
 
   _cargarTipoDocumento() async {
-    ClienteController clienteCtrll = ClienteController();
-    final lista = await clienteCtrll.getTipoDocumentos();
     setState(() {
-      listaDocumento = lista;
+      _widgetState = WidgetState.LOADING;
     });
+    try {
+      ClienteController clienteCtrll = ClienteController();
+      final lista = await clienteCtrll.getTipoDocumentos();
+      setState(() {
+        listaDocumento = lista;
+        _widgetState = WidgetState.LOADED;
+      });
+    } catch (e) {
+      print(e.toString());
+      setState(() {
+        _widgetState = WidgetState.ERROR;
+      });
+    }
   }
 
   @override
@@ -55,6 +66,50 @@ class AppRegistrarClienteLoginState extends State<AppRegistrarClienteLogin> {
       setState(() {
         _widgetState = WidgetState.LOADING;
       });
+
+      if (idTipoDocumento == 0 || idTipoDocumento == 1) {
+        mostrarAlerta(context, "Mensaje", "Seleccione el documento correcto.");
+        setState(() {
+          _widgetState = WidgetState.LOADED;
+        });
+        return;
+      }
+
+      if (tecNumeroDocumento.text.toString().trim().length < 8) {
+        mostrarAlerta(
+            context, "Mensaje", "Ingrese un numero de documento valido.");
+        setState(() {
+          _widgetState = WidgetState.LOADED;
+        });
+        return;
+      }
+
+      if (tecNombre.text.toString().trim().length < 2) {
+        mostrarAlerta(context, "Mensaje", "Ingrese un nombre valido.");
+        setState(() {
+          _widgetState = WidgetState.LOADED;
+        });
+        return;
+      }
+
+      if (tecNombreUsuario.text.toString().trim().length < 2) {
+        mostrarAlerta(
+            context, "Mensaje", "El usuario debe tener mas de 2 caracteres.");
+        setState(() {
+          _widgetState = WidgetState.LOADED;
+        });
+        return;
+      }
+
+      if (tecContraseniaUsuario.text.toString().trim().length < 5) {
+        mostrarAlerta(context, "Mensaje",
+            "El contraseña debe tener mas de 5 caracteres.");
+        setState(() {
+          _widgetState = WidgetState.LOADED;
+        });
+        return;
+      }
+
       ClienteController clienteCtrll = ClienteController();
 
       UsuarioModel usuarioModel = UsuarioModel(
@@ -69,18 +124,45 @@ class AppRegistrarClienteLoginState extends State<AppRegistrarClienteLogin> {
           telefonoCliente: tecTelefono.text,
           emailCliente: tecEmail.text,
           usuario: usuarioModel);
-      await clienteCtrll.addCliente(clienteModel);
+      var respuesta = await clienteCtrll.addCliente(clienteModel);
 
-      Navigator.of(context).pop();
-      Navigator.of(context).pop();
-      Navigator.pushNamed(context, '/login-cliente');
+      // bool respuesta = false;
+      if (respuesta) {
+        const snackBar = SnackBar(
+          duration: Duration(seconds: 7),
+          backgroundColor: Colors.green,
+          content: Text('Se ha registrado correctamente'),
+        );
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
 
-      setState(() {
-        _widgetState = WidgetState.LOADED;
-      });
+        setState(() {
+          _widgetState = WidgetState.LOADED;
+        });
+
+        Navigator.of(context).pop();
+        Navigator.of(context).pop();
+        Navigator.pushNamed(context, '/login-cliente');
+      } else {
+        const snackBar = SnackBar(
+          duration: Duration(seconds: 7),
+          backgroundColor: Colors.red,
+          content: Text('No se logro registrar'),
+        );
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+        setState(() {
+          _widgetState = WidgetState.LOADED;
+        });
+      }
     } catch (e) {
-      print("Exception capturada.");
-      print(e.toString());
+      // print("Exception capturada.");
+      // print(e.toString());
+      const snackBar = SnackBar(
+        duration: Duration(seconds: 7),
+        backgroundColor: Colors.red,
+        content: Text('ERROR!. No se pudo registrar'),
+      );
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+
       setState(() {
         _widgetState = WidgetState.ERROR;
       });

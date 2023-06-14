@@ -3,7 +3,6 @@ import 'package:app_jugueria/componentes/app_drawer.dart';
 import 'package:app_jugueria/modelos/adicionalModel.dart';
 import 'package:app_jugueria/modelos/pedidoModel.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 //import 'package:flutter_charts/flutter_charts.dart' as;
 import 'package:fl_chart/fl_chart.dart';
 

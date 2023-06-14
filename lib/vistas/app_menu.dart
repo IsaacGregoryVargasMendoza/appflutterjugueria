@@ -4,6 +4,7 @@ import 'package:app_jugueria/controladores/mesaController.dart';
 import 'package:app_jugueria/controladores/clienteController.dart';
 import 'package:app_jugueria/controladores/administradorController.dart';
 import 'package:app_jugueria/controladores/adicionalController.dart';
+import 'package:app_jugueria/componentes/info_global.dart';
 import 'package:app_jugueria/componentes/app_drawer.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter/material.dart';
@@ -64,6 +65,8 @@ class _AppMenuState extends State<AppMenu> {
                 onTap: () async {
                   AdicionalController adicionalCtrll = AdicionalController();
                   final lista = await adicionalCtrll.getAdicionales();
+                  InfoGlobal.incrementarVentanas();
+
                   Navigator.pushNamed(
                     context,
                     '/lista-adicionales',
@@ -100,6 +103,7 @@ class _AppMenuState extends State<AppMenu> {
                 onTap: () async {
                   CategoriaController categoriaCtrll = CategoriaController();
                   final lista = await categoriaCtrll.getCategorias();
+                  InfoGlobal.incrementarVentanas();
                   Navigator.pushNamed(
                     context,
                     '/lista-categorias',
@@ -136,6 +140,7 @@ class _AppMenuState extends State<AppMenu> {
                 onTap: () async {
                   ClienteController productoCtrll = ClienteController();
                   final lista = await productoCtrll.getClientes();
+                  InfoGlobal.incrementarVentanas();
                   Navigator.pushNamed(
                     context,
                     '/lista-clientes',
@@ -171,6 +176,7 @@ class _AppMenuState extends State<AppMenu> {
                 onTap: () async {
                   ProductoController productoCtrll = ProductoController();
                   final lista = await productoCtrll.getProductos();
+                  InfoGlobal.incrementarVentanas();
                   Navigator.pushNamed(
                     context,
                     '/lista-productos',
@@ -207,6 +213,7 @@ class _AppMenuState extends State<AppMenu> {
                 onTap: () async {
                   MesaController mesaCtrll = MesaController();
                   final lista = await mesaCtrll.getMesas();
+                  InfoGlobal.incrementarVentanas();
                   Navigator.pushNamed(
                     context,
                     '/lista-mesas',
@@ -244,6 +251,7 @@ class _AppMenuState extends State<AppMenu> {
                   AdministradorController administradorCtrll =
                       AdministradorController();
                   final lista = await administradorCtrll.getAdministradores();
+                  InfoGlobal.incrementarVentanas();
                   Navigator.pushNamed(
                     context,
                     '/lista-administradores',

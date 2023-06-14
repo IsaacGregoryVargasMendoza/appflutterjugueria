@@ -53,6 +53,8 @@ class _AppLoginState extends State<AppLogin> {
         usuarioModel.id = respuesta[0].usuario!.id;
         administradorModel.usuario = usuarioModel;
         InfoGlobal.administradorModel = administradorModel;
+        InfoGlobal.incrementarVentanas();
+
         Navigator.pushNamed(context, '/dashboard-pedidos');
 
         setState(() {
@@ -97,10 +99,10 @@ class _AppLoginState extends State<AppLogin> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     CircularProgressIndicator(color: Colors.amber.shade900),
-                    SizedBox(
+                    const SizedBox(
                       height: 10,
                     ),
-                    Text(
+                    const Text(
                       "Cargando...",
                       style: TextStyle(
                           fontFamily: 'Roboto',

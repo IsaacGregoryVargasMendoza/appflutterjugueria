@@ -3,6 +3,7 @@ import 'package:app_jugueria/componentes/app_text.dart';
 import 'package:app_jugueria/componentes/app_buttons.dart';
 import 'package:app_jugueria/componentes/app_textFieldRound.dart';
 import 'package:app_jugueria/componentes/app_drawer.dart';
+import 'package:app_jugueria/componentes/info_global.dart';
 import 'package:app_jugueria/modelos/mesaModel.dart';
 import 'package:flutter/material.dart';
 
@@ -37,17 +38,31 @@ class _AppRegistroMesaState extends State<AppRegistroMesa> {
         _widgetState = WidgetState.LOADING;
       });
 
+      if (numeroMesa.text.toString().trim().isEmpty) {
+        InfoGlobal.mostrarAlerta(
+            context, "Mensaje", "Ingrese un numero de mesa valido.");
+        setState(() {
+          _widgetState = WidgetState.LOADED;
+        });
+        return;
+      }
+
       MesaController mesaCtrll = MesaController();
 
       if (widget.mesaModel != null) {
         MesaModel mesa =
             MesaModel(id: widget.mesaModel!.id, numeroMesa: numeroMesa.text);
         await mesaCtrll.updateMesa(mesa);
+        InfoGlobal.mensajeConfirmacion(
+            context, "Se ha actualizado correctamente.");
       } else {
         await mesaCtrll.addMesa(numeroMesa.text);
+        InfoGlobal.mensajeConfirmacion(
+            context, "Se ha registrado correctamente.");
       }
 
       final lista = await mesaCtrll.getMesas();
+
       Navigator.of(context).pop();
       Navigator.pushNamed(
         context,
@@ -59,10 +74,9 @@ class _AppRegistroMesaState extends State<AppRegistroMesa> {
         _widgetState = WidgetState.LOADED;
       });
     } catch (e) {
-      print("Exception capturada.");
-      print(e.toString());
+      InfoGlobal.mensajeFallo(context, "No se pudo registrar.");
       setState(() {
-        _widgetState = WidgetState.NONE;
+        _widgetState = WidgetState.LOADED;
       });
     }
   }

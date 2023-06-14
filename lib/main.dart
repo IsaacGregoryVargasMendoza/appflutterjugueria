@@ -1,3 +1,4 @@
+import 'package:app_jugueria/componentes/info_global.dart';
 import 'package:app_jugueria/modelos/adicionalModel.dart';
 import 'package:app_jugueria/modelos/categoriaModel.dart';
 import 'package:app_jugueria/modelos/productoModel.dart';
@@ -265,6 +266,7 @@ class _MyAppState extends State<MyApp> {
                         width: 250,
                         height: 50,
                         funcion: () {
+                          InfoGlobal.incrementarVentanas();
                           Navigator.pushNamed(context, '/login');
                         }),
                     const SizedBox(height: 15),
@@ -277,10 +279,8 @@ class _MyAppState extends State<MyApp> {
                       width: 250,
                       height: 50,
                       funcion: () async {
+                        InfoGlobal.incrementarVentanas();
                         Navigator.pushNamed(context, '/login-cliente');
-
-                        ///login-cliente
-                        //arguments: listaMesas);
                       },
                     ),
                   ],

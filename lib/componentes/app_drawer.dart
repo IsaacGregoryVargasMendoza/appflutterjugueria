@@ -39,7 +39,8 @@ class AppMenuDrawer extends StatelessWidget {
                           // border: Border.all(width: 0.1),
                           borderRadius: BorderRadius.circular(100),
                           image: const DecorationImage(
-                            image: AssetImage("assets/usuario_administrador.png"),
+                            image:
+                                AssetImage("assets/usuario_administrador.png"),
                           ),
                         ),
                       ),
@@ -69,17 +70,17 @@ class AppMenuDrawer extends StatelessWidget {
                             GestureDetector(
                               onTap: () {
                                 print("click en editar.");
-  //                               int openNavigatorCount = 0;
-  
-  // widgets.WidgetsBinding.instance!.addPostFrameCallback((_) {
-  //   final context = widgets.WidgetsBinding.instance!.rootElement?;
-  //   if (context != null) {
-  //     final navigatorState = Navigator.of(context).restorationScope?.navigatorState;
-  //     if (navigatorState != null && !navigatorState.mounted) {
-  //       openNavigatorCount++;
-  //     }
-  //   }
-  // });
+                                //                               int openNavigatorCount = 0;
+
+                                // widgets.WidgetsBinding.instance!.addPostFrameCallback((_) {
+                                //   final context = widgets.WidgetsBinding.instance!.rootElement?;
+                                //   if (context != null) {
+                                //     final navigatorState = Navigator.of(context).restorationScope?.navigatorState;
+                                //     if (navigatorState != null && !navigatorState.mounted) {
+                                //       openNavigatorCount++;
+                                //     }
+                                //   }
+                                // });
                               },
                               child: const Text(
                                 "Editar perfil",
@@ -172,12 +173,10 @@ class AppMenuDrawer extends StatelessWidget {
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
               ),
               onTap: () {
-                Navigator.of(context).pop();
-                Navigator.of(context).pop();
-                Navigator.pushNamed(
-                  context,
-                  '/dashboard-pedidos'
-                );
+                // Navigator.of(context).pop();
+                // Navigator.of(context).pop();
+                InfoGlobal.incrementarVentanas();
+                Navigator.pushNamed(context, '/dashboard-pedidos');
               },
             ),
             ListTile(
@@ -187,12 +186,10 @@ class AppMenuDrawer extends StatelessWidget {
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
               ),
               onTap: () {
-                Navigator.of(context).pop();
-                Navigator.of(context).pop();
-                Navigator.pushNamed(
-                  context,
-                  '/menu-administrador'
-                );
+                // Navigator.of(context).pop();
+                // Navigator.of(context).pop();
+                InfoGlobal.incrementarVentanas();
+                Navigator.pushNamed(context, '/menu-administrador');
               },
             ),
             ListTile(
@@ -204,8 +201,9 @@ class AppMenuDrawer extends StatelessWidget {
               onTap: () async {
                 PedidoController pedidoCtrll = PedidoController();
                 final lista = await pedidoCtrll.getPedidos();
-                Navigator.of(context).pop();
-                Navigator.of(context).pop();
+                // Navigator.of(context).pop();
+                // Navigator.of(context).pop();
+                InfoGlobal.incrementarVentanas();
                 Navigator.pushNamed(
                   context,
                   '/lista-pedidos',

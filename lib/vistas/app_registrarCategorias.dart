@@ -3,6 +3,7 @@ import 'package:app_jugueria/componentes/app_text.dart';
 import 'package:app_jugueria/componentes/app_buttons.dart';
 import 'package:app_jugueria/componentes/app_textFieldRound.dart';
 import 'package:app_jugueria/componentes/app_drawer.dart';
+import 'package:app_jugueria/componentes/info_global.dart';
 import 'package:app_jugueria/modelos/categoriaModel.dart';
 import 'package:flutter/material.dart';
 
@@ -49,12 +50,16 @@ class _AppRegistroCategoriaState extends State<AppRegistroCategoria> {
             letraCategoria: letraCategoria.text);
 
         await categoriaCtrll.updateCategoria(categoriaModel);
+        InfoGlobal.mensajeConfirmacion(
+            context, "Se ha actualizado correctamente.");
       } else {
         CategoriaModel categoriaModel = CategoriaModel(
             nombreCategoria: nombreCategoria.text,
             letraCategoria: letraCategoria.text);
 
         await categoriaCtrll.addCategoria(categoriaModel);
+        InfoGlobal.mensajeConfirmacion(
+            context, "Se ha registrado correctamente.");
       }
 
       final lista = await categoriaCtrll.getCategorias();
@@ -68,10 +73,9 @@ class _AppRegistroCategoriaState extends State<AppRegistroCategoria> {
         _widgetState = WidgetState.LOADED;
       });
     } catch (e) {
-      print("Exception capturada.");
-      print(e.toString());
+      InfoGlobal.mensajeFallo(context, "No se pudo registrar.");
       setState(() {
-        _widgetState = WidgetState.NONE;
+        _widgetState = WidgetState.LOADED;
       });
     }
   }
