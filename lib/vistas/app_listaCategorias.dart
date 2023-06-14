@@ -1,6 +1,6 @@
 import 'package:app_jugueria/controladores/adicionalController.dart';
-import 'package:app_jugueria/vistas/app_registrarCategorias.dart';
 import 'package:app_jugueria/componentes/app_drawer.dart';
+import 'package:app_jugueria/componentes/info_global.dart';
 import 'package:app_jugueria/modelos/categoriaModel.dart';
 import 'package:app_jugueria/controladores/categoriaController.dart';
 import 'package:flutter/material.dart';
@@ -17,6 +17,12 @@ class AppListaCategoria extends StatefulWidget {
 }
 
 class _AppListaCategoriaState extends State<AppListaCategoria> {
+  @override
+  void dispose() {
+    super.dispose();
+    InfoGlobal.decrementarVentanas();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

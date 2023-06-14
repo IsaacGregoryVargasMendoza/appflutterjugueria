@@ -5,6 +5,7 @@ import 'package:app_jugueria/componentes/app_text.dart';
 import 'package:app_jugueria/componentes/app_buttons.dart';
 import 'package:app_jugueria/componentes/app_textFieldRound.dart';
 import 'package:app_jugueria/componentes/app_drawer.dart';
+import 'package:app_jugueria/componentes/info_global.dart';
 import 'package:app_jugueria/modelos/categoriaModel.dart';
 import 'package:flutter/material.dart';
 
@@ -53,6 +54,12 @@ class AppAsignarAdicionalState extends State<AppAsignarAdicional> {
     setState(() {
       _buttonDisabled = true;
     });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    InfoGlobal.decrementarVentanas();
   }
 
   @override

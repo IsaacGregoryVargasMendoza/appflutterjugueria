@@ -18,6 +18,12 @@ class AppSeleccionarMesaState extends State<AppSeleccionarMesa> {
   List<MesaModel>? listaMesas = [];
   WidgetState _widgetState = WidgetState.LOADED;
 
+  @override
+  void dispose() {
+    super.dispose();
+    InfoGlobal.decrementarVentanas();
+  }
+
   _cargarMesas() async {
     setState(() {
       _widgetState = WidgetState.LOADING;

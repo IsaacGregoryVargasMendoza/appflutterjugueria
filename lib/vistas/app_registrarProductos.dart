@@ -3,6 +3,7 @@ import 'package:app_jugueria/componentes/app_text.dart';
 import 'package:app_jugueria/componentes/app_buttons.dart';
 import 'package:app_jugueria/componentes/app_textFieldRound.dart';
 import 'package:app_jugueria/componentes/app_drawer.dart';
+import 'package:app_jugueria/componentes/info_global.dart';
 import 'package:app_jugueria/modelos/categoriaModel.dart';
 import 'package:app_jugueria/modelos/productoModel.dart';
 import 'package:app_jugueria/controladores/productoController.dart';
@@ -89,11 +90,44 @@ class _AppRegistroProductoState extends State<AppRegistroProducto> {
     }
   }
 
+  @override
+  void dispose() {
+    super.dispose();
+    InfoGlobal.decrementarVentanas();
+  }
+
   Future<void> registrarActualizar() async {
     try {
       setState(() {
         _widgetState = WidgetState.LOADING;
       });
+
+      if (tecNombreProducto.text.toString().trim().length < 3) {
+        InfoGlobal.mostrarAlerta(
+            context, "Mensaje", "Ingrese un nombre de producto valido.");
+        setState(() {
+          _widgetState = WidgetState.LOADED;
+        });
+        return;
+      }
+
+      if (tecPrecio.text.toString().trim() == "0") {
+        InfoGlobal.mostrarAlerta(
+            context, "Mensaje", "Ingrese un precio valido.");
+        setState(() {
+          _widgetState = WidgetState.LOADED;
+        });
+        return;
+      }
+
+      if (tecLetra.text.toString().trim().length != 1) {
+        InfoGlobal.mostrarAlerta(
+            context, "Mensaje", "Ingrese una letra valida.");
+        setState(() {
+          _widgetState = WidgetState.LOADED;
+        });
+        return;
+      }
 
       ProductoController productoCtrll = ProductoController();
 
@@ -110,6 +144,8 @@ class _AppRegistroProductoState extends State<AppRegistroProducto> {
             imagenProducto: _imagen64,
             letraProducto: tecLetra.text);
         await productoCtrll.updateProducto(productoModel);
+        InfoGlobal.mensajeConfirmacion(
+            context, "Se ha actualizado correctamente.");
       } else {
         List<int> bytes = await imagen!.readAsBytesSync();
         String _imagen64 = base64.encode(bytes);
@@ -122,6 +158,8 @@ class _AppRegistroProductoState extends State<AppRegistroProducto> {
             imagenProducto: _imagen64,
             letraProducto: tecLetra.text);
         await productoCtrll.addProducto(productoModel);
+        InfoGlobal.mensajeConfirmacion(
+            context, "Se ha registrado correctamente.");
       }
       final lista = await productoCtrll.getProductos();
 
@@ -135,8 +173,7 @@ class _AppRegistroProductoState extends State<AppRegistroProducto> {
         _widgetState = WidgetState.LOADED;
       });
     } catch (e) {
-      print("Exception capturada.");
-      print(e.toString());
+      InfoGlobal.mensajeFallo(context, "No se pudo registrar.");
       setState(() {
         _widgetState = WidgetState.NONE;
       });

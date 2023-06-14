@@ -5,6 +5,7 @@ import 'package:app_jugueria/modelos/usuarioModel.dart';
 import 'package:flutter/material.dart';
 import 'package:app_jugueria/componentes/app_buttons.dart';
 import 'package:app_jugueria/componentes/app_textFieldRound.dart';
+import 'package:app_jugueria/componentes/info_global.dart';
 
 enum WidgetState { NONE, LOADING, LOADED, ERROR }
 
@@ -59,6 +60,12 @@ class AppRegistrarClienteLoginState extends State<AppRegistrarClienteLogin> {
     tecNombreUsuario = TextEditingController();
     tecContraseniaUsuario = TextEditingController();
     _cargarTipoDocumento();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    InfoGlobal.decrementarVentanas();
   }
 
   Future<void> registrar() async {

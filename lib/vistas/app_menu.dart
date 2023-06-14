@@ -26,6 +26,12 @@ class MyGridItem {
 }
 
 class _AppMenuState extends State<AppMenu> {
+  @override
+  void dispose() {
+    super.dispose();
+    InfoGlobal.decrementarVentanas();
+  }
+
   late BuildContext contextFunction;
 
   final List<String> items = [

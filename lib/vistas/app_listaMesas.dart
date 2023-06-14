@@ -1,6 +1,6 @@
 import 'package:app_jugueria/modelos/mesaModel.dart';
-import 'package:app_jugueria/vistas/app_registrarMesa.dart';
 import 'package:app_jugueria/componentes/app_drawer.dart';
+import 'package:app_jugueria/componentes/info_global.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
@@ -15,6 +15,12 @@ class AppListaMesa extends StatefulWidget {
 }
 
 class _AppListaMesaState extends State<AppListaMesa> {
+  @override
+  void dispose() {
+    super.dispose();
+    InfoGlobal.decrementarVentanas();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

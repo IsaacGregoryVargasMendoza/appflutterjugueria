@@ -117,47 +117,30 @@ class AppConfirmarPedidoState extends State<AppConfirmarPedido> {
             widget.listaDetalle!, widget.cantidades!);
 
         var pedidoConfirmado = await pedidoCtrll.addPedido(pedidoModel);
-
+        InfoGlobal.mensajeConfirmacion(context, "Se realizo la compra correctamente.");
         Navigator.pushNamed(context, '/mensaje-confirmacion',
             arguments: pedidoConfirmado);
-        print("Se registro los datos con exito.");
         setState(() {
           _widgetState = WidgetState.LOADED;
         });
       } else {
-        mostrarAlerta(context, "Mensaje", "Debe seleccionar un comprobante.");
+        InfoGlobal.mostrarAlerta(context, "Mensaje", "Debe seleccionar un comprobante.");
         setState(() {
           _widgetState = WidgetState.LOADED;
         });
       }
     } catch (e) {
-      mostrarAlerta(context, "Error!", "No se pudo registrar la compra.");
-      print("Excepcion capturada");
-      print(e.toString());
+      InfoGlobal.mensajeFallo(context, "No se pudo registrar la compra.");
       setState(() {
         _widgetState = WidgetState.ERROR;
       });
     }
   }
-
-  void mostrarAlerta(BuildContext context, String cabecera, String mensaje) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(cabecera),
-          content: Text(mensaje),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('OK'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
+  
+  @override
+  void dispose() {
+    super.dispose();
+    InfoGlobal.decrementarVentanas();
   }
 
   @override

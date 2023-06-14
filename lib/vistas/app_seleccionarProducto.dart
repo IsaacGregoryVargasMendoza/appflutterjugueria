@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:app_jugueria/componentes/app_drawer.dart';
+import 'package:app_jugueria/componentes/info_global.dart';
 import 'package:app_jugueria/modelos/productoModel.dart';
 import 'package:app_jugueria/controladores/productoController.dart';
 import 'package:carousel_slider/carousel_slider.dart';
@@ -80,6 +81,12 @@ class _AppSeleccionarProductoState extends State<AppSeleccionarProducto> {
     //loadModel();
     _loadClassifier();
     inicializarCamara();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    InfoGlobal.decrementarVentanas();
   }
 
   void _setAnalyzing(bool flag) {
@@ -244,9 +251,25 @@ class _AppSeleccionarProductoState extends State<AppSeleccionarProducto> {
       case WidgetState.LOADING:
         return _buildScaffold(
             context,
-            const Center(
-              child: CircularProgressIndicator(),
-            ));
+            Center(
+            child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(color: Colors.amber.shade900),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  const Text(
+                    "Cargando...",
+                    style: TextStyle(
+                        fontFamily: 'Roboto',
+                        fontSize: 20.0,
+                        color: Colors.black,
+                        decoration: TextDecoration.none),
+                  )
+                ]),
+          ));
       case WidgetState.LOADED:
         return _buildScaffold(
           context,

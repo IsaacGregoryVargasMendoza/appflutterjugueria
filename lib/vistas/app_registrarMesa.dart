@@ -32,6 +32,12 @@ class _AppRegistroMesaState extends State<AppRegistroMesa> {
     }
   }
 
+  @override
+  void dispose() {
+    super.dispose();
+    InfoGlobal.decrementarVentanas();
+  }
+
   Future<void> registrarActualizar() async {
     try {
       setState(() {

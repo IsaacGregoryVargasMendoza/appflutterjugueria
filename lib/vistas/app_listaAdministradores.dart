@@ -1,8 +1,6 @@
-import 'package:app_jugueria/controladores/administradorController.dart';
 import 'package:app_jugueria/componentes/app_drawer.dart';
-import 'package:app_jugueria/modelos/usuarioModel.dart';
+import 'package:app_jugueria/componentes/info_global.dart';
 import 'package:app_jugueria/modelos/administradorModel.dart';
-import 'package:app_jugueria/modelos/tipoDocumentoModel.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
@@ -17,6 +15,12 @@ class AppListaAdministradores extends StatefulWidget {
 }
 
 class AppListaAdministradoresState extends State<AppListaAdministradores> {
+  @override
+  void dispose() {
+    super.dispose();
+    InfoGlobal.decrementarVentanas();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

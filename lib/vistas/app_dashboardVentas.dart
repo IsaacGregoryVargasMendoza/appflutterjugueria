@@ -58,6 +58,12 @@ class AppDashboardPedidoState extends State<AppDashboardPedido> {
     cargarDatosPastel();
     cargarDatosGrafico();
   }
+  
+  @override
+  void dispose() {
+    super.dispose();
+    InfoGlobal.decrementarVentanas();
+  }
 
   void cargarDatosGrafico() {
     PedidoController pedidoController = PedidoController();

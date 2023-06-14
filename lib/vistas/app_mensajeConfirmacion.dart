@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:app_jugueria/componentes/info_global.dart';
 import 'package:app_jugueria/modelos/pedidoModel.dart';
 import 'package:intl/intl.dart';
 
@@ -14,6 +15,12 @@ class AppMensajeConfirmacion extends StatefulWidget {
 }
 
 class AppMensajeConfirmacionState extends State<AppMensajeConfirmacion> {
+  @override
+  void dispose() {
+    super.dispose();
+    InfoGlobal.decrementarVentanas();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
