@@ -2,10 +2,10 @@ import 'package:mysql1/mysql1.dart';
 
 class Configuracion {
   static final instancia = ConnectionSettings(
-    host: '34.176.109.9',
+    host: 'srv944.hstgr.io',
     port: 3306,
-    user: 'basesql-jugueria-2023',
-    password: '123456789.',
-    db: 'app-jugueria',
+    user: 'u839948428_jugueria',
+    password: '3?PkZYMk',
+    db: 'u839948428_mysqljugueria',
   );
 }
