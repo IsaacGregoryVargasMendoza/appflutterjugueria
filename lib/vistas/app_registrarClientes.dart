@@ -2,6 +2,7 @@ import 'package:app_jugueria/componentes/app_text.dart';
 import 'package:app_jugueria/componentes/app_buttons.dart';
 import 'package:app_jugueria/componentes/app_textFieldRound.dart';
 import 'package:app_jugueria/componentes/app_drawer.dart';
+import 'package:app_jugueria/componentes/info_global.dart';
 import 'package:app_jugueria/modelos/clienteModel.dart';
 import 'package:app_jugueria/modelos/tipoDocumentoModel.dart';
 import 'package:app_jugueria/controladores/clienteController.dart';
@@ -61,6 +62,12 @@ class _AppRegistroClienteState extends State<AppRegistroCliente> {
     }
   }
 
+  @override
+  void dispose() {
+    super.dispose();
+    InfoGlobal.decrementarVentanas();
+  }
+
   Future<void> registrarActualizar() async {
     try {
       setState(() {
@@ -84,6 +91,7 @@ class _AppRegistroClienteState extends State<AppRegistroCliente> {
             emailCliente: tecEmail.text,
             usuario: usuarioModel);
         await clienteCtrll.updateCliente(clienteModel);
+
       } else {
         UsuarioModel usuarioModel = UsuarioModel(
             nombreUsuario: tecNombreUsuario.text,

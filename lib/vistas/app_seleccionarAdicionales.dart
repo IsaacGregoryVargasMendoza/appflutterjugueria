@@ -1,23 +1,13 @@
 import 'dart:convert';
-import 'package:app_jugueria/componentes/app_text.dart';
-import 'package:app_jugueria/componentes/app_buttons.dart';
-import 'package:app_jugueria/componentes/app_textFieldRound.dart';
-import 'package:app_jugueria/componentes/app_drawer.dart';
-import 'package:app_jugueria/modelos/categoriaModel.dart';
+import 'package:app_jugueria/componentes/info_global.dart';
 import 'package:app_jugueria/modelos/productoModel.dart';
 import 'package:app_jugueria/modelos/adicionalModel.dart';
 import 'package:app_jugueria/controladores/adicionalController.dart';
 import 'package:flutter/material.dart';
-import 'dart:typed_data';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image/image.dart' as img;
-// import 'dart:image';
-import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-// import 'package:tflite/tflite.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:tflite_flutter/tflite_flutter.dart';
-import 'package:tflite_flutter_helper/tflite_flutter_helper.dart';
 import 'package:camera/camera.dart';
 import 'package:app_jugueria/classifier/classifier.dart';
 import 'dart:io';
@@ -99,6 +89,12 @@ class AppSeleccionarAdicionalState extends State<AppSeleccionarAdicional> {
         widget.productos!.length, (index) => []);
     _loadClassifier();
     inicializarCamara();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    InfoGlobal.decrementarVentanas();
   }
 
   void _setAnalyzing(bool flag) {

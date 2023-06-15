@@ -1,5 +1,6 @@
 import 'package:app_jugueria/controladores/clienteController.dart';
 import 'package:app_jugueria/componentes/app_drawer.dart';
+import 'package:app_jugueria/componentes/info_global.dart';
 import 'package:app_jugueria/modelos/clienteModel.dart';
 import 'package:app_jugueria/modelos/tipoDocumentoModel.dart';
 import 'package:app_jugueria/modelos/usuarioModel.dart';
@@ -17,6 +18,12 @@ class AppListaCliente extends StatefulWidget {
 }
 
 class _AppListaClienteState extends State<AppListaCliente> {
+  @override
+  void dispose() {
+    super.dispose();
+    InfoGlobal.decrementarVentanas();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

@@ -21,11 +21,35 @@ class AppLoginClienteState extends State<AppLoginCliente> {
   final contraseniaUsuario = TextEditingController();
   WidgetState _widgetState = WidgetState.LOADED;
 
+  @override
+  void dispose() {
+    super.dispose();
+    InfoGlobal.decrementarVentanas();
+  }
+
   Future<void> validarLogin() async {
     try {
       setState(() {
         _widgetState = WidgetState.LOADING;
       });
+
+      if (nombreUsuario.text.toString().trim().length < 2) {
+        InfoGlobal.mostrarAlerta(
+            context, "Mensaje", "Ingrese un nombre de usuario valido.");
+        setState(() {
+          _widgetState = WidgetState.LOADED;
+        });
+        return;
+      }
+
+      if (contraseniaUsuario.text.toString().trim().length < 2) {
+        InfoGlobal.mostrarAlerta(
+            context, "Mensaje", "Ingrese una contraseña valida.");
+        setState(() {
+          _widgetState = WidgetState.LOADED;
+        });
+        return;
+      }
 
       ClienteController clienteCtrll = ClienteController();
 

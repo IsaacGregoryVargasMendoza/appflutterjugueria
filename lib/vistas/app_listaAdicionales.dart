@@ -1,4 +1,5 @@
 import 'package:app_jugueria/componentes/app_drawer.dart';
+import 'package:app_jugueria/componentes/info_global.dart';
 import 'package:app_jugueria/modelos/adicionalModel.dart';
 import 'package:app_jugueria/controladores/adicionalController.dart';
 import 'package:flutter/material.dart';
@@ -15,6 +16,12 @@ class AppListaAdicional extends StatefulWidget {
 }
 
 class AppListaAdicionalState extends State<AppListaAdicional> {
+  @override
+  void dispose() {
+    super.dispose();
+    InfoGlobal.decrementarVentanas();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

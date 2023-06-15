@@ -1,5 +1,6 @@
 import 'package:app_jugueria/controladores/pedidoController.dart';
 import 'package:app_jugueria/componentes/app_drawer.dart';
+import 'package:app_jugueria/componentes/info_global.dart';
 import 'package:app_jugueria/modelos/adicionalModel.dart';
 import 'package:app_jugueria/modelos/pedidoModel.dart';
 import 'package:flutter/material.dart';
@@ -87,6 +88,12 @@ class AppListaPedidoState extends State<AppListaPedido> {
     //cargarDatosPastel();
     super.initState();
     cargarDatosPastel();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    InfoGlobal.decrementarVentanas();
   }
 
   @override

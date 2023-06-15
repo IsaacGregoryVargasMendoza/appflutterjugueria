@@ -37,11 +37,36 @@ class _AppRegistroCategoriaState extends State<AppRegistroCategoria> {
     }
   }
 
+  @override
+  void dispose() {
+    super.dispose();
+    InfoGlobal.decrementarVentanas();
+  }
+
   Future<void> registrarActualizar() async {
     try {
       setState(() {
         _widgetState = WidgetState.LOADING;
       });
+
+      if (nombreCategoria.text.toString().trim().length < 3) {
+        InfoGlobal.mostrarAlerta(
+            context, "Mensaje", "Ingrese una categoria valido.");
+        setState(() {
+          _widgetState = WidgetState.LOADED;
+        });
+        return;
+      }
+
+      if (letraCategoria.text.toString().trim().length != 1) {
+        InfoGlobal.mostrarAlerta(
+            context, "Mensaje", "Ingrese una letra valida.");
+        setState(() {
+          _widgetState = WidgetState.LOADED;
+        });
+        return;
+      }
+
       CategoriaController categoriaCtrll = CategoriaController();
       if (widget.categoriaModel != null) {
         CategoriaModel categoriaModel = CategoriaModel(
@@ -63,6 +88,7 @@ class _AppRegistroCategoriaState extends State<AppRegistroCategoria> {
       }
 
       final lista = await categoriaCtrll.getCategorias();
+      InfoGlobal.incrementarVentanas();
       Navigator.pushNamed(
         context,
         '/lista-categorias',

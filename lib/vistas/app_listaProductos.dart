@@ -1,7 +1,7 @@
 import 'package:app_jugueria/componentes/app_drawer.dart';
 import 'package:app_jugueria/controladores/productoController.dart';
 import 'package:app_jugueria/controladores/categoriaController.dart';
-import 'package:app_jugueria/vistas/app_registrarProductos.dart';
+import 'package:app_jugueria/componentes/info_global.dart';
 import 'package:app_jugueria/modelos/productoModel.dart';
 import 'package:app_jugueria/modelos/categoriaModel.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -32,6 +32,12 @@ class _AppListaProductoState extends State<AppListaProducto> {
 
   void initState() {
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    InfoGlobal.decrementarVentanas();
   }
 
   @override

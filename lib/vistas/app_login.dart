@@ -27,6 +27,24 @@ class _AppLoginState extends State<AppLogin> {
         _widgetState = WidgetState.LOADING;
       });
 
+      if (nombreUsuario.text.toString().trim().length < 2) {
+        InfoGlobal.mostrarAlerta(
+            context, "Mensaje", "Ingrese un nombre de usuario valido.");
+        setState(() {
+          _widgetState = WidgetState.LOADED;
+        });
+        return;
+      }
+
+      if (contraseniaUsuario.text.toString().trim().length < 2) {
+        InfoGlobal.mostrarAlerta(
+            context, "Mensaje", "Ingrese una contraseña valida.");
+        setState(() {
+          _widgetState = WidgetState.LOADED;
+        });
+        return;
+      }
+
       AdministradorController administradorCtrl = AdministradorController();
 
       UsuarioModel usuarioModel = UsuarioModel(
@@ -73,6 +91,13 @@ class _AppLoginState extends State<AppLogin> {
         _widgetState = WidgetState.LOADED;
       });
     }
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    InfoGlobal.decrementarVentanas();
   }
 
   @override

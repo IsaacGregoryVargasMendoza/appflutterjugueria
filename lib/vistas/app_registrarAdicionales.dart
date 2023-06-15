@@ -3,6 +3,7 @@ import 'package:app_jugueria/componentes/app_text.dart';
 import 'package:app_jugueria/componentes/app_buttons.dart';
 import 'package:app_jugueria/componentes/app_textFieldRound.dart';
 import 'package:app_jugueria/componentes/app_drawer.dart';
+import 'package:app_jugueria/componentes/info_global.dart';
 import 'package:app_jugueria/modelos/adicionalModel.dart';
 import 'package:flutter/material.dart';
 
@@ -23,6 +24,12 @@ class AppRegistroAdicionalState extends State<AppRegistroAdicional> {
   List<String> opciones = ['NO', 'SI'];
   String valorRespuesta = "NO";
   WidgetState _widgetState = WidgetState.NONE;
+
+  @override
+  void dispose() {
+    super.dispose();
+    InfoGlobal.decrementarVentanas();
+  }
 
   @override
   void initState() {
@@ -49,37 +56,67 @@ class AppRegistroAdicionalState extends State<AppRegistroAdicional> {
   }
 
   Future<void> registrarActualizar() async {
-    setState(() {
-      _widgetState = WidgetState.LOADING;
-    });
+    try {
+      setState(() {
+        _widgetState = WidgetState.LOADING;
+      });
 
-    AdicionalController adicionalCtrll = AdicionalController();
-    if (widget.adicional != null) {
-      AdicionalModel adicionalModel = AdicionalModel(
-          id: widget.adicional!.id,
-          nombreAdicional: nombreAdicional.text,
-          letraAdicional: letraAdicional.text,
-          visibleAdicional: (valorRespuesta == "NO") ? 0 : 1);
+      if (nombreAdicional.text.toString().trim().length < 2) {
+        InfoGlobal.mostrarAlerta(
+            context, "Mensaje", "Ingrese un adicional valido.");
+        setState(() {
+          _widgetState = WidgetState.LOADED;
+        });
+        return;
+      }
 
-      await adicionalCtrll.updateAdicional(adicionalModel);
-    } else {
-      AdicionalModel adicionalModel = AdicionalModel(
-          nombreAdicional: nombreAdicional.text,
-          letraAdicional: letraAdicional.text,
-          visibleAdicional: (valorRespuesta == "NO") ? 0 : 1);
+      if (letraAdicional.text.toString().trim().length != 1) {
+        InfoGlobal.mostrarAlerta(
+            context, "Mensaje", "Ingrese una letra valida.");
+        setState(() {
+          _widgetState = WidgetState.LOADED;
+        });
+        return;
+      }
 
-      await adicionalCtrll.addAdicional(adicionalModel);
+      AdicionalController adicionalCtrll = AdicionalController();
+      if (widget.adicional != null) {
+        AdicionalModel adicionalModel = AdicionalModel(
+            id: widget.adicional!.id,
+            nombreAdicional: nombreAdicional.text,
+            letraAdicional: letraAdicional.text,
+            visibleAdicional: (valorRespuesta == "NO") ? 0 : 1);
+
+        await adicionalCtrll.updateAdicional(adicionalModel);
+        InfoGlobal.mensajeConfirmacion(
+            context, "Se ha actualizado correctamente.");
+      } else {
+        AdicionalModel adicionalModel = AdicionalModel(
+            nombreAdicional: nombreAdicional.text,
+            letraAdicional: letraAdicional.text,
+            visibleAdicional: (valorRespuesta == "NO") ? 0 : 1);
+
+        await adicionalCtrll.addAdicional(adicionalModel);
+        InfoGlobal.mensajeConfirmacion(
+            context, "Se ha registrado correctamente.");
+      }
+
+      final lista = await adicionalCtrll.getAdicionales();
+      InfoGlobal.incrementarVentanas();
+      Navigator.pushNamed(
+        context,
+        '/lista-adicionales',
+        arguments: lista,
+      );
+      setState(() {
+        _widgetState = WidgetState.LOADED;
+      });
+    } catch (e) {
+      InfoGlobal.mensajeFallo(context, "No se pudo registrar.");
+      setState(() {
+        _widgetState = WidgetState.LOADED;
+      });
     }
-
-    final lista = await adicionalCtrll.getAdicionales();
-    Navigator.pushNamed(
-      context,
-      '/lista-adicionales',
-      arguments: lista,
-    );
-    setState(() {
-      _widgetState = WidgetState.LOADED;
-    });
   }
 
   @override
