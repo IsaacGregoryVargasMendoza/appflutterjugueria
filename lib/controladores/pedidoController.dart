@@ -86,7 +86,8 @@ class PedidoController {
 
   List<PedidoModel> formatearFechas(List<PedidoModel> lista) {
     for (var i = 0; i < lista.length; i++) {
-      lista[i].fechaPedido = lista[i].fechaPedido!.split(" ")[0].toString();
+      var fecha = lista[i].fechaPedido!.split(" ")[0].toString();
+      lista[i].fechaPedido = "${fecha.split("/")[1]}/${fecha.split("/")[2]}";
     }
 
     return lista;
