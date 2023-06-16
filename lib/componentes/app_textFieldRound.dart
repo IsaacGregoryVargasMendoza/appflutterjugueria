@@ -43,6 +43,9 @@ class AppTextFieldRound extends StatelessWidget {
                 obscureText: true,
                 enableSuggestions: false,
                 autocorrect: false,
+                onSubmitted: (value) {
+                  print("estoy terminando");
+                },
                 style: TextStyle(
                   fontSize: fontSize,
                   height: 2,
@@ -60,6 +63,9 @@ class AppTextFieldRound extends StatelessWidget {
                 keyboardType: TextInputType.multiline,
                 enableSuggestions: false,
                 autocorrect: false,
+                onSubmitted: (value) {
+                  print("estoy terminando");
+                },
                 style: TextStyle(
                   fontSize: fontSize,
 

@@ -96,6 +96,8 @@ class _AppLoginState extends State<AppLogin> {
   @override
   void dispose() {
     // TODO: implement dispose
+    nombreUsuario.dispose();
+    contraseniaUsuario.dispose();
     super.dispose();
     InfoGlobal.decrementarVentanas();
   }

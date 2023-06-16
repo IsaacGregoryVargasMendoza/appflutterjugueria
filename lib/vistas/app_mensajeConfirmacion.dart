@@ -18,7 +18,20 @@ class AppMensajeConfirmacionState extends State<AppMensajeConfirmacion> {
   @override
   void dispose() {
     super.dispose();
+    cargarMesas();
+  }
+
+  cargarMesas() {
+    Navigator.pop(context);
+    Navigator.pop(context);
+    Navigator.pop(context);
+    Navigator.pop(context);
+    Navigator.pop(context);
     InfoGlobal.decrementarVentanas();
+    InfoGlobal.decrementarVentanas();
+    InfoGlobal.decrementarVentanas();
+    InfoGlobal.decrementarVentanas();
+    Navigator.pushNamed(context, '/seleccionar-mesas');
   }
 
   @override
@@ -133,12 +146,7 @@ class AppMensajeConfirmacionState extends State<AppMensajeConfirmacion> {
                     const SizedBox(height: 20),
                     GestureDetector(
                       onTap: () {
-                        Navigator.pop(context);
-                        Navigator.pop(context);
-                        Navigator.pop(context);
-                        Navigator.pop(context);
-                        Navigator.pop(context);
-                        Navigator.pushNamed(context, '/seleccionar-mesas');
+                        cargarMesas();
                       },
                       child: Container(
                         width: 100,

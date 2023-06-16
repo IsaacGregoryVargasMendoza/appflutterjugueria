@@ -23,6 +23,8 @@ class AppLoginClienteState extends State<AppLoginCliente> {
 
   @override
   void dispose() {
+    nombreUsuario.dispose();
+    contraseniaUsuario.dispose();
     super.dispose();
     InfoGlobal.decrementarVentanas();
   }
