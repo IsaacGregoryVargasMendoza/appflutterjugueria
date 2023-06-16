@@ -21,10 +21,16 @@ class AppDashboardPedidoState extends State<AppDashboardPedido> {
   List<PieChartSectionData> sectionsChart = [];
   List<PedidoModel>? listaPedidos = [];
   List<GraficoLineal>? listaGrafico = [];
+  List<String>? listaReportes = [
+    "Ventas totales",
+    "Ventas por comprobante",
+    "Ventas por categoria",
+    "Producto mas vendido"
+  ];
   double _maxX = 0;
   double _maxY = 0;
 
-  int selectedOption = 0;
+  int selectedOption = 1;
 
   List<FlSpot>? data = [];
   List<FlSpot>? dataTotales = [];
@@ -34,20 +40,20 @@ class AppDashboardPedidoState extends State<AppDashboardPedido> {
   //   FlSpot(3, 7),
   //   FlSpot(4, 20),
   // ];
-  // final List<String> months = [
-  //   'Jan',
-  //   'Feb',
-  //   'Mar',
-  //   'Apr',
-  //   'May',
-  //   'Jun',
-  //   'Jul',
-  //   'Aug',
-  //   'Sep',
-  //   'Oct',
-  //   'Nov',
-  //   'Dec'
-  // ];
+  final List<String> meses = [
+    'Enero',
+    'Febrero',
+    'Marzo',
+    'Abril',
+    'Mayo',
+    'Junio',
+    'Julio',
+    'Agosto',
+    'Septiembre',
+    'Octubre',
+    'Noviembre',
+    'Diciembre'
+  ];
 
   Future<void> cargarPedidos() async {
     PedidoController pedidoController = PedidoController();
@@ -58,7 +64,7 @@ class AppDashboardPedidoState extends State<AppDashboardPedido> {
     cargarDatosPastel();
     cargarDatosGrafico();
   }
-  
+
   @override
   void dispose() {
     super.dispose();
@@ -76,32 +82,48 @@ class AppDashboardPedidoState extends State<AppDashboardPedido> {
     var objetosAgrupados = groupBy(lista, (pedido) => pedido.fechaPedido);
     double i = 0;
 
-    objetosAgrupados.forEach((fecha, objetos) {
-      print('Fecha: $fecha - Total: ${objetos.length}');
-      GraficoLineal valor = GraficoLineal(
-          fecha: fecha.toString(), cantidad: objetos.length.toDouble());
-
-      double total = 0;
-      for (var j = 0; j < objetos.length; j++) {
-        total = total + objetos[j].totalPedido!;
-      }
-
-      data!.add(FlSpot(i, valor.cantidad!));
-      dataTotales!.add(FlSpot(i, total));
-
-      i++;
+    for (var i = 0; i < meses.length; i++) {
+      var elemento;
+      GraficoLineal valor =
+          GraficoLineal(fecha: meses[i], cantidad: meses.length.toDouble());
+      dataTotales!.add(FlSpot(i.toDouble(), i.toDouble()));
+      //data!.add(FlSpot(i.toDouble(), i.toDouble()));
       listaGrafico!.add(valor);
-      if (_maxY < total) {
-        _maxY = total;
+      if (_maxY < 20) {
+        _maxY = 20;
       }
-      // if (_maxY < objetos.length) {
-      //   _maxY = objetos.length.toDouble();
-      // }
-    });
+    }
 
     setState(() {
-      _maxX = objetosAgrupados.length.toDouble();
+      _maxX = meses.length.toDouble();
     });
+
+    // objetosAgrupados.forEach((fecha, objetos) {
+    //   print('Fecha: $fecha - Total: ${objetos.length}');
+    //   GraficoLineal valor = GraficoLineal(
+    //       fecha: "fecha.toString()", cantidad: objetos.length.toDouble());
+
+    //   double total = 0;
+    //   for (var j = 0; j < objetos.length; j++) {
+    //     total = total + objetos[j].totalPedido!;
+    //   }
+
+    //   data!.add(FlSpot(i, valor.cantidad!));
+    //   dataTotales!.add(FlSpot(i, total));
+
+    //   i++;
+    //   listaGrafico!.add(valor);
+    //   if (_maxY < total) {
+    //     _maxY = total;
+    //   }
+    //   // if (_maxY < objetos.length) {
+    //   //   _maxY = objetos.length.toDouble();
+    //   // }
+    // });
+
+    // setState(() {
+    //   _maxX = objetosAgrupados.length.toDouble();
+    // });
   }
 
   void cargarDatosPastel() {
@@ -175,7 +197,7 @@ class AppDashboardPedidoState extends State<AppDashboardPedido> {
                   width: MediaQuery.of(context).size.width,
                   padding: EdgeInsets.fromLTRB(15, 15, 10, 15),
                   child: Text(
-                    "Bienvenido \n${InfoGlobal.administradorModel!.nombreAdministrador}",
+                    "Bienvenido ${InfoGlobal.administradorModel!.nombreAdministrador}",
                     style: const TextStyle(
                         fontFamily: 'Roboto',
                         fontSize: 20.0,
@@ -187,27 +209,107 @@ class AppDashboardPedidoState extends State<AppDashboardPedido> {
                 Container(
                   color: Colors.white,
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      RadioListTile(
-                        title: const Text('Cantidad de ventas'),
-                        value: 1,
-                        groupValue: selectedOption,
-                        onChanged: (value) {
-                          setState(() {
-                            selectedOption = value!;
-                          });
-                        },
+                      const Padding(
+                        padding: EdgeInsets.fromLTRB(20, 0, 50, 0),
+                        child: Text(
+                          "Filtro",
+                          style: TextStyle(
+                              fontFamily: 'Roboto',
+                              fontSize: 16,
+                              color: Colors.black,
+                              decoration: TextDecoration.none,
+                              fontWeight: FontWeight.bold),
+                        ),
                       ),
-                      RadioListTile(
-                        title: const Text('Monto total por ventas'),
-                        value: 2,
-                        groupValue: selectedOption,
-                        onChanged: (value) {
-                          setState(() {
-                            selectedOption = value!;
-                          });
-                        },
+                      Padding(
+                        padding: EdgeInsets.fromLTRB(50, 0, 50, 0),
+                        child: DropdownButtonFormField(
+                            decoration:
+                                const InputDecoration(border: InputBorder.none),
+                            value: 0,
+                            borderRadius: BorderRadius.circular(15),
+                            items: listaReportes!.map((reporte) {
+                              return DropdownMenuItem(
+                                  child: Text(reporte),
+                                  value: listaReportes!.indexOf(reporte));
+                            }).toList(),
+                            onChanged: (value) async {
+                              debugPrint(value.toString());
+                            }),
                       ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Padding(
+                            padding: EdgeInsets.fromLTRB(20, 0, 5, 0),
+                            child: Column(
+                              children: [
+                                const Text(
+                                  "Desde",
+                                  style: TextStyle(
+                                      fontFamily: 'Roboto',
+                                      fontSize: 16,
+                                      color: Colors.black,
+                                      decoration: TextDecoration.none,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                Container(
+                                  width: MediaQuery.of(context).size.width / 2 -
+                                      50,
+                                  child: DropdownButtonFormField(
+                                      decoration: const InputDecoration(
+                                          border: InputBorder.none),
+                                      value: 0,
+                                      borderRadius: BorderRadius.circular(15),
+                                      items: meses.map((mes) {
+                                        return DropdownMenuItem(
+                                            child: Text(mes),
+                                            value: meses!.indexOf(mes));
+                                      }).toList(),
+                                      onChanged: (value) async {
+                                        debugPrint(value.toString());
+                                      }),
+                                )
+                              ],
+                            ),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.fromLTRB(5, 0, 20, 0),
+                            child: Column(
+                              children: [
+                                const Text(
+                                  "Hasta",
+                                  style: TextStyle(
+                                      fontFamily: 'Roboto',
+                                      fontSize: 16,
+                                      color: Colors.black,
+                                      decoration: TextDecoration.none,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                Container(
+                                  width: MediaQuery.of(context).size.width / 2 -
+                                      50,
+                                  child: DropdownButtonFormField(
+                                      decoration: const InputDecoration(
+                                          border: InputBorder.none),
+                                      value: 11,
+                                      borderRadius: BorderRadius.circular(15),
+                                      items: meses.map((mes) {
+                                        return DropdownMenuItem(
+                                            child: Text(mes),
+                                            value: meses!.indexOf(mes));
+                                      }).toList(),
+                                      onChanged: (value) async {
+                                        debugPrint(value.toString());
+                                      }),
+                                )
+                              ],
+                            ),
+                          ),
+                        ],
+                      )
                     ],
                   ),
                 ),
@@ -225,13 +327,13 @@ class AppDashboardPedidoState extends State<AppDashboardPedido> {
                           LineChartData(
                             //backgroundColor: Colors.amber,
                             lineBarsData: [
-                              LineChartBarData(
-                                spots: data,
-                                isCurved: false,
-                                color: Colors.blue,
-                                //colors: [Colors.blue],
-                                barWidth: 4,
-                              ),
+                              // LineChartBarData(
+                              //   spots: data,
+                              //   isCurved: false,
+                              //   color: Colors.blue,
+                              //   //colors: [Colors.blue],
+                              //   barWidth: 4,
+                              // ),
                               LineChartBarData(
                                 spots: dataTotales,
                                 isCurved: false,
