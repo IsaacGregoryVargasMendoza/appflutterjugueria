@@ -27,12 +27,15 @@ class AppDashboardPedidoState extends State<AppDashboardPedido> {
     "Ventas por categoria",
     "Producto mas vendido"
   ];
+  late Map<String?, List<PedidoModel>> objetosAgrupadosGlobal;
   double _maxX = 0;
   double _maxY = 0;
 
-  int selectedOption = 1;
+  int filtro = 0;
+  int idInicioMes = 0;
+  int idFinMes = 11;
 
-  List<FlSpot>? data = [];
+  // List<FlSpot>? data = [];
   List<FlSpot>? dataTotales = [];
   //   FlSpot(0, 5),
   //   FlSpot(1, 10),
@@ -40,19 +43,22 @@ class AppDashboardPedidoState extends State<AppDashboardPedido> {
   //   FlSpot(3, 7),
   //   FlSpot(4, 20),
   // ];
+
+  final List<String> anios = ['2019', '2020', '2021', '2022', '2023'];
+
   final List<String> meses = [
-    'Enero',
-    'Febrero',
-    'Marzo',
-    'Abril',
-    'Mayo',
-    'Junio',
-    'Julio',
-    'Agosto',
-    'Septiembre',
-    'Octubre',
-    'Noviembre',
-    'Diciembre'
+    'Ene',
+    'Feb',
+    'Mar',
+    'Abr',
+    'May',
+    'Jun',
+    'Jul',
+    'Ago',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dic'
   ];
 
   Future<void> cargarPedidos() async {
@@ -80,50 +86,196 @@ class AppDashboardPedidoState extends State<AppDashboardPedido> {
     }
 
     var objetosAgrupados = groupBy(lista, (pedido) => pedido.fechaPedido);
-    double i = 0;
 
-    for (var i = 0; i < meses.length; i++) {
-      var elemento;
+    objetosAgrupadosGlobal = objetosAgrupados;
+    llenarDatosGrafico();
+  }
+
+  void llenarDatosGrafico() {
+    dataTotales = [];
+    listaGrafico = [];
+
+    int contador = 0;
+
+    for (var i = idInicioMes; i <= idFinMes; i++) {
       GraficoLineal valor =
           GraficoLineal(fecha: meses[i], cantidad: meses.length.toDouble());
-      dataTotales!.add(FlSpot(i.toDouble(), i.toDouble()));
-      //data!.add(FlSpot(i.toDouble(), i.toDouble()));
+
+      double total = 0;
+
+      switch (meses[i]) {
+        case "Ene":
+          var listas = objetosAgrupadosGlobal.entries
+              .where((entry) => entry.key == "01/2023")
+              .map((entry) => entry.value)
+              .toList();
+
+          if (listas.isNotEmpty) {
+            var objetos = listas.first;
+            for (var j = 0; j < objetos.length; j++) {
+              total = total + objetos[j].totalPedido!;
+            }
+          }
+
+          break;
+        case "Feb":
+          var listas = objetosAgrupadosGlobal.entries
+              .where((entry) => entry.key == "02/2023")
+              .map((entry) => entry.value)
+              .toList();
+
+          if (listas.isNotEmpty) {
+            var objetos = listas.first;
+            for (var j = 0; j < objetos.length; j++) {
+              total = total + objetos[j].totalPedido!;
+            }
+          }
+          break;
+        case "Mar":
+          var listas = objetosAgrupadosGlobal.entries
+              .where((entry) => entry.key == "03/2023")
+              .map((entry) => entry.value)
+              .toList();
+
+          if (listas.isNotEmpty) {
+            var objetos = listas.first;
+            for (var j = 0; j < objetos.length; j++) {
+              total = total + objetos[j].totalPedido!;
+            }
+          }
+          break;
+        case "Abr":
+          var listas = objetosAgrupadosGlobal.entries
+              .where((entry) => entry.key == "04/2023")
+              .map((entry) => entry.value)
+              .toList();
+
+          if (listas.isNotEmpty) {
+            var objetos = listas.first;
+            for (var j = 0; j < objetos.length; j++) {
+              total = total + objetos[j].totalPedido!;
+            }
+          }
+          break;
+        case "May":
+          var listas = objetosAgrupadosGlobal.entries
+              .where((entry) => entry.key == "05/2023")
+              .map((entry) => entry.value)
+              .toList();
+
+          if (listas.isNotEmpty) {
+            var objetos = listas.first;
+            for (var j = 0; j < objetos.length; j++) {
+              total = total + objetos[j].totalPedido!;
+            }
+          }
+          break;
+        case "Jun":
+          var listas = objetosAgrupadosGlobal.entries
+              .where((entry) => entry.key == "06/2023")
+              .map((entry) => entry.value)
+              .toList();
+
+          if (listas.isNotEmpty) {
+            var objetos = listas.first;
+            for (var j = 0; j < objetos.length; j++) {
+              total = total + objetos[j].totalPedido!;
+            }
+          }
+          break;
+        case "Jul":
+          var listas = objetosAgrupadosGlobal.entries
+              .where((entry) => entry.key == "07/2023")
+              .map((entry) => entry.value)
+              .toList();
+
+          if (listas.isNotEmpty) {
+            var objetos = listas.first;
+            for (var j = 0; j < objetos.length; j++) {
+              total = total + objetos[j].totalPedido!;
+            }
+          }
+          break;
+        case "Ago":
+          var listas = objetosAgrupadosGlobal.entries
+              .where((entry) => entry.key == "08/2023")
+              .map((entry) => entry.value)
+              .toList();
+
+          if (listas.isNotEmpty) {
+            var objetos = listas.first;
+            for (var j = 0; j < objetos.length; j++) {
+              total = total + objetos[j].totalPedido!;
+            }
+          }
+          break;
+        case "Sep":
+          var listas = objetosAgrupadosGlobal.entries
+              .where((entry) => entry.key == "09/2023")
+              .map((entry) => entry.value)
+              .toList();
+
+          if (listas.isNotEmpty) {
+            var objetos = listas.first;
+            for (var j = 0; j < objetos.length; j++) {
+              total = total + objetos[j].totalPedido!;
+            }
+          }
+          break;
+        case "Oct":
+          var listas = objetosAgrupadosGlobal.entries
+              .where((entry) => entry.key == "10/2023")
+              .map((entry) => entry.value)
+              .toList();
+
+          if (listas.isNotEmpty) {
+            var objetos = listas.first;
+            for (var j = 0; j < objetos.length; j++) {
+              total = total + objetos[j].totalPedido!;
+            }
+          }
+          break;
+        case "Nov":
+          var listas = objetosAgrupadosGlobal.entries
+              .where((entry) => entry.key == "11/2023")
+              .map((entry) => entry.value)
+              .toList();
+
+          if (listas.isNotEmpty) {
+            var objetos = listas.first;
+            for (var j = 0; j < objetos.length; j++) {
+              total = total + objetos[j].totalPedido!;
+            }
+          }
+          break;
+        case "Dic":
+          var listas = objetosAgrupadosGlobal.entries
+              .where((entry) => entry.key == "12/2023")
+              .map((entry) => entry.value)
+              .toList();
+
+          if (listas.isNotEmpty) {
+            var objetos = listas.first;
+            for (var j = 0; j < objetos.length; j++) {
+              total = total + objetos[j].totalPedido!;
+            }
+          }
+          break;
+      }
+
+      dataTotales!.add(FlSpot(contador.toDouble(), total));
+
+      contador++;
+
       listaGrafico!.add(valor);
-      if (_maxY < 20) {
-        _maxY = 20;
+      if (_maxY < total) {
+        _maxY = total;
       }
     }
 
     setState(() {
-      _maxX = meses.length.toDouble();
+      _maxX = idFinMes.toDouble() - idInicioMes.toDouble();
     });
-
-    // objetosAgrupados.forEach((fecha, objetos) {
-    //   print('Fecha: $fecha - Total: ${objetos.length}');
-    //   GraficoLineal valor = GraficoLineal(
-    //       fecha: "fecha.toString()", cantidad: objetos.length.toDouble());
-
-    //   double total = 0;
-    //   for (var j = 0; j < objetos.length; j++) {
-    //     total = total + objetos[j].totalPedido!;
-    //   }
-
-    //   data!.add(FlSpot(i, valor.cantidad!));
-    //   dataTotales!.add(FlSpot(i, total));
-
-    //   i++;
-    //   listaGrafico!.add(valor);
-    //   if (_maxY < total) {
-    //     _maxY = total;
-    //   }
-    //   // if (_maxY < objetos.length) {
-    //   //   _maxY = objetos.length.toDouble();
-    //   // }
-    // });
-
-    // setState(() {
-    //   _maxX = objetosAgrupados.length.toDouble();
-    // });
   }
 
   void cargarDatosPastel() {
@@ -184,314 +336,465 @@ class AppDashboardPedidoState extends State<AppDashboardPedido> {
         backgroundColor: Colors.green.shade900,
       ),
       drawer: AppMenuDrawer(),
-      body: ListView(
-        //padding: ,
-        children: [
-          Container(
-            height: MediaQuery.of(context).size.height,
-            width: MediaQuery.of(context).size.width,
-            child: Column(
-              children: [
-                Container(
-                  //color: Colors.blue,
-                  width: MediaQuery.of(context).size.width,
-                  padding: EdgeInsets.fromLTRB(15, 15, 10, 15),
-                  child: Text(
-                    "Bienvenido ${InfoGlobal.administradorModel!.nombreAdministrador}",
-                    style: const TextStyle(
-                        fontFamily: 'Roboto',
-                        fontSize: 20.0,
-                        color: Colors.black,
-                        decoration: TextDecoration.none,
-                        fontWeight: FontWeight.bold),
+      body: Container(
+        height: MediaQuery.of(context).size.height,
+        width: MediaQuery.of(context).size.width,
+        child: ListView(
+          children: [
+            Container(
+              //color: Colors.blue,
+              width: MediaQuery.of(context).size.width,
+              padding: EdgeInsets.fromLTRB(15, 15, 10, 15),
+              child: Text(
+                "Bienvenido ${InfoGlobal.administradorModel!.nombreAdministrador}",
+                style: const TextStyle(
+                    fontFamily: 'Roboto',
+                    fontSize: 20.0,
+                    color: Colors.black,
+                    decoration: TextDecoration.none,
+                    fontWeight: FontWeight.bold),
+              ),
+            ),
+            Container(
+              color: Colors.white,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Padding(
+                    padding: EdgeInsets.fromLTRB(20, 0, 50, 0),
+                    child: Text(
+                      "Año",
+                      style: TextStyle(
+                          fontFamily: 'Roboto',
+                          fontSize: 16,
+                          color: Colors.black,
+                          decoration: TextDecoration.none,
+                          fontWeight: FontWeight.bold),
+                    ),
                   ),
-                ),
-                Container(
-                  color: Colors.white,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(50, 0, 50, 0),
+                    child: DropdownButtonFormField(
+                        decoration:
+                            const InputDecoration(border: InputBorder.none),
+                        value: 4,
+                        // enableFeedback: false,
+                        onChanged: null,
+                        borderRadius: BorderRadius.circular(15),
+                        items: anios.map((anio) {
+                          return DropdownMenuItem(
+                              child: Text(anio), value: anios.indexOf(anio));
+                        }).toList(),
+                        // onChanged: (value) async {
+                        //   debugPrint(value.toString());
+                        // },
+                        ),
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.fromLTRB(20, 0, 50, 0),
+                    child: Text(
+                      "Filtro",
+                      style: TextStyle(
+                          fontFamily: 'Roboto',
+                          fontSize: 16,
+                          color: Colors.black,
+                          decoration: TextDecoration.none,
+                          fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(50, 0, 50, 0),
+                    child: DropdownButtonFormField(
+                        decoration:
+                            const InputDecoration(border: InputBorder.none),
+                        value: 0,
+                        borderRadius: BorderRadius.circular(15),
+                        items: listaReportes!.map((reporte) {
+                          return DropdownMenuItem(
+                              child: Text(reporte),
+                              value: listaReportes!.indexOf(reporte));
+                        }).toList(),
+                        onChanged: (value) async {
+                          setState(() {
+                            filtro = value!;
+                          });
+                        }),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Padding(
-                        padding: EdgeInsets.fromLTRB(20, 0, 50, 0),
-                        child: Text(
-                          "Filtro",
-                          style: TextStyle(
-                              fontFamily: 'Roboto',
-                              fontSize: 16,
-                              color: Colors.black,
-                              decoration: TextDecoration.none,
-                              fontWeight: FontWeight.bold),
+                      Padding(
+                        padding: EdgeInsets.fromLTRB(20, 0, 5, 0),
+                        child: Column(
+                          children: [
+                            const Text(
+                              "Desde",
+                              style: TextStyle(
+                                  fontFamily: 'Roboto',
+                                  fontSize: 16,
+                                  color: Colors.black,
+                                  decoration: TextDecoration.none,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                            Container(
+                              width: MediaQuery.of(context).size.width / 2 - 50,
+                              child: DropdownButtonFormField(
+                                  decoration: const InputDecoration(
+                                      border: InputBorder.none),
+                                  value: 0,
+                                  borderRadius: BorderRadius.circular(15),
+                                  items: meses.map((mes) {
+                                    return DropdownMenuItem(
+                                        child: Text(mes),
+                                        value: meses!.indexOf(mes));
+                                  }).toList(),
+                                  onChanged: (value) async {
+                                        idInicioMes = value!;
+                                    int diferencia = idFinMes - idInicioMes;
+                                    if (diferencia > 0) {
+                                      // setState(() {
+                                      //   idInicioMes = value!;
+                                      // });
+                                      llenarDatosGrafico();
+                                    } else {
+                                      InfoGlobal.mensajeFallo(context,
+                                          "Debe seleccionar un rango de fechas valido.");
+                                    }
+                                  }),
+                            )
+                          ],
                         ),
                       ),
                       Padding(
-                        padding: EdgeInsets.fromLTRB(50, 0, 50, 0),
-                        child: DropdownButtonFormField(
-                            decoration:
-                                const InputDecoration(border: InputBorder.none),
-                            value: 0,
-                            borderRadius: BorderRadius.circular(15),
-                            items: listaReportes!.map((reporte) {
-                              return DropdownMenuItem(
-                                  child: Text(reporte),
-                                  value: listaReportes!.indexOf(reporte));
-                            }).toList(),
-                            onChanged: (value) async {
-                              debugPrint(value.toString());
-                            }),
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Padding(
-                            padding: EdgeInsets.fromLTRB(20, 0, 5, 0),
-                            child: Column(
-                              children: [
-                                const Text(
-                                  "Desde",
-                                  style: TextStyle(
-                                      fontFamily: 'Roboto',
-                                      fontSize: 16,
-                                      color: Colors.black,
-                                      decoration: TextDecoration.none,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                                Container(
-                                  width: MediaQuery.of(context).size.width / 2 -
-                                      50,
-                                  child: DropdownButtonFormField(
-                                      decoration: const InputDecoration(
-                                          border: InputBorder.none),
-                                      value: 0,
-                                      borderRadius: BorderRadius.circular(15),
-                                      items: meses.map((mes) {
-                                        return DropdownMenuItem(
-                                            child: Text(mes),
-                                            value: meses!.indexOf(mes));
-                                      }).toList(),
-                                      onChanged: (value) async {
-                                        debugPrint(value.toString());
-                                      }),
-                                )
-                              ],
-                            ),
-                          ),
-                          Padding(
-                            padding: EdgeInsets.fromLTRB(5, 0, 20, 0),
-                            child: Column(
-                              children: [
-                                const Text(
-                                  "Hasta",
-                                  style: TextStyle(
-                                      fontFamily: 'Roboto',
-                                      fontSize: 16,
-                                      color: Colors.black,
-                                      decoration: TextDecoration.none,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                                Container(
-                                  width: MediaQuery.of(context).size.width / 2 -
-                                      50,
-                                  child: DropdownButtonFormField(
-                                      decoration: const InputDecoration(
-                                          border: InputBorder.none),
-                                      value: 11,
-                                      borderRadius: BorderRadius.circular(15),
-                                      items: meses.map((mes) {
-                                        return DropdownMenuItem(
-                                            child: Text(mes),
-                                            value: meses!.indexOf(mes));
-                                      }).toList(),
-                                      onChanged: (value) async {
-                                        debugPrint(value.toString());
-                                      }),
-                                )
-                              ],
-                            ),
-                          ),
-                        ],
-                      )
-                    ],
-                  ),
-                ),
-                (data!.isNotEmpty)
-                    ? Container(
-                        height: 300,
-                        padding: EdgeInsets.fromLTRB(10, 20, 10, 5),
-                        margin: EdgeInsets.fromLTRB(10, 10, 10, 0),
-                        width: MediaQuery.of(context).size.width - 25,
-                        decoration: BoxDecoration(
-                            color: Color.fromRGBO(30, 2, 90, 1),
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(10))),
-                        child: LineChart(
-                          LineChartData(
-                            //backgroundColor: Colors.amber,
-                            lineBarsData: [
-                              // LineChartBarData(
-                              //   spots: data,
-                              //   isCurved: false,
-                              //   color: Colors.blue,
-                              //   //colors: [Colors.blue],
-                              //   barWidth: 4,
-                              // ),
-                              LineChartBarData(
-                                spots: dataTotales,
-                                isCurved: false,
-                                color: Colors.orange,
-                                //colors: [Colors.blue],
-                                barWidth: 4,
-                              ),
-                            ],
-                            minX: 0,
-                            maxX: _maxX,
-                            minY: 0,
-                            maxY: _maxY + 10,
-                            titlesData: FlTitlesData(
-                              show: true,
-                              bottomTitles: AxisTitles(
-                                sideTitles: SideTitles(
-                                  //interval: 10,
-                                  showTitles: true,
-                                  reservedSize: 100,
-                                  getTitlesWidget: (value, meta) {
-                                    //print(value);
-                                    final int index = value.toInt();
-                                    if (index >= 0 &&
-                                        index < listaGrafico!.length) {
-                                      return Container(
-                                          padding:
-                                              EdgeInsets.fromLTRB(0, 60, 0, 0),
-                                          child: Transform(
-                                            transform: Matrix4.rotationZ(315 *
-                                                0.0174533), // 45 grados en radianes
-                                            child: Text(
-                                              listaGrafico![index].fecha!,
-                                              style: TextStyle(
-                                                  color: Colors.grey,
-                                                  fontWeight: FontWeight.bold),
-                                            ),
-                                          ));
-                                    }
-                                    return Text("");
-                                  },
-                                ),
-                              ),
-                              topTitles: AxisTitles(
-                                  sideTitles: SideTitles(showTitles: false)),
-                              rightTitles: AxisTitles(
-                                  sideTitles: SideTitles(showTitles: false)),
-                              leftTitles: AxisTitles(
-                                sideTitles: SideTitles(
-                                  //interval: 10,
-                                  showTitles: true,
-                                  reservedSize: 50,
-                                  getTitlesWidget: (value, meta) {
-                                    return Text(
-                                      value.toString(),
-                                      style: TextStyle(color: Colors.grey),
-                                    );
-                                  },
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      )
-                    : Container(
-                        height: 300,
-                        padding: EdgeInsets.fromLTRB(10, 20, 10, 20),
-                        margin: EdgeInsets.fromLTRB(10, 10, 10, 0),
-                        width: MediaQuery.of(context).size.width - 25,
-                        decoration: const BoxDecoration(
-                            color: Color.fromRGBO(30, 2, 90, 1),
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(10))),
+                        padding: EdgeInsets.fromLTRB(5, 0, 20, 0),
                         child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              CircularProgressIndicator(
-                                color: Colors.amber.shade800,
-                              ),
-                              const Text(
-                                "Cargando datos...",
-                                style: TextStyle(
-                                    fontSize: 18, color: Colors.white),
-                                textAlign: TextAlign.start,
-                              ),
-                            ]),
+                          children: [
+                            const Text(
+                              "Hasta",
+                              style: TextStyle(
+                                  fontFamily: 'Roboto',
+                                  fontSize: 16,
+                                  color: Colors.black,
+                                  decoration: TextDecoration.none,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                            Container(
+                              width: MediaQuery.of(context).size.width / 2 - 50,
+                              child: DropdownButtonFormField(
+                                  decoration: const InputDecoration(
+                                      border: InputBorder.none),
+                                  value: 11,
+                                  borderRadius: BorderRadius.circular(15),
+                                  items: meses.map((mes) {
+                                    return DropdownMenuItem(
+                                        child: Text(mes),
+                                        value: meses!.indexOf(mes));
+                                  }).toList(),
+                                  onChanged: (value) async {
+                                    idFinMes = value!;
+                                    int diferencia = idFinMes - idInicioMes;
+                                    if (diferencia > 0) {
+                                      llenarDatosGrafico();
+                                    } else {
+                                      InfoGlobal.mensajeFallo(context,
+                                          "Debe seleccionar un rango de fechas valido.");
+                                    }
+                                  }),
+                            )
+                          ],
+                        ),
                       ),
-                Container(
-                  padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
-                  height: 250,
-                  width: MediaQuery.of(context).size.width,
-                  child: Column(
+                    ],
+                  )
+                ],
+              ),
+            ),
+
+            // (data!.isNotEmpty)
+            //     ? Container(
+            //         height: 300,
+            //         padding: EdgeInsets.fromLTRB(10, 20, 10, 5),
+            //         margin: EdgeInsets.fromLTRB(10, 10, 10, 0),
+            //         width: MediaQuery.of(context).size.width - 25,
+            //         decoration: BoxDecoration(
+            //             color: Color.fromRGBO(30, 2, 90, 1),
+            //             borderRadius:
+            //                 BorderRadius.all(Radius.circular(10))),
+            //         child: LineChart(
+            //           LineChartData(
+            //             //backgroundColor: Colors.amber,
+            //             lineBarsData: [
+            //               // LineChartBarData(
+            //               //   spots: data,
+            //               //   isCurved: false,
+            //               //   color: Colors.blue,
+            //               //   //colors: [Colors.blue],
+            //               //   barWidth: 4,
+            //               // ),
+            //               LineChartBarData(
+            //                 spots: dataTotales,
+            //                 isCurved: false,
+            //                 color: Colors.orange,
+            //                 //colors: [Colors.blue],
+            //                 barWidth: 4,
+            //               ),
+            //             ],
+            //             minX: 0,
+            //             maxX: _maxX,
+            //             minY: 0,
+            //             maxY: _maxY + 10,
+            //             titlesData: FlTitlesData(
+            //               show: true,
+            //               bottomTitles: AxisTitles(
+            //                 sideTitles: SideTitles(
+            //                   //interval: 10,
+            //                   showTitles: true,
+            //                   reservedSize: 100,
+            //                   getTitlesWidget: (value, meta) {
+            //                     //print(value);
+            //                     final int index = value.toInt();
+            //                     if (index >= 0 &&
+            //                         index < listaGrafico!.length) {
+            //                       return Container(
+            //                           padding:
+            //                               EdgeInsets.fromLTRB(0, 60, 0, 0),
+            //                           child: Transform(
+            //                             transform: Matrix4.rotationZ(315 *
+            //                                 0.0174533), // 45 grados en radianes
+            //                             child: Text(
+            //                               listaGrafico![index].fecha!,
+            //                               style: TextStyle(
+            //                                   color: Colors.grey,
+            //                                   fontWeight: FontWeight.bold),
+            //                             ),
+            //                           ));
+            //                     }
+            //                     return Text("");
+            //                   },
+            //                 ),
+            //               ),
+            //               topTitles: AxisTitles(
+            //                   sideTitles: SideTitles(showTitles: false)),
+            //               rightTitles: AxisTitles(
+            //                   sideTitles: SideTitles(showTitles: false)),
+            //               leftTitles: AxisTitles(
+            //                 sideTitles: SideTitles(
+            //                   //interval: 10,
+            //                   showTitles: true,
+            //                   reservedSize: 50,
+            //                   getTitlesWidget: (value, meta) {
+            //                     return Text(
+            //                       value.toString(),
+            //                       style: TextStyle(color: Colors.grey),
+            //                     );
+            //                   },
+            //                 ),
+            //               ),
+            //             ),
+            //           ),
+            //         ),
+            //       )
+
+            // Container(
+            //   height: 300,
+            //   padding: EdgeInsets.fromLTRB(10, 20, 10, 20),
+            //   margin: EdgeInsets.fromLTRB(10, 10, 10, 0),
+            //   width: MediaQuery.of(context).size.width - 25,
+            //   decoration: const BoxDecoration(
+            //       color: Color.fromRGBO(30, 2, 90, 1),
+            //       borderRadius: BorderRadius.all(Radius.circular(10))),
+            //   child: Column(
+            //       mainAxisAlignment: MainAxisAlignment.center,
+            //       crossAxisAlignment: CrossAxisAlignment.center,
+            //       children: [
+            //         CircularProgressIndicator(
+            //           color: Colors.amber.shade800,
+            //         ),
+            //         const Text(
+            //           "Cargando datos...",
+            //           style: TextStyle(fontSize: 18, color: Colors.white),
+            //           textAlign: TextAlign.start,
+            //         ),
+            //       ]),
+            // ),
+            graficoLineal(),
+            Container(
+              padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
+              height: 250,
+              width: MediaQuery.of(context).size.width,
+              child: Column(
+                children: [
+                  Container(
+                    padding: EdgeInsets.fromLTRB(0, 70, 0, 0),
+                    height: 150,
+                    width: 150,
+                    child: PieChart(
+                      PieChartData(
+                          borderData: FlBorderData(
+                            show: false,
+                          ),
+                          sectionsSpace: 0,
+                          centerSpaceRadius: 0,
+                          sections: sectionsChart),
+                    ),
+                  ),
+                  Row(
                     children: [
                       Container(
-                        padding: EdgeInsets.fromLTRB(0, 70, 0, 0),
-                        height: 150,
-                        width: 150,
-                        child: PieChart(
-                          PieChartData(
-                              borderData: FlBorderData(
-                                show: false,
-                              ),
-                              sectionsSpace: 0,
-                              centerSpaceRadius: 0,
-                              sections: sectionsChart),
-                        ),
+                        height: 20,
+                        width: 20,
+                        color: Colors.blue,
                       ),
-                      Row(
-                        children: [
-                          Container(
-                            height: 20,
-                            width: 20,
-                            color: Colors.blue,
-                          ),
-                          const Text(
-                            " Boletas",
-                            style: TextStyle(fontSize: 18, color: Colors.black),
-                            textAlign: TextAlign.start,
-                          ),
-                        ],
+                      const Text(
+                        " Boletas",
+                        style: TextStyle(fontSize: 18, color: Colors.black),
+                        textAlign: TextAlign.start,
                       ),
-                      Row(
-                        children: [
-                          Container(
-                            height: 20,
-                            width: 20,
-                            color: Colors.red,
-                          ),
-                          const Text(
-                            " Facturas",
-                            style: TextStyle(fontSize: 18, color: Colors.black),
-                            textAlign: TextAlign.start,
-                          ),
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          Container(
-                            height: 20,
-                            width: 20,
-                            color: Colors.orange,
-                          ),
-                          const Text(
-                            " Tickets",
-                            style: TextStyle(fontSize: 18, color: Colors.black),
-                            textAlign: TextAlign.start,
-                          ),
-                        ],
-                      )
                     ],
                   ),
-                ),
-              ],
+                  Row(
+                    children: [
+                      Container(
+                        height: 20,
+                        width: 20,
+                        color: Colors.red,
+                      ),
+                      const Text(
+                        " Facturas",
+                        style: TextStyle(fontSize: 18, color: Colors.black),
+                        textAlign: TextAlign.start,
+                      ),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      Container(
+                        height: 20,
+                        width: 20,
+                        color: Colors.orange,
+                      ),
+                      const Text(
+                        " Tickets",
+                        style: TextStyle(fontSize: 18, color: Colors.black),
+                        textAlign: TextAlign.start,
+                      ),
+                    ],
+                  )
+                ],
+              ),
             ),
-          )
-        ],
+          ],
+        ),
       ),
     );
+  }
+
+  Widget graficoLineal() {
+    return (filtro == 0 && dataTotales!.isNotEmpty)
+        ? Container(
+            height: 300,
+            padding: EdgeInsets.fromLTRB(10, 20, 30, 5),
+            margin: EdgeInsets.fromLTRB(10, 10, 10, 0),
+            width: MediaQuery.of(context).size.width - 25,
+            decoration: BoxDecoration(
+                color: Color.fromRGBO(30, 2, 90, 1),
+                borderRadius: BorderRadius.all(Radius.circular(10))),
+            child: LineChart(
+              LineChartData(
+                //backgroundColor: Colors.amber,
+                lineBarsData: (filtro == 0)
+                    ? [
+                        // LineChartBarData(
+                        //   spots: data,
+                        //   isCurved: false,
+                        //   color: Colors.blue,
+                        //   //colors: [Colors.blue],
+                        //   barWidth: 4,
+                        // ),
+                        LineChartBarData(
+                          spots: dataTotales,
+                          isCurved: false,
+                          color: Colors.orange,
+                          //colors: [Colors.blue],
+                          barWidth: 4,
+                        ),
+                      ]
+                    : [],
+                minX: 0,
+                maxX: _maxX,
+                minY: 0,
+                maxY: _maxY + 10,
+                titlesData: FlTitlesData(
+                  show: true,
+                  bottomTitles: AxisTitles(
+                    sideTitles: SideTitles(
+                      //interval: 10,
+                      showTitles: true,
+                      reservedSize: 100,
+                      getTitlesWidget: (value, meta) {
+                        //print(value);
+                        final int index = value.toInt();
+                        if (index >= 0 && index < listaGrafico!.length) {
+                          return Container(
+                              padding: EdgeInsets.fromLTRB(0, 30, 0, 0),
+                              child: Transform(
+                                transform: Matrix4.rotationZ(
+                                    315 * 0.0174533), // 45 grados en radianes
+                                child: Text(
+                                  listaGrafico![index].fecha!,
+                                  style: TextStyle(
+                                      color: Colors.grey,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                              ));
+                        }
+                        return Text("");
+                      },
+                    ),
+                  ),
+                  topTitles:
+                      AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  rightTitles:
+                      AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  leftTitles: AxisTitles(
+                    sideTitles: SideTitles(
+                      //interval: 10,
+                      showTitles: true,
+                      reservedSize: 50,
+                      getTitlesWidget: (value, meta) {
+                        return Text(
+                          value.toString(),
+                          style: TextStyle(color: Colors.grey),
+                        );
+                      },
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          )
+        : Container(
+            height: 300,
+            padding: EdgeInsets.fromLTRB(10, 20, 10, 20),
+            margin: EdgeInsets.fromLTRB(10, 10, 10, 0),
+            width: MediaQuery.of(context).size.width - 25,
+            decoration: const BoxDecoration(
+                color: Color.fromRGBO(30, 2, 90, 1),
+                borderRadius: BorderRadius.all(Radius.circular(10))),
+            child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(
+                    color: Colors.amber.shade800,
+                  ),
+                  const Text(
+                    "Cargando datos...",
+                    style: TextStyle(fontSize: 18, color: Colors.white),
+                    textAlign: TextAlign.start,
+                  ),
+                ]),
+          );
   }
 
   abrirModalDetalle(List<DetallePedidoModel> lista,
