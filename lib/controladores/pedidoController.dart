@@ -85,12 +85,55 @@ class PedidoController {
   }
 
   List<PedidoModel> formatearFechas(List<PedidoModel> lista) {
+    List<PedidoModel> listaNueva = [];
     for (var i = 0; i < lista.length; i++) {
-      var fecha = lista[i].fechaPedido!.split(" ")[0].toString();
-      lista[i].fechaPedido = "${fecha.split("/")[1]}/${fecha.split("/")[2]}";
+
+      PedidoModel pedidoModel = PedidoModel();
+      pedidoModel.id = lista[i].id;
+      pedidoModel.cliente = lista[i].cliente;
+      pedidoModel.mesa = lista[i].mesa;
+      pedidoModel.comprobante = lista[i].comprobante;
+      pedidoModel.numeroDocumento = lista[i].numeroDocumento;
+      pedidoModel.denominacionCliente = lista[i].denominacionCliente;
+      pedidoModel.direccionCliente = lista[i].direccionCliente;
+      pedidoModel.fechaPedido = lista[i].fechaPedido;
+      pedidoModel.seriePedido = lista[i].seriePedido;
+      pedidoModel.correlativoPedido = lista[i].correlativoPedido;
+      pedidoModel.subTotalPedido = lista[i].subTotalPedido;
+      pedidoModel.igvPedido = lista[i].igvPedido;
+      pedidoModel.totalPedido = lista[i].totalPedido;
+
+      var fecha = pedidoModel.fechaPedido!.split(" ")[0].toString();
+      pedidoModel.fechaPedido = "${fecha.split("/")[1]}/${fecha.split("/")[2]}";
+
+      listaNueva.add(pedidoModel);
     }
 
-    return lista;
+    return listaNueva;
+  }
+
+  List<List<PedidoModel>?> listaPorComprobante(List<PedidoModel> lista) {
+    List<List<PedidoModel>> listaPorComprobante = [];
+
+    List<PedidoModel> listaTickets = [];
+    List<PedidoModel> listaBoletas = [];
+    List<PedidoModel> listaFacturas = [];
+
+    listaTickets = lista
+        .where((element) => element.comprobante!.nombreComprobante == "TICKET")
+        .toList();
+    listaBoletas = lista
+        .where((element) => element.comprobante!.nombreComprobante == "BOLETA")
+        .toList();
+    listaFacturas = lista
+        .where((element) => element.comprobante!.nombreComprobante == "FACTURA")
+        .toList();
+
+    listaPorComprobante.add(listaTickets);
+    listaPorComprobante.add(listaBoletas);
+    listaPorComprobante.add(listaFacturas);
+
+    return listaPorComprobante;
   }
 
   Future<List<DetallePedidoModel>> getListDetalleOfPedido(int id) async {

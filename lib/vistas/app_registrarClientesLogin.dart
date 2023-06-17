@@ -271,7 +271,9 @@ class AppRegistrarClienteLoginState extends State<AppRegistrarClienteLogin> {
                               );
                             }).toList(),
                             onChanged: (value) {
-                              idTipoDocumento = value!;
+                              setState(() {
+                                idTipoDocumento = value!;
+                              });
                             })
                         : DropdownButtonFormField(
                             decoration:
@@ -294,9 +296,13 @@ class AppRegistrarClienteLoginState extends State<AppRegistrarClienteLogin> {
                     padding: const EdgeInsets.all(0),
                     width: 320,
                     height: 20,
-                    child: const Text(
-                      "N° documento",
-                      style: TextStyle(fontSize: 14, color: Colors.white),
+                    child: Text(
+                      (idTipoDocumento == 2)
+                          ? "DNI"
+                          : (idTipoDocumento == 3)
+                              ? "RUC"
+                              : "N° TIpo documento",
+                      style: const TextStyle(fontSize: 14, color: Colors.white),
                     ),
                   ),
                   AppTextFieldRound(
@@ -311,9 +317,13 @@ class AppRegistrarClienteLoginState extends State<AppRegistrarClienteLogin> {
                     padding: const EdgeInsets.all(0),
                     width: 320,
                     height: 20,
-                    child: const Text(
-                      "Nombres",
-                      style: TextStyle(fontSize: 14, color: Colors.white),
+                    child: Text(
+                      (idTipoDocumento == 2)
+                          ? "Nombres"
+                          : (idTipoDocumento == 3)
+                              ? "Razon social"
+                              : "Nombres",
+                      style: const TextStyle(fontSize: 14, color: Colors.white),
                     ),
                   ),
                   AppTextFieldRound(
@@ -322,23 +332,27 @@ class AppRegistrarClienteLoginState extends State<AppRegistrarClienteLogin> {
                     funcion: () {},
                     myController: tecNombre,
                   ),
-                  const SizedBox(height: 15),
-                  Container(
-                    margin: const EdgeInsets.all(0),
-                    padding: const EdgeInsets.all(0),
-                    width: 320,
-                    height: 20,
-                    child: const Text(
-                      "Apellidos",
-                      style: TextStyle(fontSize: 14, color: Colors.white),
-                    ),
-                  ),
-                  AppTextFieldRound(
-                    width: 320,
-                    isPassword: false,
-                    funcion: () {},
-                    myController: tecApellido,
-                  ),
+                  SizedBox(height: (idTipoDocumento != 3) ? 15 : 0),
+                  (idTipoDocumento != 3)
+                      ? Container(
+                          margin: const EdgeInsets.all(0),
+                          padding: const EdgeInsets.all(0),
+                          width: 320,
+                          height: 20,
+                          child: const Text(
+                            "Apellidos",
+                            style: TextStyle(fontSize: 14, color: Colors.white),
+                          ),
+                        )
+                      : SizedBox(height: 0),
+                  (idTipoDocumento != 3)
+                      ? AppTextFieldRound(
+                          width: 320,
+                          isPassword: false,
+                          funcion: () {},
+                          myController: tecApellido,
+                        )
+                      : SizedBox(height: 0),
                   const SizedBox(height: 15),
                   Container(
                     width: 320,

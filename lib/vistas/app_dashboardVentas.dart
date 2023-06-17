@@ -28,6 +28,7 @@ class AppDashboardPedidoState extends State<AppDashboardPedido> {
     "Producto mas vendido"
   ];
   late Map<String?, List<PedidoModel>> objetosAgrupadosGlobal;
+  late List<Map<String?, List<PedidoModel>>> listaObjetosAgrupadosGlobal = [];
   double _maxX = 0;
   double _maxY = 0;
 
@@ -35,14 +36,8 @@ class AppDashboardPedidoState extends State<AppDashboardPedido> {
   int idInicioMes = 0;
   int idFinMes = 11;
 
-  // List<FlSpot>? data = [];
   List<FlSpot>? dataTotales = [];
-  //   FlSpot(0, 5),
-  //   FlSpot(1, 10),
-  //   FlSpot(2, 15),
-  //   FlSpot(3, 7),
-  //   FlSpot(4, 20),
-  // ];
+  List<List<FlSpot>>? listaDataTotales = [];
 
   final List<String> anios = ['2019', '2020', '2021', '2022', '2023'];
 
@@ -82,13 +77,210 @@ class AppDashboardPedidoState extends State<AppDashboardPedido> {
     var lista = pedidoController.formatearFechas(listaPedidos!);
 
     for (var i = 0; i < lista.length; i++) {
-      print(lista[i].fechaPedido);
+      debugPrint(lista[i].fechaPedido);
     }
 
     var objetosAgrupados = groupBy(lista, (pedido) => pedido.fechaPedido);
 
     objetosAgrupadosGlobal = objetosAgrupados;
     llenarDatosGrafico();
+  }
+
+  void llenarDatosGraficoPorComprobante() {
+    dataTotales = [];
+    listaGrafico = [];
+    listaDataTotales = [];
+
+    for (var i = idInicioMes; i <= idFinMes; i++) {
+      GraficoLineal valor =
+          GraficoLineal(fecha: meses[i], cantidad: meses.length.toDouble());
+      listaGrafico!.add(valor);
+    }
+
+    for (var l = 0; l < listaObjetosAgrupadosGlobal.length; l++) {
+      var objetosAgrupados = listaObjetosAgrupadosGlobal[l];
+      int contador = 0;
+
+      List<FlSpot> dataTotal = [];
+
+      for (var i = idInicioMes; i <= idFinMes; i++) {
+        double total = 0;
+
+        switch (meses[i]) {
+          case "Ene":
+            var listas = objetosAgrupados.entries
+                .where((entry) => entry.key == "01/2023")
+                .map((entry) => entry.value)
+                .toList();
+
+            if (listas.isNotEmpty) {
+              var objetos = listas.first;
+              for (var j = 0; j < objetos.length; j++) {
+                total = total + objetos[j].totalPedido!;
+              }
+            }
+
+            break;
+          case "Feb":
+            var listas = objetosAgrupados.entries
+                .where((entry) => entry.key == "02/2023")
+                .map((entry) => entry.value)
+                .toList();
+
+            if (listas.isNotEmpty) {
+              var objetos = listas.first;
+              for (var j = 0; j < objetos.length; j++) {
+                total = total + objetos[j].totalPedido!;
+              }
+            }
+            break;
+          case "Mar":
+            var listas = objetosAgrupados.entries
+                .where((entry) => entry.key == "03/2023")
+                .map((entry) => entry.value)
+                .toList();
+
+            if (listas.isNotEmpty) {
+              var objetos = listas.first;
+              for (var j = 0; j < objetos.length; j++) {
+                total = total + objetos[j].totalPedido!;
+              }
+            }
+            break;
+          case "Abr":
+            var listas = objetosAgrupados.entries
+                .where((entry) => entry.key == "04/2023")
+                .map((entry) => entry.value)
+                .toList();
+
+            if (listas.isNotEmpty) {
+              var objetos = listas.first;
+              for (var j = 0; j < objetos.length; j++) {
+                total = total + objetos[j].totalPedido!;
+              }
+            }
+            break;
+          case "May":
+            var listas = objetosAgrupados.entries
+                .where((entry) => entry.key == "05/2023")
+                .map((entry) => entry.value)
+                .toList();
+
+            if (listas.isNotEmpty) {
+              var objetos = listas.first;
+              for (var j = 0; j < objetos.length; j++) {
+                total = total + objetos[j].totalPedido!;
+              }
+            }
+            break;
+          case "Jun":
+            var listas = objetosAgrupados.entries
+                .where((entry) => entry.key == "06/2023")
+                .map((entry) => entry.value)
+                .toList();
+
+            if (listas.isNotEmpty) {
+              var objetos = listas.first;
+              for (var j = 0; j < objetos.length; j++) {
+                total = total + objetos[j].totalPedido!;
+              }
+            }
+            break;
+          case "Jul":
+            var listas = objetosAgrupados.entries
+                .where((entry) => entry.key == "07/2023")
+                .map((entry) => entry.value)
+                .toList();
+
+            if (listas.isNotEmpty) {
+              var objetos = listas.first;
+              for (var j = 0; j < objetos.length; j++) {
+                total = total + objetos[j].totalPedido!;
+              }
+            }
+            break;
+          case "Ago":
+            var listas = objetosAgrupados.entries
+                .where((entry) => entry.key == "08/2023")
+                .map((entry) => entry.value)
+                .toList();
+
+            if (listas.isNotEmpty) {
+              var objetos = listas.first;
+              for (var j = 0; j < objetos.length; j++) {
+                total = total + objetos[j].totalPedido!;
+              }
+            }
+            break;
+          case "Sep":
+            var listas = objetosAgrupados.entries
+                .where((entry) => entry.key == "09/2023")
+                .map((entry) => entry.value)
+                .toList();
+
+            if (listas.isNotEmpty) {
+              var objetos = listas.first;
+              for (var j = 0; j < objetos.length; j++) {
+                total = total + objetos[j].totalPedido!;
+              }
+            }
+            break;
+          case "Oct":
+            var listas = objetosAgrupados.entries
+                .where((entry) => entry.key == "10/2023")
+                .map((entry) => entry.value)
+                .toList();
+
+            if (listas.isNotEmpty) {
+              var objetos = listas.first;
+              for (var j = 0; j < objetos.length; j++) {
+                total = total + objetos[j].totalPedido!;
+              }
+            }
+            break;
+          case "Nov":
+            var listas = objetosAgrupados.entries
+                .where((entry) => entry.key == "11/2023")
+                .map((entry) => entry.value)
+                .toList();
+
+            if (listas.isNotEmpty) {
+              var objetos = listas.first;
+              for (var j = 0; j < objetos.length; j++) {
+                total = total + objetos[j].totalPedido!;
+              }
+            }
+            break;
+          case "Dic":
+            var listas = objetosAgrupados.entries
+                .where((entry) => entry.key == "12/2023")
+                .map((entry) => entry.value)
+                .toList();
+
+            if (listas.isNotEmpty) {
+              var objetos = listas.first;
+              for (var j = 0; j < objetos.length; j++) {
+                total = total + objetos[j].totalPedido!;
+              }
+            }
+            break;
+        }
+
+        dataTotal.add(FlSpot(contador.toDouble(), total));
+
+        contador++;
+
+        if (_maxY < total) {
+          _maxY = total;
+        }
+      }
+
+      listaDataTotales!.add(dataTotal);
+    }
+
+    setState(() {
+      _maxX = idFinMes.toDouble() - idInicioMes.toDouble();
+    });
   }
 
   void llenarDatosGrafico() {
@@ -278,6 +470,21 @@ class AppDashboardPedidoState extends State<AppDashboardPedido> {
     });
   }
 
+  void cargarDatosGraficoPorComprobante() {
+    PedidoController pedidoController = PedidoController();
+    var listaPorComprobante =
+        pedidoController.listaPorComprobante(listaPedidos!);
+
+    for (var a = 0; a < listaPorComprobante.length; a++) {
+      var lista = pedidoController.formatearFechas(listaPorComprobante[a]!);
+      var objetosAgrupados = groupBy(lista, (pedido) => pedido.fechaPedido);
+
+      listaObjetosAgrupadosGlobal.add(objetosAgrupados);
+    }
+
+    llenarDatosGraficoPorComprobante();
+  }
+
   void cargarDatosPastel() {
     var tickets = listaPedidos!
         .where((element) => element.comprobante!.nombreComprobante! == "TICKET")
@@ -375,20 +582,17 @@ class AppDashboardPedidoState extends State<AppDashboardPedido> {
                   Padding(
                     padding: EdgeInsets.fromLTRB(50, 0, 50, 0),
                     child: DropdownButtonFormField(
-                        decoration:
-                            const InputDecoration(border: InputBorder.none),
-                        value: 4,
-                        // enableFeedback: false,
-                        onChanged: null,
-                        borderRadius: BorderRadius.circular(15),
-                        items: anios.map((anio) {
-                          return DropdownMenuItem(
-                              child: Text(anio), value: anios.indexOf(anio));
-                        }).toList(),
-                        // onChanged: (value) async {
-                        //   debugPrint(value.toString());
-                        // },
-                        ),
+                      decoration:
+                          const InputDecoration(border: InputBorder.none),
+                      value: 4,
+                      // enableFeedback: false,
+                      onChanged: null,
+                      borderRadius: BorderRadius.circular(15),
+                      items: anios.map((anio) {
+                        return DropdownMenuItem(
+                            child: Text(anio), value: anios.indexOf(anio));
+                      }).toList(),
+                    ),
                   ),
                   const Padding(
                     padding: EdgeInsets.fromLTRB(20, 0, 50, 0),
@@ -415,9 +619,15 @@ class AppDashboardPedidoState extends State<AppDashboardPedido> {
                               value: listaReportes!.indexOf(reporte));
                         }).toList(),
                         onChanged: (value) async {
-                          setState(() {
-                            filtro = value!;
-                          });
+                          print(value);
+                          // setState(() {
+                          filtro = value!;
+                          // });
+                          if (filtro == 0) {
+                            cargarDatosGrafico();
+                          } else if (filtro == 1) {
+                            cargarDatosGraficoPorComprobante();
+                          } else {}
                         }),
                   ),
                   Row(
@@ -449,13 +659,15 @@ class AppDashboardPedidoState extends State<AppDashboardPedido> {
                                         value: meses!.indexOf(mes));
                                   }).toList(),
                                   onChanged: (value) async {
-                                        idInicioMes = value!;
+                                    idInicioMes = value!;
                                     int diferencia = idFinMes - idInicioMes;
                                     if (diferencia > 0) {
-                                      // setState(() {
-                                      //   idInicioMes = value!;
-                                      // });
-                                      llenarDatosGrafico();
+                                      if (filtro == 0) {
+                                        llenarDatosGrafico();
+                                      } else if (filtro == 1) {
+                                        llenarDatosGraficoPorComprobante();
+                                      } else {}
+                                      // llenarDatosGrafico();
                                     } else {
                                       InfoGlobal.mensajeFallo(context,
                                           "Debe seleccionar un rango de fechas valido.");
@@ -494,7 +706,11 @@ class AppDashboardPedidoState extends State<AppDashboardPedido> {
                                     idFinMes = value!;
                                     int diferencia = idFinMes - idInicioMes;
                                     if (diferencia > 0) {
-                                      llenarDatosGrafico();
+                                      if (filtro == 0) {
+                                        llenarDatosGrafico();
+                                      } else if (filtro == 1) {
+                                        llenarDatosGraficoPorComprobante();
+                                      } else {}
                                     } else {
                                       InfoGlobal.mensajeFallo(context,
                                           "Debe seleccionar un rango de fechas valido.");
@@ -690,7 +906,8 @@ class AppDashboardPedidoState extends State<AppDashboardPedido> {
   }
 
   Widget graficoLineal() {
-    return (filtro == 0 && dataTotales!.isNotEmpty)
+    return ((filtro == 0 && dataTotales!.isNotEmpty) ||
+            (filtro == 1 && listaDataTotales!.isNotEmpty))
         ? Container(
             height: 300,
             padding: EdgeInsets.fromLTRB(10, 20, 30, 5),
@@ -704,22 +921,39 @@ class AppDashboardPedidoState extends State<AppDashboardPedido> {
                 //backgroundColor: Colors.amber,
                 lineBarsData: (filtro == 0)
                     ? [
-                        // LineChartBarData(
-                        //   spots: data,
-                        //   isCurved: false,
-                        //   color: Colors.blue,
-                        //   //colors: [Colors.blue],
-                        //   barWidth: 4,
-                        // ),
                         LineChartBarData(
                           spots: dataTotales,
                           isCurved: false,
-                          color: Colors.orange,
+                          color: Colors.green,
                           //colors: [Colors.blue],
                           barWidth: 4,
                         ),
-                      ]
-                    : [],
+                      ] //
+                    : (filtro == 1)
+                        ? [
+                            LineChartBarData(
+                              spots: listaDataTotales![1],
+                              isCurved: false,
+                              color: Colors.blue,
+                              //colors: [Colors.blue],
+                              barWidth: 4,
+                            ),
+                            LineChartBarData(
+                              spots: listaDataTotales![2],
+                              isCurved: false,
+                              color: Colors.red,
+                              //colors: [Colors.blue],
+                              barWidth: 4,
+                            ),
+                            LineChartBarData(
+                              spots: listaDataTotales![0],
+                              isCurved: false,
+                              color: Colors.orange,
+                              //colors: [Colors.blue],
+                              barWidth: 4,
+                            )
+                          ]
+                        : [],
                 minX: 0,
                 maxX: _maxX,
                 minY: 0,
@@ -732,8 +966,8 @@ class AppDashboardPedidoState extends State<AppDashboardPedido> {
                       showTitles: true,
                       reservedSize: 100,
                       getTitlesWidget: (value, meta) {
-                        //print(value);
                         final int index = value.toInt();
+
                         if (index >= 0 && index < listaGrafico!.length) {
                           return Container(
                               padding: EdgeInsets.fromLTRB(0, 30, 0, 0),

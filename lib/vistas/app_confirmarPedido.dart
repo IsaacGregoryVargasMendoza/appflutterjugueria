@@ -34,6 +34,8 @@ class AppConfirmarPedido extends StatefulWidget {
 
 enum WidgetState { NONE, LOADING, LOADED, ERROR }
 
+enum WidgetStateDatosComprobante { NONE, LOADING, LOADED, ERROR }
+
 const kAnalyzingTextStyle = TextStyle(
     fontFamily: 'Roboto',
     fontSize: 20.0,
@@ -49,6 +51,8 @@ const kPreguntaTextStyle = TextStyle(
 
 class AppConfirmarPedidoState extends State<AppConfirmarPedido> {
   WidgetState _widgetState = WidgetState.LOADED;
+  WidgetStateDatosComprobante _widgetStateDatosComprobante =
+      WidgetStateDatosComprobante.LOADED;
   CameraImage? cameraImage;
   File? imagen;
   TextEditingController numeroDocumentoController = TextEditingController();
@@ -117,14 +121,24 @@ class AppConfirmarPedidoState extends State<AppConfirmarPedido> {
             widget.listaDetalle!, widget.cantidades!);
 
         var pedidoConfirmado = await pedidoCtrll.addPedido(pedidoModel);
-        InfoGlobal.mensajeConfirmacion(context, "Se realizo la compra correctamente.");
+        Navigator.pop(context);
+        Navigator.pop(context);
+        Navigator.pop(context);
+        Navigator.pop(context);
+        InfoGlobal.decrementarVentanas();
+        InfoGlobal.decrementarVentanas();
+        InfoGlobal.decrementarVentanas();
+        InfoGlobal.decrementarVentanas();
+        InfoGlobal.mensajeConfirmacion(
+            context, "Se realizo la compra correctamente.");
         Navigator.pushNamed(context, '/mensaje-confirmacion',
             arguments: pedidoConfirmado);
         setState(() {
           _widgetState = WidgetState.LOADED;
         });
       } else {
-        InfoGlobal.mostrarAlerta(context, "Mensaje", "Debe seleccionar un comprobante.");
+        InfoGlobal.mostrarAlerta(
+            context, "Mensaje", "Debe seleccionar un comprobante.");
         setState(() {
           _widgetState = WidgetState.LOADED;
         });
@@ -136,7 +150,7 @@ class AppConfirmarPedidoState extends State<AppConfirmarPedido> {
       });
     }
   }
-  
+
   @override
   void dispose() {
     super.dispose();
@@ -227,161 +241,212 @@ class AppConfirmarPedidoState extends State<AppConfirmarPedido> {
                             ],
                           ),
                           (idComprobante > 1)
-                              ? Container(
-                                  child: Column(
-                                    children: [
-                                      const Row(
+                              ? (_widgetStateDatosComprobante ==
+                                      WidgetStateDatosComprobante.LOADED)
+                                  ? Container(
+                                      child: Column(
                                         children: [
-                                          Text(
-                                            "Datos del comprobante:",
-                                            style: kPreguntaTextStyle,
-                                            //textAlign: TextAlign.left,
+                                          const Row(
+                                            children: [
+                                              Text(
+                                                "Datos del comprobante:",
+                                                style: kPreguntaTextStyle,
+                                                //textAlign: TextAlign.left,
+                                              ),
+                                            ],
                                           ),
-                                        ],
-                                      ),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        children: [
-                                          Text(
-                                            (idComprobante == 2)
-                                                ? "DNI: "
-                                                : (idComprobante == 3)
-                                                    ? "RUC: "
-                                                    : "NINGUNO: ",
-                                            style: kPreguntaTextStyle,
-                                          ),
-                                          AppTextField(
-                                            backgroundColor: Colors.white,
-                                            borderColor: const Color.fromRGBO(
-                                                255, 255, 255, 1),
-                                            fontSize: 14,
-                                            height: 30,
-                                            width: 150,
-                                            funcion: () {},
-                                            text: "",
-                                            textColor: Colors.black,
-                                            controlador:
-                                                numeroDocumentoController,
-                                          ),
-                                          Container(
-                                            margin: EdgeInsets.all(0),
-                                            padding: EdgeInsets.all(0),
-                                            decoration: BoxDecoration(
-                                              color: Colors.green,
-                                              borderRadius:
-                                                  BorderRadius.circular(5),
-                                            ),
-                                            child: TextButton(
-                                              onPressed: () async {
-                                                PedidoController pedidoCtrll =
-                                                    PedidoController();
-                                                if (idComprobante == 2) {
-                                                  String jsonString =
-                                                      await pedidoCtrll.getPersona(
-                                                          numeroDocumentoController
-                                                              .text);
-                                                  var json =
-                                                      jsonDecode(jsonString);
-                                                  denominacionClienteController
-                                                          .text =
-                                                      "${json["apellidoPaterno"]} ${json["apellidoMaterno"]} ${json["nombres"]}";
-                                                  // " " +
-                                                  // json["apellidoMaterno"] +
-                                                  // " " +
-                                                  // json["nombres"];
-                                                } else if (idComprobante == 3) {
-                                                  String jsonString =
-                                                      await pedidoCtrll.getEmpresa(
-                                                          numeroDocumentoController
-                                                              .text);
-                                                  var json =
-                                                      jsonDecode(jsonString);
-                                                  denominacionClienteController
-                                                          .text =
-                                                      json["razonSocial"];
-                                                }
-                                              },
-                                              child: const Center(
-                                                child: Text(
-                                                  "Buscar",
-                                                  style: TextStyle(
-                                                      color: Colors.white,
-                                                      fontSize: 12,
-                                                      fontWeight:
-                                                          FontWeight.bold),
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.start,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.center,
+                                            children: [
+                                              Text(
+                                                (idComprobante == 2)
+                                                    ? "DNI: "
+                                                    : (idComprobante == 3)
+                                                        ? "RUC: "
+                                                        : "NINGUNO: ",
+                                                style: kPreguntaTextStyle,
+                                              ),
+                                              AppTextField(
+                                                backgroundColor: Colors.white,
+                                                borderColor:
+                                                    const Color.fromRGBO(
+                                                        255, 255, 255, 1),
+                                                fontSize: 15,
+                                                height: 40,
+                                                width: 150,
+                                                funcion: () {},
+                                                text: "",
+                                                textColor: Colors.black,
+                                                controlador:
+                                                    numeroDocumentoController,
+                                              ),
+                                              Container(
+                                                margin: EdgeInsets.all(0),
+                                                padding: EdgeInsets.all(0),
+                                                decoration: BoxDecoration(
+                                                  color: Colors.green,
+                                                  borderRadius:
+                                                      BorderRadius.circular(5),
+                                                ),
+                                                child: TextButton(
+                                                  onPressed: () async {
+                                                    setState(() {
+                                                      _widgetStateDatosComprobante =
+                                                          WidgetStateDatosComprobante
+                                                              .LOADING;
+                                                    });
+                                                    PedidoController
+                                                        pedidoCtrll =
+                                                        PedidoController();
+                                                    if (idComprobante == 2) {
+                                                      String jsonString =
+                                                          await pedidoCtrll
+                                                              .getPersona(
+                                                                  numeroDocumentoController
+                                                                      .text);
+                                                      var json = jsonDecode(
+                                                          jsonString);
+                                                      denominacionClienteController
+                                                              .text =
+                                                          "${json["apellidoPaterno"]} ${json["apellidoMaterno"]} ${json["nombres"]}";
+                                                    } else if (idComprobante ==
+                                                        3) {
+                                                      String jsonString =
+                                                          await pedidoCtrll
+                                                              .getEmpresa(
+                                                                  numeroDocumentoController
+                                                                      .text);
+                                                      var json = jsonDecode(
+                                                          jsonString);
+                                                      denominacionClienteController
+                                                              .text =
+                                                          json["razonSocial"];
+                                                      direccionClienteController
+                                                              .text =
+                                                          json["direccion"];
+                                                    }
+                                                    setState(() {
+                                                      _widgetStateDatosComprobante =
+                                                          WidgetStateDatosComprobante
+                                                              .LOADED;
+                                                    });
+                                                  },
+                                                  child: const Center(
+                                                    child: Text(
+                                                      "Buscar",
+                                                      style: TextStyle(
+                                                          color: Colors.white,
+                                                          fontSize: 12,
+                                                          fontWeight:
+                                                              FontWeight.bold),
+                                                    ),
+                                                  ),
                                                 ),
                                               ),
-                                            ),
+                                            ],
                                           ),
-                                        ],
-                                      ),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        children: [
-                                          Text(
-                                            (idComprobante == 2)
-                                                ? "Nombre: "
-                                                : (idComprobante == 3)
-                                                    ? "Razon Social: "
-                                                    : "NINGUNO: ",
-                                            style: kPreguntaTextStyle,
-                                            textAlign: TextAlign.left,
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.start,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.center,
+                                            children: [
+                                              Text(
+                                                (idComprobante == 2)
+                                                    ? "Nombre: "
+                                                    : (idComprobante == 3)
+                                                        ? "Razon Social: "
+                                                        : "NINGUNO: ",
+                                                style: kPreguntaTextStyle,
+                                                textAlign: TextAlign.left,
+                                              ),
+                                              AppTextField(
+                                                backgroundColor: Colors.white,
+                                                borderColor:
+                                                    const Color.fromRGBO(
+                                                        255, 255, 255, 1),
+                                                fontSize: 14,
+                                                height: 40,
+                                                width: 200,
+                                                funcion: () {},
+                                                text: "",
+                                                textColor: Colors.black,
+                                                controlador:
+                                                    denominacionClienteController,
+                                              )
+                                            ],
                                           ),
-                                          AppTextField(
-                                            backgroundColor: Colors.white,
-                                            borderColor: const Color.fromRGBO(
-                                                255, 255, 255, 1),
-                                            fontSize: 12,
-                                            height: 30,
-                                            width: 200,
-                                            funcion: () {},
-                                            text: "",
-                                            textColor: Colors.black,
-                                            controlador:
-                                                denominacionClienteController,
-                                          )
-                                        ],
-                                      ),
-                                      (idComprobante > 2)
-                                          ? Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.start,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.center,
-                                              children: [
-                                                const Text(
-                                                  "Direccion: ",
-                                                  style: kPreguntaTextStyle,
-                                                  textAlign: TextAlign.left,
-                                                ),
-                                                AppTextField(
-                                                  backgroundColor: Colors.white,
-                                                  borderColor:
-                                                      const Color.fromRGBO(
-                                                          255, 255, 255, 1),
-                                                  fontSize: 14,
-                                                  height: 30,
-                                                  width: 200,
-                                                  funcion: () {},
-                                                  text: "",
-                                                  textColor: Colors.black,
-                                                  controlador:
-                                                      direccionClienteController,
+                                          (idComprobante > 2)
+                                              ? Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.start,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.center,
+                                                  children: [
+                                                    const Text(
+                                                      "Direccion: ",
+                                                      style: kPreguntaTextStyle,
+                                                      textAlign: TextAlign.left,
+                                                    ),
+                                                    AppTextField(
+                                                      backgroundColor:
+                                                          Colors.white,
+                                                      borderColor:
+                                                          const Color.fromRGBO(
+                                                              255, 255, 255, 1),
+                                                      fontSize: 14,
+                                                      height: 40,
+                                                      width: 200,
+                                                      funcion: () {},
+                                                      text: "",
+                                                      textColor: Colors.black,
+                                                      controlador:
+                                                          direccionClienteController,
+                                                    )
+                                                  ],
                                                 )
-                                              ],
-                                            )
-                                          : const SizedBox(
-                                              height: 0,
-                                            )
-                                    ],
-                                  ),
-                                )
+                                              : const SizedBox(
+                                                  height: 0,
+                                                )
+                                        ],
+                                      ),
+                                    )
+                                  : Container(
+                                      // height: 300,
+                                      padding:
+                                          EdgeInsets.fromLTRB(10, 20, 10, 20),
+                                      margin:
+                                          EdgeInsets.fromLTRB(10, 10, 10, 0),
+                                      width: MediaQuery.of(context).size.width -
+                                          25,
+                                      decoration: const BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(10))),
+                                      child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          children: [
+                                            CircularProgressIndicator(
+                                              color: Colors.amber.shade800,
+                                            ),
+                                            SizedBox(
+                                              height: 10,
+                                            ),
+                                            Text(
+                                              "Cargando datos...",
+                                              style: TextStyle(
+                                                  fontSize: 15,
+                                                  color: Colors.grey.shade800),
+                                              textAlign: TextAlign.start,
+                                            ),
+                                          ]),
+                                    )
                               : const SizedBox(
                                   height: 0,
                                 )

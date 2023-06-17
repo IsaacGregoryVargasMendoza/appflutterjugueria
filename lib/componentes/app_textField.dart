@@ -29,7 +29,7 @@ class AppTextField extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.all(0),
-      padding: const EdgeInsets.all(5),
+      padding: const EdgeInsets.all(0),
       width: width,
       height: height,
       decoration: BoxDecoration(
@@ -43,32 +43,20 @@ class AppTextField extends StatelessWidget {
         ),
       ),
       child: TextField(
-        style: TextStyle(
-          fontSize: fontSize,
-          height: 1,
-          // fontWeight: FontWeight.bold,
-          color: textColor,
-        ),
-        // decoration: InputDecoration(hintText: text, contentPadding: EdgeInsets.symmetric(horizontal: 20)),
-        decoration: InputDecoration(
-          hintText: text,
-        ),
-        controller:
-            (controlador == null) ? TextEditingController() : controlador,
-      ),
-
-      // child: TextButton(
-      //   onPressed: funcion,
-      //   child: Center(
-      //     child: Text(
-      //       text,
-      //       style: TextStyle(
-      //           color: textColor,
-      //           fontSize: fontSize,
-      //           fontWeight: FontWeight.bold),
-      //     ),
-      //   ),
-      // ),
+            scrollController: ScrollController(),
+            style: TextStyle(
+              fontSize: fontSize,
+              height: 1,
+              // fontWeight: FontWeight.bold,
+              color: textColor,
+            ),
+            // decoration: InputDecoration(hintText: text, contentPadding: EdgeInsets.symmetric(horizontal: 20)),
+            decoration: InputDecoration(
+              hintText: text,
+            ),
+            controller:
+                (controlador == null) ? TextEditingController() : controlador,
+          )
     );
   }
 }
