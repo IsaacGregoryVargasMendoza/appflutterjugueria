@@ -2,6 +2,7 @@ import 'package:app_jugueria/componentes/info_global.dart';
 import 'package:app_jugueria/modelos/mesaModel.dart';
 import 'package:app_jugueria/controladores/mesaController.dart';
 import 'package:app_jugueria/controladores/productoController.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:app_jugueria/componentes/app_drawer.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
@@ -20,20 +21,60 @@ class AppLiberarMesaState extends State<AppLiberarMesa> {
   WidgetState _widgetState = WidgetState.LOADED;
   Timer? consultaTimer;
 
+  Widget seleccionarPunto(BuildContext context) {
+    return AlertDialog(
+      title: Text('Acciones'),
+      actions: [
+        Container(
+          color: Colors.yellow.shade600,
+          width: MediaQuery.of(context).size.width,
+          child: TextButton(
+            onPressed: () {
+              Navigator.of(context).pop('Opción 1');
+            },
+            child: Text(
+              'Liberar',
+              style: TextStyle(color: Colors.black),
+            ),
+          ),
+          // ),
+        ),
+        SizedBox(
+          height: 5,
+        ),
+        // Container(
+        //   color: Colors.amber,
+        //   width: MediaQuery.of(context).size.width,
+        //   child: TextButton(
+        //     onPressed: () {
+        //       Navigator.of(context).pop('Opción 2');
+        //     },
+        //     child: Text(
+        //       'Punto final',
+        //       style: TextStyle(color: Colors.black),
+        //     ),
+        //   ),
+        // ),
+      ],
+    );
+  }
+
   @override
   void dispose() {
     super.dispose();
     InfoGlobal.decrementarVentanas();
+    consultaTimer?.cancel();
   }
 
   void iniciarConsultaPeriodica() {
     // Detener el Timer si ya está en ejecución
-    // if (consultaTimer != null && consultaTimer!.isActive) {
-    //   consultaTimer!.cancel();
-    // }
+    if (consultaTimer != null && consultaTimer!.isActive) {
+      consultaTimer!.cancel();
+    }
 
     // Iniciar el Timer para ejecutar la consulta cada 5 segundos
     consultaTimer = Timer.periodic(const Duration(seconds: 10), (timer) {
+      debugPrint("Se cargo las mesas");
       _cargarMesas();
     });
   }
@@ -63,7 +104,14 @@ class AppLiberarMesaState extends State<AppLiberarMesa> {
   void initState() {
     super.initState();
     _cargarMesas();
-    iniciarConsultaPeriodica();
+    //iniciarConsultaPeriodica();
+  }
+
+  Future<void> liberarMesa(int idMesa) async{
+    MesaController mesaController = MesaController();
+    await mesaController.freeMesa(idMesa);
+    InfoGlobal.mensajeConfirmacion(context,"Mesa liberada correctamente.");
+    _cargarMesas();
   }
 
   // Future<void> cargarNuevaInterfaz(MesaModel mesaModel) async {
@@ -90,7 +138,7 @@ class AppLiberarMesaState extends State<AppLiberarMesa> {
         return Scaffold(
           backgroundColor: Colors.white,
           appBar: AppBar(
-            title: const Text("Seleccionar mesa"),
+            title: const Text("Liberar mesa"),
             backgroundColor: Colors.green.shade900,
           ),
           drawer: AppMenuDrawer(),
@@ -118,18 +166,17 @@ class AppLiberarMesaState extends State<AppLiberarMesa> {
         return Scaffold(
           backgroundColor: Colors.white,
           appBar: AppBar(
-            title: const Text("Seleccionar mesa"),
+            title: const Text("Liberar mesa"),
             backgroundColor: Colors.green.shade900,
-            // actions: <Widget>[
-            //   IconButton(
-            //     onPressed: () {
-            //       Navigator.of(context).pop();
-            //       Navigator.pushNamed(context, '/registrar-mesa');
-            //     },
-            //     icon: const FaIcon(FontAwesomeIcons.plus),
-            //     // hoverColor: Colors.black,
-            //   ),
-            // ],
+            actions: <Widget>[
+              IconButton(
+                onPressed: () {
+                  _cargarMesas();
+                },
+                icon: const FaIcon(FontAwesomeIcons.spinner),
+                // hoverColor: Colors.black,
+              ),
+            ],
           ),
           body: GridView.builder(
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -144,6 +191,21 @@ class AppLiberarMesaState extends State<AppLiberarMesa> {
                 onTap: () async {
                   if (listaMesas![index].ocupadoMesa == 1) {
                     print(listaMesas![index].numeroMesa);
+
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return seleccionarPunto(context);
+                      },
+                    ).then((value) {
+                      if (value == 'Opción 1') {
+                        liberarMesa(listaMesas![index].id!);
+                        debugPrint("Liberar mesa");
+                        //onTab(latLng);
+                      } else if (value == 'Opción 2') {
+                        debugPrint("nada");
+                      }
+                    });
 
                     // InfoGlobal.mesaModel = listaMesas![index];
                     // ProductoController productoCtrll = ProductoController();

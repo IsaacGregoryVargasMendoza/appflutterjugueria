@@ -24,16 +24,18 @@ class AppSeleccionarMesaState extends State<AppSeleccionarMesa> {
   void dispose() {
     super.dispose();
     InfoGlobal.decrementarVentanas();
+    consultaTimer?.cancel();
   }
 
   void iniciarConsultaPeriodica() {
     // Detener el Timer si ya está en ejecución
-    // if (consultaTimer != null && consultaTimer!.isActive) {
-    //   consultaTimer!.cancel();
-    // }
+    if (consultaTimer != null && consultaTimer!.isActive) {
+      consultaTimer!.cancel();
+    }
 
     // Iniciar el Timer para ejecutar la consulta cada 5 segundos
     consultaTimer = Timer.periodic(Duration(seconds: 10), (timer) {
+      debugPrint("Se cargo las mesas");
       _cargarMesas();
     });
   }

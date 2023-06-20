@@ -193,6 +193,19 @@ class AppMenuDrawer extends StatelessWidget {
               },
             ),
             ListTile(
+              leading: const FaIcon(FontAwesomeIcons.tableCells),
+              title: const Text(
+                'Liberar mesas',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+              ),
+              onTap: () {
+                // Navigator.of(context).pop();
+                // Navigator.of(context).pop();
+                InfoGlobal.incrementarVentanas();
+                Navigator.pushNamed(context, '/liberar-mesas');
+              },
+            ),
+            ListTile(
               leading: const FaIcon(FontAwesomeIcons.clipboardCheck),
               title: const Text(
                 'Pedidos',

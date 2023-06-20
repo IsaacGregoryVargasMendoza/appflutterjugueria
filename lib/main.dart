@@ -16,6 +16,7 @@ import 'package:app_jugueria/vistas/app_listaPedidos.dart';
 import 'package:app_jugueria/vistas/app_dashboardVentas.dart';
 import 'package:app_jugueria/vistas/app_seleccionarAdicionales.dart';
 import 'package:app_jugueria/vistas/app_seleccionarProducto.dart';
+import 'package:app_jugueria/vistas/app_liberarMesa.dart';
 import 'package:flutter/material.dart';
 import 'package:app_jugueria/componentes/app_buttons.dart';
 import 'package:app_jugueria/vistas/app_login.dart';
@@ -84,6 +85,12 @@ void main() {
           //     settings.arguments as List<MesaModel>;
           return MaterialPageRoute(
             builder: (context) => AppSeleccionarMesa(
+                //data: listaMesas,
+                ),
+          );
+          case '/liberar-mesas':
+          return MaterialPageRoute(
+            builder: (context) => AppLiberarMesa(
                 //data: listaMesas,
                 ),
           );
