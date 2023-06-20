@@ -6,16 +6,16 @@ import 'package:app_jugueria/componentes/app_drawer.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 
-class AppSeleccionarMesa extends StatefulWidget {
+class AppLiberarMesa extends StatefulWidget {
   @override
-  State<AppSeleccionarMesa> createState() {
-    return AppSeleccionarMesaState();
+  State<AppLiberarMesa> createState() {
+    return AppLiberarMesaState();
   }
 }
 
 enum WidgetState { NONE, LOADING, LOADED, ERROR }
 
-class AppSeleccionarMesaState extends State<AppSeleccionarMesa> {
+class AppLiberarMesaState extends State<AppLiberarMesa> {
   List<MesaModel>? listaMesas = [];
   WidgetState _widgetState = WidgetState.LOADED;
   Timer? consultaTimer;
@@ -33,7 +33,7 @@ class AppSeleccionarMesaState extends State<AppSeleccionarMesa> {
     // }
 
     // Iniciar el Timer para ejecutar la consulta cada 5 segundos
-    consultaTimer = Timer.periodic(Duration(seconds: 10), (timer) {
+    consultaTimer = Timer.periodic(const Duration(seconds: 10), (timer) {
       _cargarMesas();
     });
   }
@@ -42,6 +42,8 @@ class AppSeleccionarMesaState extends State<AppSeleccionarMesa> {
     setState(() {
       _widgetState = WidgetState.LOADING;
     });
+
+    listaMesas = [];
 
     try {
       MesaController mesaCtrll = MesaController();
@@ -64,21 +66,21 @@ class AppSeleccionarMesaState extends State<AppSeleccionarMesa> {
     iniciarConsultaPeriodica();
   }
 
-  Future<void> cargarNuevaInterfaz(MesaModel mesaModel) async {
-    setState(() {
-      _widgetState = WidgetState.LOADING;
-    });
+  // Future<void> cargarNuevaInterfaz(MesaModel mesaModel) async {
+  //   setState(() {
+  //     _widgetState = WidgetState.LOADING;
+  //   });
 
-    InfoGlobal.mesaModel = mesaModel;
-    ProductoController productoCtrll = ProductoController();
-    final listaProductos = await productoCtrll.getProductos();
+  //   InfoGlobal.mesaModel = mesaModel;
+  //   ProductoController productoCtrll = ProductoController();
+  //   final listaProductos = await productoCtrll.getProductos();
 
-    Navigator.pushNamed(context, '/seleccionar-productos',
-        arguments: listaProductos);
-    setState(() {
-      _widgetState = WidgetState.LOADED;
-    });
-  }
+  //   Navigator.pushNamed(context, '/seleccionar-productos',
+  //       arguments: listaProductos);
+  //   setState(() {
+  //     _widgetState = WidgetState.LOADED;
+  //   });
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -140,7 +142,7 @@ class AppSeleccionarMesaState extends State<AppSeleccionarMesa> {
             itemBuilder: (context, index) {
               return GestureDetector(
                 onTap: () async {
-                  if (listaMesas![index].ocupadoMesa == 0) {
+                  if (listaMesas![index].ocupadoMesa == 1) {
                     print(listaMesas![index].numeroMesa);
 
                     // InfoGlobal.mesaModel = listaMesas![index];
@@ -149,7 +151,7 @@ class AppSeleccionarMesaState extends State<AppSeleccionarMesa> {
                     // Navigator.pushNamed(context, '/seleccionar-productos',
                     //     arguments: listaProductos);
 
-                    await cargarNuevaInterfaz(listaMesas![index]);
+                    //await cargarNuevaInterfaz(listaMesas![index]);
                   }
                 },
                 child: Column(
