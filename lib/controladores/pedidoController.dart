@@ -1,4 +1,5 @@
 import 'package:app_jugueria/controladores/mesaController.dart';
+import 'package:app_jugueria/modelos/categoriaModel.dart';
 import 'package:mysql1/mysql1.dart';
 import 'package:app_jugueria/modelos/productoModel.dart';
 import 'package:app_jugueria/modelos/adicionalModel.dart';
@@ -66,6 +67,16 @@ class PedidoController {
     return pedidos;
   }
 
+  Future<List<CategoriasVendidasModel>> getCategoriasVendidasConFecha() async {
+    final conn = await MySqlConnection.connect(Configuracion.instancia);
+    final result = await conn.query(//'select * from pedido;');
+        "select p.id as 'idPedido',p.fechaPedido as 'fechaPedido',dp.cantidadDetalle as 'cantidadPedido',dp.precioDetalle as 'precioPedido',dp.idProducto as 'idProducto',pr.nombreProducto as 'nombreProducto',c.nombreCategoria as 'nombreCategoria' from pedido p inner join detallePedido dp on p.id = dp.idDetallePedido inner join producto pr on dp.idProducto = pr.id inner join categoria c on c.id = pr.idCategoria order by p.id;");
+
+    final categoriasVendidas =
+        result.map((result) => CategoriasVendidasModel.fromJson(result.fields)).toList();
+    return categoriasVendidas;
+  }
+
   Future<List<ComprobanteModel>> getComprobantes() async {
     final conn = await MySqlConnection.connect(Configuracion.instancia);
     final result = await conn.query('select * from comprobante;');
@@ -92,6 +103,27 @@ class PedidoController {
     await conn.query(
         'update comprobante set correlativoComprobante = correlativoComprobante + 1 where id = ?;',
         [idComprobante]);
+  }
+
+  List<CategoriasVendidasModel> formatearFechasCategoriasVendidas(List<CategoriasVendidasModel> lista) {
+    List<CategoriasVendidasModel> listaNueva = [];
+    for (var i = 0; i < lista.length; i++) {
+      CategoriasVendidasModel categoriaVendidaModel = CategoriasVendidasModel();
+      categoriaVendidaModel.idPedido = lista[i].idPedido;
+      categoriaVendidaModel.idProducto = lista[i].idProducto;
+      categoriaVendidaModel.nombreProducto = lista[i].nombreProducto;
+      categoriaVendidaModel.cantidadPedido = lista[i].cantidadPedido;
+      categoriaVendidaModel.precioPedido = lista[i].precioPedido;
+      categoriaVendidaModel.nombreCategoria = lista[i].nombreCategoria;
+      categoriaVendidaModel.fechaPedido = lista[i].fechaPedido;
+
+      var fecha = categoriaVendidaModel.fechaPedido!.split(" ")[0].toString();
+      categoriaVendidaModel.fechaPedido = "${fecha.split("/")[1]}/${fecha.split("/")[2]}";
+
+      listaNueva.add(categoriaVendidaModel);
+    }
+
+    return listaNueva;
   }
 
   List<PedidoModel> formatearFechas(List<PedidoModel> lista) {
@@ -143,6 +175,22 @@ class PedidoController {
     listaPorComprobante.add(listaFacturas);
 
     return listaPorComprobante;
+  }
+
+  List<List<CategoriasVendidasModel>?> listaPorCategoria(List<CategoriasVendidasModel> lista, List<CategoriaModel> listaCategorias) {
+    List<List<CategoriasVendidasModel>> listaPorCategoria = [];
+
+    for(var i = 0;  i<listaCategorias.length; i++){
+      var listaAux = lista
+        .where((element) => element.nombreCategoria == listaCategorias[i].nombreCategoria)
+        .toList();
+
+      if(listaAux.isNotEmpty){
+        listaPorCategoria.add(listaAux);
+      }
+    }
+
+    return listaPorCategoria;
   }
 
   Future<List<DetallePedidoModel>> getListDetalleOfPedido(int id) async {

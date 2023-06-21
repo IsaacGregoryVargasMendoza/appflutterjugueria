@@ -1,10 +1,13 @@
 import 'package:app_jugueria/componentes/info_global.dart';
+import 'package:app_jugueria/controladores/categoriaController.dart';
 import 'package:app_jugueria/controladores/pedidoController.dart';
 import 'package:app_jugueria/componentes/app_drawer.dart';
 import 'package:app_jugueria/modelos/adicionalModel.dart';
+import 'package:app_jugueria/modelos/categoriaModel.dart';
 import 'package:app_jugueria/modelos/pedidoModel.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'dart:math';
 import 'package:collection/collection.dart';
 //import 'package:flutter_charts/flutter_charts.dart' as;
 import 'package:fl_chart/fl_chart.dart';
@@ -19,6 +22,12 @@ class AppDashboardPedido extends StatefulWidget {
 
 class AppDashboardPedidoState extends State<AppDashboardPedido> {
   List<PieChartSectionData> sectionsChart = [];
+  List<CategoriaModel> listaCategorias = [];
+  List<CategoriasVendidasModel>? listaCategoriasVendidas = [];
+
+  List<LineChartBarData> lineas = [];
+
+  List<HistoriaPastel> listaHistoriaPastel = [];
   List<PedidoModel>? listaPedidos = [];
   List<GraficoLineal>? listaGrafico = [];
   List<String>? listaReportes = [
@@ -28,7 +37,11 @@ class AppDashboardPedidoState extends State<AppDashboardPedido> {
     "Producto mas vendido"
   ];
   late Map<String?, List<PedidoModel>> objetosAgrupadosGlobal;
+  late Map<String?, List<CategoriasVendidasModel>>
+      categoriaVendidaAgrupadasGlobal;
   late List<Map<String?, List<PedidoModel>>> listaObjetosAgrupadosGlobal = [];
+  late List<Map<String?, List<CategoriasVendidasModel>>>
+      listaCategoriasVendidasAgrupadosGlobal = [];
   double _maxX = 0;
   double _maxY = 0;
 
@@ -56,6 +69,13 @@ class AppDashboardPedidoState extends State<AppDashboardPedido> {
     'Dic'
   ];
 
+  Future<void> cargarCategorias() async {
+    CategoriaController categoriaController = CategoriaController();
+    var lista = await categoriaController.getCategorias();
+
+    listaCategorias = lista;
+  }
+
   Future<void> cargarPedidos() async {
     PedidoController pedidoController = PedidoController();
     var lista = await pedidoController.getPedidos();
@@ -64,6 +84,37 @@ class AppDashboardPedidoState extends State<AppDashboardPedido> {
 
     cargarDatosPastel();
     cargarDatosGrafico();
+  }
+
+  Future<void> obtenerCategoriasVendidas() async {
+    PedidoController pedidoController = PedidoController();
+    var lista = await pedidoController.getCategoriasVendidasConFecha();
+
+    listaCategoriasVendidas = lista;
+
+    cargarDatosPastelCategoriasVendidas();
+    cargarDatosGraficoPorCategoria();
+    // cargarDatosPastelCategoriasVendidas();
+    //cargarDatosGraficoCategoriasVendidas();
+  }
+
+  void cargarDatosGraficoPorCategoria() {
+    PedidoController pedidoController = PedidoController();
+    var listaPorCategoria = pedidoController.listaPorCategoria(
+        listaCategoriasVendidas!, listaCategorias);
+    listaCategoriasVendidasAgrupadosGlobal = [];
+
+    for (var a = 0; a < listaPorCategoria.length; a++) {
+      var lista = pedidoController
+          .formatearFechasCategoriasVendidas(listaPorCategoria[a]!);
+      var objetosAgrupados = groupBy(lista, (pedido) => pedido.fechaPedido);
+
+      listaCategoriasVendidasAgrupadosGlobal.add(objetosAgrupados);
+    }
+
+    llenarDatosGraficoPorCategoriasVendidas();
+
+    // llenarDatosGraficoPorComprobante();
   }
 
   @override
@@ -84,6 +135,24 @@ class AppDashboardPedidoState extends State<AppDashboardPedido> {
 
     objetosAgrupadosGlobal = objetosAgrupados;
     llenarDatosGrafico();
+  }
+
+  void cargarDatosGraficoCategoriasVendidas() {
+    PedidoController pedidoController = PedidoController();
+    var lista = pedidoController
+        .formatearFechasCategoriasVendidas(listaCategoriasVendidas!);
+
+    debugPrint("FECHAS DE CATEGORIAS VENDIDAS");
+    for (var i = 0; i < lista.length; i++) {
+      debugPrint(lista[i].fechaPedido);
+    }
+
+    var objetosAgrupados = groupBy(lista, (pedido) => pedido.fechaPedido);
+
+    debugPrint(objetosAgrupados.length.toString());
+
+    categoriaVendidaAgrupadasGlobal = objetosAgrupados;
+    llenarDatosGraficoPorCategoriasVendidas();
   }
 
   void llenarDatosGraficoPorComprobante() {
@@ -276,6 +345,241 @@ class AppDashboardPedidoState extends State<AppDashboardPedido> {
       }
 
       listaDataTotales!.add(dataTotal);
+    }
+
+    setState(() {
+      _maxX = idFinMes.toDouble() - idInicioMes.toDouble();
+    });
+  }
+
+  void llenarDatosGraficoPorCategoriasVendidas() {
+    dataTotales = [];
+    listaGrafico = [];
+    listaDataTotales = [];
+    lineas = [];
+
+    for (var i = idInicioMes; i <= idFinMes; i++) {
+      GraficoLineal valor =
+          GraficoLineal(fecha: meses[i], cantidad: meses.length.toDouble());
+      listaGrafico!.add(valor);
+    }
+
+    // int contador = 0;
+
+    for (var l = 0; l < listaCategoriasVendidasAgrupadosGlobal.length; l++) {
+      var objetosAgrupados = listaCategoriasVendidasAgrupadosGlobal[l];
+      int contador = 0;
+
+      List<FlSpot> dataTotal = [];
+
+      for (var i = idInicioMes; i <= idFinMes; i++) {
+        GraficoLineal valor =
+            GraficoLineal(fecha: meses[i], cantidad: meses.length.toDouble());
+
+        double total = 0;
+
+        switch (meses[i]) {
+          case "Ene":
+            var listas = objetosAgrupados.entries
+                .where((entry) => entry.key == "01/2023")
+                .map((entry) => entry.value)
+                .toList();
+
+            if (listas.isNotEmpty) {
+              var objetos = listas.first;
+              for (var j = 0; j < objetos.length; j++) {
+                total = total +
+                    (objetos[j].cantidadPedido! * objetos[j].precioPedido!);
+              }
+            }
+
+            break;
+          case "Feb":
+            var listas = objetosAgrupados.entries
+                .where((entry) => entry.key == "02/2023")
+                .map((entry) => entry.value)
+                .toList();
+
+            if (listas.isNotEmpty) {
+              var objetos = listas.first;
+              for (var j = 0; j < objetos.length; j++) {
+                total = total +
+                    (objetos[j].cantidadPedido! * objetos[j].precioPedido!);
+              }
+            }
+            break;
+          case "Mar":
+            var listas = objetosAgrupados.entries
+                .where((entry) => entry.key == "03/2023")
+                .map((entry) => entry.value)
+                .toList();
+
+            if (listas.isNotEmpty) {
+              var objetos = listas.first;
+              for (var j = 0; j < objetos.length; j++) {
+                total = total +
+                    (objetos[j].cantidadPedido! * objetos[j].precioPedido!);
+              }
+            }
+            break;
+          case "Abr":
+            var listas = objetosAgrupados.entries
+                .where((entry) => entry.key == "04/2023")
+                .map((entry) => entry.value)
+                .toList();
+
+            if (listas.isNotEmpty) {
+              var objetos = listas.first;
+              for (var j = 0; j < objetos.length; j++) {
+                total = total +
+                    (objetos[j].cantidadPedido! * objetos[j].precioPedido!);
+              }
+            }
+            break;
+          case "May":
+            var listas = objetosAgrupados.entries
+                .where((entry) => entry.key == "05/2023")
+                .map((entry) => entry.value)
+                .toList();
+
+            if (listas.isNotEmpty) {
+              var objetos = listas.first;
+              for (var j = 0; j < objetos.length; j++) {
+                total = total +
+                    (objetos[j].cantidadPedido! * objetos[j].precioPedido!);
+              }
+            }
+            break;
+          case "Jun":
+            var listas = objetosAgrupados.entries
+                .where((entry) => entry.key == "06/2023")
+                .map((entry) => entry.value)
+                .toList();
+
+            if (listas.isNotEmpty) {
+              var objetos = listas.first;
+              for (var j = 0; j < objetos.length; j++) {
+                total = total +
+                    (objetos[j].cantidadPedido! * objetos[j].precioPedido!);
+              }
+            }
+            break;
+          case "Jul":
+            var listas = objetosAgrupados.entries
+                .where((entry) => entry.key == "07/2023")
+                .map((entry) => entry.value)
+                .toList();
+
+            if (listas.isNotEmpty) {
+              var objetos = listas.first;
+              for (var j = 0; j < objetos.length; j++) {
+                total = total +
+                    (objetos[j].cantidadPedido! * objetos[j].precioPedido!);
+              }
+            }
+            break;
+          case "Ago":
+            var listas = objetosAgrupados.entries
+                .where((entry) => entry.key == "08/2023")
+                .map((entry) => entry.value)
+                .toList();
+
+            if (listas.isNotEmpty) {
+              var objetos = listas.first;
+              for (var j = 0; j < objetos.length; j++) {
+                total = total +
+                    (objetos[j].cantidadPedido! * objetos[j].precioPedido!);
+              }
+            }
+            break;
+          case "Sep":
+            var listas = objetosAgrupados.entries
+                .where((entry) => entry.key == "09/2023")
+                .map((entry) => entry.value)
+                .toList();
+
+            if (listas.isNotEmpty) {
+              var objetos = listas.first;
+              for (var j = 0; j < objetos.length; j++) {
+                total = total +
+                    (objetos[j].cantidadPedido! * objetos[j].precioPedido!);
+              }
+            }
+            break;
+          case "Oct":
+            var listas = objetosAgrupados.entries
+                .where((entry) => entry.key == "10/2023")
+                .map((entry) => entry.value)
+                .toList();
+
+            if (listas.isNotEmpty) {
+              var objetos = listas.first;
+              for (var j = 0; j < objetos.length; j++) {
+                total = total +
+                    (objetos[j].cantidadPedido! * objetos[j].precioPedido!);
+              }
+            }
+            break;
+          case "Nov":
+            var listas = objetosAgrupados.entries
+                .where((entry) => entry.key == "11/2023")
+                .map((entry) => entry.value)
+                .toList();
+
+            if (listas.isNotEmpty) {
+              var objetos = listas.first;
+              for (var j = 0; j < objetos.length; j++) {
+                total = total +
+                    (objetos[j].cantidadPedido! * objetos[j].precioPedido!);
+              }
+            }
+            break;
+          case "Dic":
+            var listas = objetosAgrupados.entries
+                .where((entry) => entry.key == "12/2023")
+                .map((entry) => entry.value)
+                .toList();
+
+            if (listas.isNotEmpty) {
+              var objetos = listas.first;
+              for (var j = 0; j < objetos.length; j++) {
+                total = total +
+                    (objetos[j].cantidadPedido! * objetos[j].precioPedido!);
+              }
+            }
+            break;
+        }
+
+        dataTotal.add(FlSpot(contador.toDouble(), total));
+
+        contador++;
+
+        listaGrafico!.add(valor);
+        if (_maxY < total) {
+          _maxY = total;
+        }
+      }
+      listaDataTotales!.add(dataTotal);
+    }
+
+    debugPrint(listaCategoriasVendidasAgrupadosGlobal.length.toString());
+    debugPrint(listaDataTotales!.length.toString());
+    debugPrint(listaHistoriaPastel.length.toString());
+
+    for (int m = 0; m < listaDataTotales!.length; m++) {
+      List<FlSpot> spots = listaDataTotales![m];
+      Color color = listaHistoriaPastel[m]
+          .color!; // Utiliza la función de generación de color aleatorio de la respuesta anterior
+
+      // Color color = generarColorAleatorio();
+      LineChartBarData linea = LineChartBarData(
+        spots: spots,
+        isCurved: false,
+        color: color,
+        barWidth: 4,
+      );
+
+      lineas.add(linea);
     }
 
     setState(() {
@@ -485,45 +789,130 @@ class AppDashboardPedidoState extends State<AppDashboardPedido> {
     llenarDatosGraficoPorComprobante();
   }
 
+  Color generarColorAleatorio() {
+    Random random = Random();
+    int r = random
+        .nextInt(256); // Valor aleatorio entre 0 y 255 para el componente rojo
+    int g = random
+        .nextInt(256); // Valor aleatorio entre 0 y 255 para el componente verde
+    int b = random
+        .nextInt(250); // Valor aleatorio entre 0 y 255 para el componente azul
+    return Color.fromARGB(
+        255, r, g, b); // Crea un objeto Color con los valores generados
+  }
+
+  void cargarDatosPastelCategoriasVendidas() {
+    listaHistoriaPastel = [];
+    sectionsChart = [];
+
+    for (var i = 0; i < listaCategorias.length; i++) {
+      var lista = listaCategoriasVendidas!
+          .where((element) =>
+              element.nombreCategoria == listaCategorias[i].nombreCategoria)
+          .toList();
+
+      if (lista.isNotEmpty) {
+        double total = 0;
+        for (var i = 0; i < lista.length; i++) {
+          total = (lista[i].cantidadPedido! * lista[i].precioPedido!) + total;
+        }
+
+        var color = generarColorAleatorio();
+
+        var pedazoPastel = PieChartSectionData(
+          value: total,
+          title: (total > 0) ? "${total}" : "0",
+          showTitle: true,
+          color: color,
+          radius: 100,
+        );
+
+        listaHistoriaPastel.add(HistoriaPastel(
+            color: color, texto: listaCategorias[i].nombreCategoria));
+
+        sectionsChart.add(pedazoPastel);
+      }
+    }
+
+    setState(() {});
+  }
+
   void cargarDatosPastel() {
-    var tickets = listaPedidos!
-        .where((element) => element.comprobante!.nombreComprobante! == "TICKET")
-        .toList();
-    var boletas = listaPedidos!
-        .where((element) => element.comprobante!.nombreComprobante! == "BOLETA")
-        .toList();
-    var facturas = listaPedidos!
-        .where(
-            (element) => element.comprobante!.nombreComprobante! == "FACTURA")
-        .toList();
+    List<String> listaComprobantes = ["TICKET", "BOLETA", "FACTURA"];
+    listaHistoriaPastel = [];
+    sectionsChart = [];
 
-    var ticketsPastel = PieChartSectionData(
-      value: tickets.length.toDouble(),
-      title: "${tickets.length.toDouble()}%",
-      showTitle: true,
-      color: Colors.orange,
-      radius: 100,
-    );
-    var boletasPastel = PieChartSectionData(
-      value: boletas.length.toDouble(),
-      title: "${boletas.length.toDouble()}%",
-      showTitle: true,
-      color: Colors.blue,
-      radius: 100,
-    );
-    var facturasPastel = PieChartSectionData(
-      value: facturas.length.toDouble(),
-      title: "${facturas.length.toDouble()}%",
-      showTitle: true,
-      color: Colors.red,
-      radius: 100,
-    );
+    for (var i = 0; i < listaComprobantes.length; i++) {
+      var lista = listaPedidos!
+          .where((element) =>
+              element.comprobante!.nombreComprobante! == listaComprobantes[i])
+          .toList();
 
-    setState(() {
-      sectionsChart.add(ticketsPastel);
-      sectionsChart.add(boletasPastel);
-      sectionsChart.add(facturasPastel);
-    });
+      double total = 0;
+      for (var i = 0; i < lista.length; i++) {
+        total = lista[i].totalPedido! + total;
+      }
+
+      var color = (listaComprobantes[i] == "BOLETA")
+          ? Colors.blue
+          : (listaComprobantes[i] == "FACTURA")
+              ? Colors.red
+              : Colors.orange;
+
+      var pedazoPastel = PieChartSectionData(
+        value: total,
+        title: (total > 0) ? "${total}" : "0",
+        showTitle: true,
+        color: color,
+        radius: 100,
+      );
+
+      listaHistoriaPastel
+          .add(HistoriaPastel(color: color, texto: listaComprobantes[i]));
+
+      sectionsChart.add(pedazoPastel);
+    }
+
+    setState(() {});
+
+    // var tickets = listaPedidos!
+    //     .where((element) => element.comprobante!.nombreComprobante! == "TICKET")
+    //     .toList();
+    // var boletas = listaPedidos!
+    //     .where((element) => element.comprobante!.nombreComprobante! == "BOLETA")
+    //     .toList();
+    // var facturas = listaPedidos!
+    //     .where(
+    //         (element) => element.comprobante!.nombreComprobante! == "FACTURA")
+    //     .toList();
+
+    // var ticketsPastel = PieChartSectionData(
+    //   value: tickets.length.toDouble(),
+    //   title: "${tickets.length.toDouble()}%",
+    //   showTitle: true,
+    //   color: Colors.orange,
+    //   radius: 100,
+    // );
+    // var boletasPastel = PieChartSectionData(
+    //   value: boletas.length.toDouble(),
+    //   title: "${boletas.length.toDouble()}%",
+    //   showTitle: true,
+    //   color: Colors.blue,
+    //   radius: 100,
+    // );
+    // var facturasPastel = PieChartSectionData(
+    //   value: facturas.length.toDouble(),
+    //   title: "${facturas.length.toDouble()}%",
+    //   showTitle: true,
+    //   color: Colors.red,
+    //   radius: 100,
+    // );
+
+    // setState(() {
+    //   sectionsChart.add(ticketsPastel);
+    //   sectionsChart.add(boletasPastel);
+    //   sectionsChart.add(facturasPastel);
+    // });
   }
 
   @override
@@ -531,6 +920,8 @@ class AppDashboardPedidoState extends State<AppDashboardPedido> {
     //cargarDatosPastel();
     super.initState();
 
+    cargarCategorias();
+    //cargarCategoriasVendidas();
     cargarPedidos();
   }
 
@@ -549,7 +940,6 @@ class AppDashboardPedidoState extends State<AppDashboardPedido> {
         child: ListView(
           children: [
             Container(
-              //color: Colors.blue,
               width: MediaQuery.of(context).size.width,
               padding: EdgeInsets.fromLTRB(15, 15, 10, 15),
               child: Text(
@@ -620,14 +1010,21 @@ class AppDashboardPedidoState extends State<AppDashboardPedido> {
                         }).toList(),
                         onChanged: (value) async {
                           print(value);
-                          // setState(() {
-                          filtro = value!;
-                          // });
-                          if (filtro == 0) {
-                            cargarDatosGrafico();
-                          } else if (filtro == 1) {
-                            cargarDatosGraficoPorComprobante();
-                          } else {}
+                          int diferencia = idFinMes - idInicioMes;
+                          if (diferencia > 0) {
+                            filtro = value!;
+                            if (filtro == 0) {
+                              cargarDatosGrafico();
+                            } else if (filtro == 1) {
+                              cargarDatosGraficoPorComprobante();
+                            } else if (filtro == 2) {
+                              obtenerCategoriasVendidas();
+                            }
+                          } else {
+                            InfoGlobal.mensajeFallo(context,
+                                "Debe seleccionar un rango de fechas valido.");
+                                
+                          }
                         }),
                   ),
                   Row(
@@ -666,7 +1063,9 @@ class AppDashboardPedidoState extends State<AppDashboardPedido> {
                                         llenarDatosGrafico();
                                       } else if (filtro == 1) {
                                         llenarDatosGraficoPorComprobante();
-                                      } else {}
+                                      } else if (filtro == 2) {
+                                        llenarDatosGraficoPorCategoriasVendidas();
+                                      }
                                       // llenarDatosGrafico();
                                     } else {
                                       InfoGlobal.mensajeFallo(context,
@@ -710,7 +1109,9 @@ class AppDashboardPedidoState extends State<AppDashboardPedido> {
                                         llenarDatosGrafico();
                                       } else if (filtro == 1) {
                                         llenarDatosGraficoPorComprobante();
-                                      } else {}
+                                      } else if (filtro == 2) {
+                                        llenarDatosGraficoPorCategoriasVendidas();
+                                      }
                                     } else {
                                       InfoGlobal.mensajeFallo(context,
                                           "Debe seleccionar un rango de fechas valido.");
@@ -725,118 +1126,91 @@ class AppDashboardPedidoState extends State<AppDashboardPedido> {
                 ],
               ),
             ),
-
-            // (data!.isNotEmpty)
+            graficoLineal(),
+            // (filtro == 1)
             //     ? Container(
-            //         height: 300,
-            //         padding: EdgeInsets.fromLTRB(10, 20, 10, 5),
-            //         margin: EdgeInsets.fromLTRB(10, 10, 10, 0),
-            //         width: MediaQuery.of(context).size.width - 25,
-            //         decoration: BoxDecoration(
-            //             color: Color.fromRGBO(30, 2, 90, 1),
-            //             borderRadius:
-            //                 BorderRadius.all(Radius.circular(10))),
-            //         child: LineChart(
-            //           LineChartData(
-            //             //backgroundColor: Colors.amber,
-            //             lineBarsData: [
-            //               // LineChartBarData(
-            //               //   spots: data,
-            //               //   isCurved: false,
-            //               //   color: Colors.blue,
-            //               //   //colors: [Colors.blue],
-            //               //   barWidth: 4,
-            //               // ),
-            //               LineChartBarData(
-            //                 spots: dataTotales,
-            //                 isCurved: false,
-            //                 color: Colors.orange,
-            //                 //colors: [Colors.blue],
-            //                 barWidth: 4,
-            //               ),
-            //             ],
-            //             minX: 0,
-            //             maxX: _maxX,
-            //             minY: 0,
-            //             maxY: _maxY + 10,
-            //             titlesData: FlTitlesData(
-            //               show: true,
-            //               bottomTitles: AxisTitles(
-            //                 sideTitles: SideTitles(
-            //                   //interval: 10,
-            //                   showTitles: true,
-            //                   reservedSize: 100,
-            //                   getTitlesWidget: (value, meta) {
-            //                     //print(value);
-            //                     final int index = value.toInt();
-            //                     if (index >= 0 &&
-            //                         index < listaGrafico!.length) {
-            //                       return Container(
-            //                           padding:
-            //                               EdgeInsets.fromLTRB(0, 60, 0, 0),
-            //                           child: Transform(
-            //                             transform: Matrix4.rotationZ(315 *
-            //                                 0.0174533), // 45 grados en radianes
-            //                             child: Text(
-            //                               listaGrafico![index].fecha!,
-            //                               style: TextStyle(
-            //                                   color: Colors.grey,
-            //                                   fontWeight: FontWeight.bold),
-            //                             ),
-            //                           ));
-            //                     }
-            //                     return Text("");
-            //                   },
-            //                 ),
-            //               ),
-            //               topTitles: AxisTitles(
-            //                   sideTitles: SideTitles(showTitles: false)),
-            //               rightTitles: AxisTitles(
-            //                   sideTitles: SideTitles(showTitles: false)),
-            //               leftTitles: AxisTitles(
-            //                 sideTitles: SideTitles(
-            //                   //interval: 10,
-            //                   showTitles: true,
-            //                   reservedSize: 50,
-            //                   getTitlesWidget: (value, meta) {
-            //                     return Text(
-            //                       value.toString(),
-            //                       style: TextStyle(color: Colors.grey),
-            //                     );
-            //                   },
-            //                 ),
+            //         padding: const EdgeInsets.fromLTRB(40, 5, 10, 5),
+            //         height: 85,
+            //         child: Column(
+            //           children: [
+            //             Container(
+            //               height: 25,
+            //               child: Row(
+            //                 children: [
+            //                   Container(
+            //                     height: 20,
+            //                     width: 20,
+            //                     color: Colors.blue,
+            //                   ),
+            //                   const Text(
+            //                     " BOLETAS",
+            //                     style: TextStyle(
+            //                         fontSize: 16, color: Colors.black),
+            //                     textAlign: TextAlign.start,
+            //                   ),
+            //                 ],
             //               ),
             //             ),
-            //           ),
+            //             Container(
+            //               height: 25,
+            //               child: Row(
+            //                 children: [
+            //                   Container(
+            //                     height: 20,
+            //                     width: 20,
+            //                     color: Colors.red,
+            //                   ),
+            //                   const Text(
+            //                     " FACTURAS",
+            //                     style: TextStyle(
+            //                         fontSize: 16, color: Colors.black),
+            //                     textAlign: TextAlign.start,
+            //                   ),
+            //                 ],
+            //               ),
+            //             ),
+            //             Container(
+            //               height: 25,
+            //               child: Row(
+            //                 children: [
+            //                   Container(
+            //                     height: 20,
+            //                     width: 20,
+            //                     color: Colors.orange,
+            //                   ),
+            //                   const Text(
+            //                     " TICKETS",
+            //                     style: TextStyle(
+            //                         fontSize: 16, color: Colors.black),
+            //                     textAlign: TextAlign.start,
+            //                   ),
+            //                 ],
+            //               ),
+            //             )
+            //           ],
             //         ),
             //       )
-
-            // Container(
-            //   height: 300,
-            //   padding: EdgeInsets.fromLTRB(10, 20, 10, 20),
-            //   margin: EdgeInsets.fromLTRB(10, 10, 10, 0),
-            //   width: MediaQuery.of(context).size.width - 25,
-            //   decoration: const BoxDecoration(
-            //       color: Color.fromRGBO(30, 2, 90, 1),
-            //       borderRadius: BorderRadius.all(Radius.circular(10))),
-            //   child: Column(
-            //       mainAxisAlignment: MainAxisAlignment.center,
-            //       crossAxisAlignment: CrossAxisAlignment.center,
-            //       children: [
-            //         CircularProgressIndicator(
-            //           color: Colors.amber.shade800,
-            //         ),
-            //         const Text(
-            //           "Cargando datos...",
-            //           style: TextStyle(fontSize: 18, color: Colors.white),
-            //           textAlign: TextAlign.start,
-            //         ),
-            //       ]),
-            // ),
-            graficoLineal(),
+            //     : const SizedBox(
+            //         height: 0,
+            //       ),
             Container(
-              padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
-              height: 250,
+              width: MediaQuery.of(context).size.width,
+              padding: EdgeInsets.all(15),
+              child: const Text(
+                "Montos vendidos S/.",
+                style: TextStyle(
+                    fontFamily: 'Roboto',
+                    fontSize: 20.0,
+                    color: Colors.black,
+                    decoration: TextDecoration.none,
+                    fontWeight: FontWeight.bold),
+                textAlign: TextAlign.center,
+              ),
+            ),
+            Container(
+              // color: Colors.red,
+              padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+              height: 220,
               width: MediaQuery.of(context).size.width,
               child: Column(
                 children: [
@@ -854,50 +1228,140 @@ class AppDashboardPedidoState extends State<AppDashboardPedido> {
                           sections: sectionsChart),
                     ),
                   ),
-                  Row(
-                    children: [
-                      Container(
-                        height: 20,
-                        width: 20,
-                        color: Colors.blue,
-                      ),
-                      const Text(
-                        " Boletas",
-                        style: TextStyle(fontSize: 18, color: Colors.black),
-                        textAlign: TextAlign.start,
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      Container(
-                        height: 20,
-                        width: 20,
-                        color: Colors.red,
-                      ),
-                      const Text(
-                        " Facturas",
-                        style: TextStyle(fontSize: 18, color: Colors.black),
-                        textAlign: TextAlign.start,
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      Container(
-                        height: 20,
-                        width: 20,
-                        color: Colors.orange,
-                      ),
-                      const Text(
-                        " Tickets",
-                        style: TextStyle(fontSize: 18, color: Colors.black),
-                        textAlign: TextAlign.start,
-                      ),
-                    ],
-                  )
                 ],
               ),
+            ),
+            Container(
+              height: listaHistoriaPastel.length * 25,
+              // color: Colors.blue,
+              padding: EdgeInsets.fromLTRB(40, 0, 10, 0),
+              margin: EdgeInsets.only(bottom: 20),
+              child: ListView.builder(
+                padding: EdgeInsets.all(0),
+                itemCount: listaHistoriaPastel
+                    .length, // Cantidad de elementos en la lista
+                itemBuilder: (BuildContext context, int index) {
+                  return Container(
+                    height: 25,
+                    child: Row(
+                      children: [
+                        Container(
+                          height: 20,
+                          width: 20,
+                          color: listaHistoriaPastel[index].color,
+                        ),
+                        Text(
+                          " ${listaHistoriaPastel[index].texto}",
+                          style: TextStyle(fontSize: 18, color: Colors.black),
+                          textAlign: TextAlign.start,
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+              // Column(
+              //   children: [
+              //     Row(
+              //       children: [
+              //         Container(
+              //           height: 20,
+              //           width: 20,
+              //           color: Colors.blue,
+              //         ),
+              //         const Text(
+              //           " Boletas",
+              //           style: TextStyle(fontSize: 18, color: Colors.black),
+              //           textAlign: TextAlign.start,
+              //         ),
+              //       ],
+              //     ),
+              //     Row(
+              //       children: [
+              //         Container(
+              //           height: 20,
+              //           width: 20,
+              //           color: Colors.red,
+              //         ),
+              //         const Text(
+              //           " Facturas",
+              //           style: TextStyle(fontSize: 18, color: Colors.black),
+              //           textAlign: TextAlign.start,
+              //         ),
+              //       ],
+              //     ),
+              //     Row(
+              //       children: [
+              //         Container(
+              //           height: 20,
+              //           width: 20,
+              //           color: Colors.orange,
+              //         ),
+              //         const Text(
+              //           " Tickets",
+              //           style: TextStyle(fontSize: 18, color: Colors.black),
+              //           textAlign: TextAlign.start,
+              //         ),
+              //       ],
+              //     ),
+              //     Row(
+              //       children: [
+              //         Container(
+              //           height: 20,
+              //           width: 20,
+              //           color: Colors.orange,
+              //         ),
+              //         const Text(
+              //           " Tickets",
+              //           style: TextStyle(fontSize: 18, color: Colors.black),
+              //           textAlign: TextAlign.start,
+              //         ),
+              //       ],
+              //     ),
+              //     Row(
+              //       children: [
+              //         Container(
+              //           height: 20,
+              //           width: 20,
+              //           color: Colors.orange,
+              //         ),
+              //         const Text(
+              //           " Tickets",
+              //           style: TextStyle(fontSize: 18, color: Colors.black),
+              //           textAlign: TextAlign.start,
+              //         ),
+              //       ],
+              //     ),
+              //     Row(
+              //       children: [
+              //         Container(
+              //           height: 20,
+              //           width: 20,
+              //           color: Colors.orange,
+              //         ),
+              //         const Text(
+              //           " Tickets",
+              //           style: TextStyle(fontSize: 18, color: Colors.black),
+              //           textAlign: TextAlign.start,
+              //         ),
+              //       ],
+              //     ),
+              //     Row(
+              //       children: [
+              //         Container(
+              //           height: 20,
+              //           width: 20,
+              //           color: Colors.orange,
+              //         ),
+              //         const Text(
+              //           " Tickets",
+              //           style: TextStyle(fontSize: 18, color: Colors.black),
+              //           textAlign: TextAlign.start,
+              //         ),
+              //       ],
+              //     )
+              //   ],
+              // ),
             ),
           ],
         ),
@@ -907,7 +1371,8 @@ class AppDashboardPedidoState extends State<AppDashboardPedido> {
 
   Widget graficoLineal() {
     return ((filtro == 0 && dataTotales!.isNotEmpty) ||
-            (filtro == 1 && listaDataTotales!.isNotEmpty))
+            (filtro == 1 && listaDataTotales!.isNotEmpty) ||
+            (filtro == 2 && listaDataTotales!.isNotEmpty))
         ? Container(
             height: 300,
             padding: EdgeInsets.fromLTRB(10, 20, 30, 5),
@@ -953,7 +1418,9 @@ class AppDashboardPedidoState extends State<AppDashboardPedido> {
                               barWidth: 4,
                             )
                           ]
-                        : [],
+                        : (filtro == 2)
+                            ? lineas
+                            : [],
                 minX: 0,
                 maxX: _maxX,
                 minY: 0,
@@ -1160,4 +1627,11 @@ class Detalle extends StatelessWidget {
       ),
     );
   }
+}
+
+class HistoriaPastel {
+  Color? color;
+  String? texto;
+
+  HistoriaPastel({this.color, this.texto});
 }

@@ -120,3 +120,34 @@ class DetalleProductoModel {
         adicional: AdicionalModel(id: json['idAdicional'] as int));
   }
 }
+
+
+class CategoriasVendidasModel {
+  int? idPedido;
+  String? fechaPedido;
+  int? cantidadPedido;
+  double? precioPedido;
+  int? idProducto;
+  String? nombreProducto;
+  String? nombreCategoria;
+
+  CategoriasVendidasModel(
+      {this.idPedido,
+      this.fechaPedido,
+      this.cantidadPedido,
+      this.precioPedido,
+      this.idProducto,
+      this.nombreProducto,
+      this.nombreCategoria});
+
+  factory CategoriasVendidasModel.fromJson(Map<String, dynamic> json) {
+    return CategoriasVendidasModel(
+        idPedido: json['idPedido'],
+        fechaPedido: json['fechaPedido'] as String,
+        cantidadPedido: json['cantidadPedido'] as int,
+        precioPedido: json['precioPedido'] as double,
+        idProducto: json['idProducto'] as int,
+        nombreProducto: json['nombreProducto'] as String,
+        nombreCategoria: json['nombreCategoria'] as String);
+  }
+}
