@@ -213,7 +213,7 @@ class AppMenuDrawer extends StatelessWidget {
               ),
               onTap: () async {
                 PedidoController pedidoCtrll = PedidoController();
-                final lista = await pedidoCtrll.getPedidos();
+                final lista = await pedidoCtrll.getPedidosDesc();
                 // Navigator.of(context).pop();
                 // Navigator.of(context).pop();
                 InfoGlobal.incrementarVentanas();

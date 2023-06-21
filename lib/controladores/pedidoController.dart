@@ -49,7 +49,17 @@ class PedidoController {
   Future<List<PedidoModel>> getPedidos() async {
     final conn = await MySqlConnection.connect(Configuracion.instancia);
     final result = await conn.query(//'select * from pedido;');
-        'select p.id, p.fechaPedido,p.seriePedido, p.correlativoPedido, p.numeroDocumento, p.denominacionCliente, p.direccionCliente,p.subTotalPedido, p.igvPedido, p.totalPedido, p.estadoPedido, p.idCliente, c.numeroDocumento, c.nombreCliente, c.apellidoCliente, c.telefonoCliente, c.emailCliente, p.idMesa ,m.numeroMesa, c2.nombreComprobante from pedido p inner join cliente c on p.idCliente = c.id inner join mesa m on m.id = p.idMesa inner join comprobante c2 on c2.id = p.idComprobante where estadoPedido = true;');
+        'select p.id, p.fechaPedido,p.seriePedido, p.correlativoPedido, p.numeroDocumento, p.denominacionCliente, p.direccionCliente,p.subTotalPedido, p.igvPedido, p.totalPedido, p.estadoPedido, p.idCliente, c.numeroDocumento, c.nombreCliente, c.apellidoCliente, c.telefonoCliente, c.emailCliente, p.idMesa ,m.numeroMesa, c2.nombreComprobante from pedido p inner join cliente c on p.idCliente = c.id inner join mesa m on m.id = p.idMesa inner join comprobante c2 on c2.id = p.idComprobante where estadoPedido = true ORDER by p.id;');
+
+    final pedidos =
+        result.map((result) => PedidoModel.fromJson(result.fields)).toList();
+    return pedidos;
+  }
+
+  Future<List<PedidoModel>> getPedidosDesc() async {
+    final conn = await MySqlConnection.connect(Configuracion.instancia);
+    final result = await conn.query(//'select * from pedido;');
+        'select p.id, p.fechaPedido,p.seriePedido, p.correlativoPedido, p.numeroDocumento, p.denominacionCliente, p.direccionCliente,p.subTotalPedido, p.igvPedido, p.totalPedido, p.estadoPedido, p.idCliente, c.numeroDocumento, c.nombreCliente, c.apellidoCliente, c.telefonoCliente, c.emailCliente, p.idMesa ,m.numeroMesa, c2.nombreComprobante from pedido p inner join cliente c on p.idCliente = c.id inner join mesa m on m.id = p.idMesa inner join comprobante c2 on c2.id = p.idComprobante where estadoPedido = true ORDER by p.id DESC;');
 
     final pedidos =
         result.map((result) => PedidoModel.fromJson(result.fields)).toList();
@@ -87,7 +97,6 @@ class PedidoController {
   List<PedidoModel> formatearFechas(List<PedidoModel> lista) {
     List<PedidoModel> listaNueva = [];
     for (var i = 0; i < lista.length; i++) {
-
       PedidoModel pedidoModel = PedidoModel();
       pedidoModel.id = lista[i].id;
       pedidoModel.cliente = lista[i].cliente;
