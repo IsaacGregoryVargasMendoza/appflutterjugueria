@@ -193,6 +193,22 @@ class PedidoController {
     return listaPorCategoria;
   }
 
+  List<List<CategoriasVendidasModel>?> listaPorProducto(List<CategoriasVendidasModel> lista, List<ProductoModel> listaProductos) {
+    List<List<CategoriasVendidasModel>> listaPorProducto = [];
+
+    for(var i = 0;  i<listaProductos.length; i++){
+      var listaAux = lista
+        .where((element) => element.nombreProducto == listaProductos[i].nombreProducto)
+        .toList();
+
+      if(listaAux.isNotEmpty){
+        listaPorProducto.add(listaAux);
+      }
+    }
+
+    return listaPorProducto;
+  }
+
   Future<List<DetallePedidoModel>> getListDetalleOfPedido(int id) async {
     final conn = await MySqlConnection.connect(Configuracion.instancia);
     final result = await conn.query(

@@ -47,9 +47,9 @@ class InfoGlobal {
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
-  static void mensajeFallo(BuildContext context, String mensaje) {
+  static void mensajeFallo(BuildContext context, String mensaje, int duracion) {
     var snackBar = SnackBar(
-      duration: Duration(seconds: 7),
+      duration: Duration(seconds: duracion),
       backgroundColor: Colors.red,
       content: Text(mensaje),
     );

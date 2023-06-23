@@ -112,7 +112,7 @@ class AppRegistroAdicionalState extends State<AppRegistroAdicional> {
         _widgetState = WidgetState.LOADED;
       });
     } catch (e) {
-      InfoGlobal.mensajeFallo(context, "No se pudo registrar.");
+      InfoGlobal.mensajeFallo(context, "No se pudo registrar.",5);
       setState(() {
         _widgetState = WidgetState.LOADED;
       });

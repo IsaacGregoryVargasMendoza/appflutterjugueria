@@ -144,7 +144,7 @@ class AppConfirmarPedidoState extends State<AppConfirmarPedido> {
         });
       }
     } catch (e) {
-      InfoGlobal.mensajeFallo(context, "No se pudo registrar la compra.");
+      InfoGlobal.mensajeFallo(context, "No se pudo registrar la compra.", 5);
       setState(() {
         _widgetState = WidgetState.ERROR;
       });

@@ -2,14 +2,14 @@ import 'package:app_jugueria/componentes/info_global.dart';
 import 'package:app_jugueria/controladores/categoriaController.dart';
 import 'package:app_jugueria/controladores/pedidoController.dart';
 import 'package:app_jugueria/componentes/app_drawer.dart';
+import 'package:app_jugueria/controladores/productoController.dart';
 import 'package:app_jugueria/modelos/adicionalModel.dart';
 import 'package:app_jugueria/modelos/categoriaModel.dart';
 import 'package:app_jugueria/modelos/pedidoModel.dart';
+import 'package:app_jugueria/modelos/productoModel.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'dart:math';
 import 'package:collection/collection.dart';
-//import 'package:flutter_charts/flutter_charts.dart' as;
 import 'package:fl_chart/fl_chart.dart';
 
 class AppDashboardPedido extends StatefulWidget {
@@ -23,6 +23,7 @@ class AppDashboardPedido extends StatefulWidget {
 class AppDashboardPedidoState extends State<AppDashboardPedido> {
   List<PieChartSectionData> sectionsChart = [];
   List<CategoriaModel> listaCategorias = [];
+  List<ProductoModel> listaProductos = [];
   List<CategoriasVendidasModel>? listaCategoriasVendidas = [];
 
   List<LineChartBarData> lineas = [];
@@ -70,32 +71,76 @@ class AppDashboardPedidoState extends State<AppDashboardPedido> {
   ];
 
   Future<void> cargarCategorias() async {
-    CategoriaController categoriaController = CategoriaController();
-    var lista = await categoriaController.getCategorias();
+    try {
+      CategoriaController categoriaController = CategoriaController();
+      var lista = await categoriaController.getCategorias();
 
-    listaCategorias = lista;
+      listaCategorias = lista;
+    } catch (e) {
+      InfoGlobal.mensajeFallo(context, "Error al cargar los datos.", 3);
+      debugPrint(e.toString());
+    }
+  }
+
+  Future<void> cargarProductos() async {
+    try {
+      ProductoController productoController = ProductoController();
+      var lista = await productoController.getProductos();
+
+      listaProductos = lista;
+    } catch (e) {
+      InfoGlobal.mensajeFallo(context, "Error al cargar los datos.", 3);
+      debugPrint(e.toString());
+    }
   }
 
   Future<void> cargarPedidos() async {
-    PedidoController pedidoController = PedidoController();
-    var lista = await pedidoController.getPedidos();
+    try {
+      PedidoController pedidoController = PedidoController();
+      var lista = await pedidoController.getPedidos();
 
-    listaPedidos = lista;
+      listaPedidos = lista;
 
-    cargarDatosPastel();
-    cargarDatosGrafico();
+      cargarDatosPastel();
+      cargarDatosGrafico();
+    } catch (e) {
+      InfoGlobal.mensajeFallo(context, "Error al cargar los datos.", 3);
+      debugPrint(e.toString());
+    }
   }
 
   Future<void> obtenerCategoriasVendidas() async {
-    PedidoController pedidoController = PedidoController();
-    var lista = await pedidoController.getCategoriasVendidasConFecha();
+    try {
+      if (listaCategoriasVendidas!.isEmpty) {
+        PedidoController pedidoController = PedidoController();
+        var lista = await pedidoController.getCategoriasVendidasConFecha();
 
-    listaCategoriasVendidas = lista;
+        listaCategoriasVendidas = lista;
+      }
 
-    cargarDatosPastelCategoriasVendidas();
-    cargarDatosGraficoPorCategoria();
-    // cargarDatosPastelCategoriasVendidas();
-    //cargarDatosGraficoCategoriasVendidas();
+      cargarDatosPastelCategoriasVendidas();
+      cargarDatosGraficoPorCategoria();
+    } catch (e) {
+      InfoGlobal.mensajeFallo(context, "Error al cargar los datos.", 3);
+      debugPrint(e.toString());
+    }
+  }
+
+  Future<void> obtenerProductosVendidos() async {
+    try {
+      if (listaCategoriasVendidas!.isEmpty) {
+        PedidoController pedidoController = PedidoController();
+        var lista = await pedidoController.getCategoriasVendidasConFecha();
+
+        listaCategoriasVendidas = lista;
+      }
+
+      cargarDatosPastelProductosVendidos();
+      cargarDatosGraficoPorProducto();
+    } catch (e) {
+      InfoGlobal.mensajeFallo(context, "Error al cargar los datos.", 3);
+      debugPrint(e.toString());
+    }
   }
 
   void cargarDatosGraficoPorCategoria() {
@@ -113,8 +158,23 @@ class AppDashboardPedidoState extends State<AppDashboardPedido> {
     }
 
     llenarDatosGraficoPorCategoriasVendidas();
+  }
 
-    // llenarDatosGraficoPorComprobante();
+  void cargarDatosGraficoPorProducto() {
+    PedidoController pedidoController = PedidoController();
+    var listaPorCategoria = pedidoController.listaPorProducto(
+        listaCategoriasVendidas!, listaProductos);
+    listaCategoriasVendidasAgrupadosGlobal = [];
+
+    for (var a = 0; a < listaPorCategoria.length; a++) {
+      var lista = pedidoController
+          .formatearFechasCategoriasVendidas(listaPorCategoria[a]!);
+      var objetosAgrupados = groupBy(lista, (pedido) => pedido.fechaPedido);
+
+      listaCategoriasVendidasAgrupadosGlobal.add(objetosAgrupados);
+    }
+
+    llenarDatosGraficoPorCategoriasVendidas();
   }
 
   @override
@@ -159,6 +219,7 @@ class AppDashboardPedidoState extends State<AppDashboardPedido> {
     dataTotales = [];
     listaGrafico = [];
     listaDataTotales = [];
+    _maxY = 0;
 
     for (var i = idInicioMes; i <= idFinMes; i++) {
       GraficoLineal valor =
@@ -357,6 +418,7 @@ class AppDashboardPedidoState extends State<AppDashboardPedido> {
     listaGrafico = [];
     listaDataTotales = [];
     lineas = [];
+    _maxY = 0;
 
     for (var i = idInicioMes; i <= idFinMes; i++) {
       GraficoLineal valor =
@@ -592,6 +654,7 @@ class AppDashboardPedidoState extends State<AppDashboardPedido> {
     listaGrafico = [];
 
     int contador = 0;
+    _maxY = 0;
 
     for (var i = idInicioMes; i <= idFinMes; i++) {
       GraficoLineal valor =
@@ -828,7 +891,47 @@ class AppDashboardPedidoState extends State<AppDashboardPedido> {
         );
 
         listaHistoriaPastel.add(HistoriaPastel(
-            color: color, texto: listaCategorias[i].nombreCategoria));
+            color: color,
+            texto: listaCategorias[i].nombreCategoria,
+            valor: total));
+
+        sectionsChart.add(pedazoPastel);
+      }
+    }
+
+    setState(() {});
+  }
+
+  void cargarDatosPastelProductosVendidos() {
+    listaHistoriaPastel = [];
+    sectionsChart = [];
+
+    for (var i = 0; i < listaProductos.length; i++) {
+      var lista = listaCategoriasVendidas!
+          .where((element) =>
+              element.nombreProducto == listaProductos[i].nombreProducto)
+          .toList();
+
+      if (lista.isNotEmpty) {
+        double total = 0;
+        for (var i = 0; i < lista.length; i++) {
+          total = (lista[i].cantidadPedido! * lista[i].precioPedido!) + total;
+        }
+
+        var color = generarColorAleatorio();
+
+        var pedazoPastel = PieChartSectionData(
+          value: total,
+          title: (total > 0) ? "${total}" : "0",
+          showTitle: true,
+          color: color,
+          radius: 100,
+        );
+
+        listaHistoriaPastel.add(HistoriaPastel(
+            color: color,
+            texto: listaProductos[i].nombreProducto,
+            valor: total));
 
         sectionsChart.add(pedazoPastel);
       }
@@ -867,52 +970,13 @@ class AppDashboardPedidoState extends State<AppDashboardPedido> {
         radius: 100,
       );
 
-      listaHistoriaPastel
-          .add(HistoriaPastel(color: color, texto: listaComprobantes[i]));
+      listaHistoriaPastel.add(HistoriaPastel(
+          color: color, texto: listaComprobantes[i], valor: total));
 
       sectionsChart.add(pedazoPastel);
     }
 
     setState(() {});
-
-    // var tickets = listaPedidos!
-    //     .where((element) => element.comprobante!.nombreComprobante! == "TICKET")
-    //     .toList();
-    // var boletas = listaPedidos!
-    //     .where((element) => element.comprobante!.nombreComprobante! == "BOLETA")
-    //     .toList();
-    // var facturas = listaPedidos!
-    //     .where(
-    //         (element) => element.comprobante!.nombreComprobante! == "FACTURA")
-    //     .toList();
-
-    // var ticketsPastel = PieChartSectionData(
-    //   value: tickets.length.toDouble(),
-    //   title: "${tickets.length.toDouble()}%",
-    //   showTitle: true,
-    //   color: Colors.orange,
-    //   radius: 100,
-    // );
-    // var boletasPastel = PieChartSectionData(
-    //   value: boletas.length.toDouble(),
-    //   title: "${boletas.length.toDouble()}%",
-    //   showTitle: true,
-    //   color: Colors.blue,
-    //   radius: 100,
-    // );
-    // var facturasPastel = PieChartSectionData(
-    //   value: facturas.length.toDouble(),
-    //   title: "${facturas.length.toDouble()}%",
-    //   showTitle: true,
-    //   color: Colors.red,
-    //   radius: 100,
-    // );
-
-    // setState(() {
-    //   sectionsChart.add(ticketsPastel);
-    //   sectionsChart.add(boletasPastel);
-    //   sectionsChart.add(facturasPastel);
-    // });
   }
 
   @override
@@ -921,6 +985,7 @@ class AppDashboardPedidoState extends State<AppDashboardPedido> {
     super.initState();
 
     cargarCategorias();
+    cargarProductos();
     //cargarCategoriasVendidas();
     cargarPedidos();
   }
@@ -939,6 +1004,20 @@ class AppDashboardPedidoState extends State<AppDashboardPedido> {
         width: MediaQuery.of(context).size.width,
         child: ListView(
           children: [
+            Container(
+              width: MediaQuery.of(context).size.width,
+              padding: const EdgeInsets.fromLTRB(15, 15, 15, 0),
+              child: const Text(
+                "Reporte de ventas",
+                style: TextStyle(
+                    fontFamily: 'Roboto',
+                    fontSize: 24.0,
+                    color: Color.fromARGB(255, 10, 126, 49),
+                    decoration: TextDecoration.none,
+                    fontWeight: FontWeight.bold),
+                textAlign: TextAlign.center,
+              ),
+            ),
             Container(
               width: MediaQuery.of(context).size.width,
               padding: EdgeInsets.fromLTRB(15, 15, 10, 15),
@@ -1014,16 +1093,21 @@ class AppDashboardPedidoState extends State<AppDashboardPedido> {
                           if (diferencia > 0) {
                             filtro = value!;
                             if (filtro == 0) {
+                              cargarDatosPastel();
                               cargarDatosGrafico();
                             } else if (filtro == 1) {
+                              cargarDatosPastel();
                               cargarDatosGraficoPorComprobante();
                             } else if (filtro == 2) {
                               obtenerCategoriasVendidas();
+                            } else if (filtro == 3) {
+                              obtenerProductosVendidos();
                             }
                           } else {
-                            InfoGlobal.mensajeFallo(context,
-                                "Debe seleccionar un rango de fechas valido.");
-                                
+                            InfoGlobal.mensajeFallo(
+                                context,
+                                "Debe seleccionar un rango de fechas valido.",
+                                5);
                           }
                         }),
                   ),
@@ -1052,8 +1136,8 @@ class AppDashboardPedidoState extends State<AppDashboardPedido> {
                                   borderRadius: BorderRadius.circular(15),
                                   items: meses.map((mes) {
                                     return DropdownMenuItem(
-                                        child: Text(mes),
-                                        value: meses!.indexOf(mes));
+                                        value: meses.indexOf(mes),
+                                        child: Text(mes));
                                   }).toList(),
                                   onChanged: (value) async {
                                     idInicioMes = value!;
@@ -1065,11 +1149,15 @@ class AppDashboardPedidoState extends State<AppDashboardPedido> {
                                         llenarDatosGraficoPorComprobante();
                                       } else if (filtro == 2) {
                                         llenarDatosGraficoPorCategoriasVendidas();
+                                      } else if (filtro == 3) {
+                                        llenarDatosGraficoPorCategoriasVendidas();
                                       }
                                       // llenarDatosGrafico();
                                     } else {
-                                      InfoGlobal.mensajeFallo(context,
-                                          "Debe seleccionar un rango de fechas valido.");
+                                      InfoGlobal.mensajeFallo(
+                                          context,
+                                          "Debe seleccionar un rango de fechas valido.",
+                                          5);
                                     }
                                   }),
                             )
@@ -1098,8 +1186,8 @@ class AppDashboardPedidoState extends State<AppDashboardPedido> {
                                   borderRadius: BorderRadius.circular(15),
                                   items: meses.map((mes) {
                                     return DropdownMenuItem(
-                                        child: Text(mes),
-                                        value: meses!.indexOf(mes));
+                                        value: meses.indexOf(mes),
+                                        child: Text(mes));
                                   }).toList(),
                                   onChanged: (value) async {
                                     idFinMes = value!;
@@ -1111,10 +1199,14 @@ class AppDashboardPedidoState extends State<AppDashboardPedido> {
                                         llenarDatosGraficoPorComprobante();
                                       } else if (filtro == 2) {
                                         llenarDatosGraficoPorCategoriasVendidas();
+                                      } else if (filtro == 3) {
+                                        llenarDatosGraficoPorCategoriasVendidas();
                                       }
                                     } else {
-                                      InfoGlobal.mensajeFallo(context,
-                                          "Debe seleccionar un rango de fechas valido.");
+                                      InfoGlobal.mensajeFallo(
+                                          context,
+                                          "Debe seleccionar un rango de fechas valido.",
+                                          5);
                                     }
                                   }),
                             )
@@ -1127,72 +1219,6 @@ class AppDashboardPedidoState extends State<AppDashboardPedido> {
               ),
             ),
             graficoLineal(),
-            // (filtro == 1)
-            //     ? Container(
-            //         padding: const EdgeInsets.fromLTRB(40, 5, 10, 5),
-            //         height: 85,
-            //         child: Column(
-            //           children: [
-            //             Container(
-            //               height: 25,
-            //               child: Row(
-            //                 children: [
-            //                   Container(
-            //                     height: 20,
-            //                     width: 20,
-            //                     color: Colors.blue,
-            //                   ),
-            //                   const Text(
-            //                     " BOLETAS",
-            //                     style: TextStyle(
-            //                         fontSize: 16, color: Colors.black),
-            //                     textAlign: TextAlign.start,
-            //                   ),
-            //                 ],
-            //               ),
-            //             ),
-            //             Container(
-            //               height: 25,
-            //               child: Row(
-            //                 children: [
-            //                   Container(
-            //                     height: 20,
-            //                     width: 20,
-            //                     color: Colors.red,
-            //                   ),
-            //                   const Text(
-            //                     " FACTURAS",
-            //                     style: TextStyle(
-            //                         fontSize: 16, color: Colors.black),
-            //                     textAlign: TextAlign.start,
-            //                   ),
-            //                 ],
-            //               ),
-            //             ),
-            //             Container(
-            //               height: 25,
-            //               child: Row(
-            //                 children: [
-            //                   Container(
-            //                     height: 20,
-            //                     width: 20,
-            //                     color: Colors.orange,
-            //                   ),
-            //                   const Text(
-            //                     " TICKETS",
-            //                     style: TextStyle(
-            //                         fontSize: 16, color: Colors.black),
-            //                     textAlign: TextAlign.start,
-            //                   ),
-            //                 ],
-            //               ),
-            //             )
-            //           ],
-            //         ),
-            //       )
-            //     : const SizedBox(
-            //         height: 0,
-            //       ),
             Container(
               width: MediaQuery.of(context).size.width,
               padding: EdgeInsets.all(15),
@@ -1232,27 +1258,71 @@ class AppDashboardPedidoState extends State<AppDashboardPedido> {
               ),
             ),
             Container(
+                height: 25,
+                padding: const EdgeInsets.fromLTRB(40, 0, 40, 0),
+                margin: const EdgeInsets.only(bottom: 5),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      (filtro == 0 || filtro == 1)
+                          ? " Comprobantes"
+                          : (filtro == 2)
+                              ? "Categorias"
+                              : "Productos",
+                      style: const TextStyle(
+                          fontSize: 18,
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold),
+                      textAlign: TextAlign.start,
+                    ),
+                    const Text(
+                      " Montos",
+                      style: TextStyle(
+                          fontSize: 18,
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold),
+                      textAlign: TextAlign.start,
+                    ),
+                  ],
+                )),
+            Container(
               height: listaHistoriaPastel.length * 25,
-              // color: Colors.blue,
-              padding: EdgeInsets.fromLTRB(40, 0, 10, 0),
-              margin: EdgeInsets.only(bottom: 20),
+              padding: const EdgeInsets.fromLTRB(40, 0, 40, 0),
+              margin: const EdgeInsets.only(bottom: 20),
               child: ListView.builder(
-                padding: EdgeInsets.all(0),
+                padding: const EdgeInsets.all(0),
                 itemCount: listaHistoriaPastel
                     .length, // Cantidad de elementos en la lista
                 itemBuilder: (BuildContext context, int index) {
                   return Container(
                     height: 25,
                     child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Container(
-                          height: 20,
-                          width: 20,
-                          color: listaHistoriaPastel[index].color,
+                          child: Row(
+                            children: [
+                              Container(
+                                height: 20,
+                                width: 20,
+                                color: listaHistoriaPastel[index].color,
+                              ),
+                              Text(
+                                " ${listaHistoriaPastel[index].texto}",
+                                style: const TextStyle(
+                                    fontSize: 18, color: Colors.black),
+                                textAlign: TextAlign.start,
+                              ),
+                            ],
+                          ),
                         ),
                         Text(
-                          " ${listaHistoriaPastel[index].texto}",
-                          style: TextStyle(fontSize: 18, color: Colors.black),
+                          " ${listaHistoriaPastel[index].valor}",
+                          style: const TextStyle(
+                              fontSize: 18,
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold),
                           textAlign: TextAlign.start,
                         ),
                       ],
@@ -1260,108 +1330,6 @@ class AppDashboardPedidoState extends State<AppDashboardPedido> {
                   );
                 },
               ),
-              // Column(
-              //   children: [
-              //     Row(
-              //       children: [
-              //         Container(
-              //           height: 20,
-              //           width: 20,
-              //           color: Colors.blue,
-              //         ),
-              //         const Text(
-              //           " Boletas",
-              //           style: TextStyle(fontSize: 18, color: Colors.black),
-              //           textAlign: TextAlign.start,
-              //         ),
-              //       ],
-              //     ),
-              //     Row(
-              //       children: [
-              //         Container(
-              //           height: 20,
-              //           width: 20,
-              //           color: Colors.red,
-              //         ),
-              //         const Text(
-              //           " Facturas",
-              //           style: TextStyle(fontSize: 18, color: Colors.black),
-              //           textAlign: TextAlign.start,
-              //         ),
-              //       ],
-              //     ),
-              //     Row(
-              //       children: [
-              //         Container(
-              //           height: 20,
-              //           width: 20,
-              //           color: Colors.orange,
-              //         ),
-              //         const Text(
-              //           " Tickets",
-              //           style: TextStyle(fontSize: 18, color: Colors.black),
-              //           textAlign: TextAlign.start,
-              //         ),
-              //       ],
-              //     ),
-              //     Row(
-              //       children: [
-              //         Container(
-              //           height: 20,
-              //           width: 20,
-              //           color: Colors.orange,
-              //         ),
-              //         const Text(
-              //           " Tickets",
-              //           style: TextStyle(fontSize: 18, color: Colors.black),
-              //           textAlign: TextAlign.start,
-              //         ),
-              //       ],
-              //     ),
-              //     Row(
-              //       children: [
-              //         Container(
-              //           height: 20,
-              //           width: 20,
-              //           color: Colors.orange,
-              //         ),
-              //         const Text(
-              //           " Tickets",
-              //           style: TextStyle(fontSize: 18, color: Colors.black),
-              //           textAlign: TextAlign.start,
-              //         ),
-              //       ],
-              //     ),
-              //     Row(
-              //       children: [
-              //         Container(
-              //           height: 20,
-              //           width: 20,
-              //           color: Colors.orange,
-              //         ),
-              //         const Text(
-              //           " Tickets",
-              //           style: TextStyle(fontSize: 18, color: Colors.black),
-              //           textAlign: TextAlign.start,
-              //         ),
-              //       ],
-              //     ),
-              //     Row(
-              //       children: [
-              //         Container(
-              //           height: 20,
-              //           width: 20,
-              //           color: Colors.orange,
-              //         ),
-              //         const Text(
-              //           " Tickets",
-              //           style: TextStyle(fontSize: 18, color: Colors.black),
-              //           textAlign: TextAlign.start,
-              //         ),
-              //       ],
-              //     )
-              //   ],
-              // ),
             ),
           ],
         ),
@@ -1372,13 +1340,14 @@ class AppDashboardPedidoState extends State<AppDashboardPedido> {
   Widget graficoLineal() {
     return ((filtro == 0 && dataTotales!.isNotEmpty) ||
             (filtro == 1 && listaDataTotales!.isNotEmpty) ||
-            (filtro == 2 && listaDataTotales!.isNotEmpty))
+            (filtro == 2 && listaDataTotales!.isNotEmpty) ||
+            (filtro == 3 && listaDataTotales!.isNotEmpty))
         ? Container(
             height: 300,
             padding: EdgeInsets.fromLTRB(10, 20, 30, 5),
             margin: EdgeInsets.fromLTRB(10, 10, 10, 0),
             width: MediaQuery.of(context).size.width - 25,
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
                 color: Color.fromRGBO(30, 2, 90, 1),
                 borderRadius: BorderRadius.all(Radius.circular(10))),
             child: LineChart(
@@ -1420,7 +1389,9 @@ class AppDashboardPedidoState extends State<AppDashboardPedido> {
                           ]
                         : (filtro == 2)
                             ? lineas
-                            : [],
+                            : (filtro == 3)
+                                ? lineas
+                                : [],
                 minX: 0,
                 maxX: _maxX,
                 minY: 0,
@@ -1437,19 +1408,19 @@ class AppDashboardPedidoState extends State<AppDashboardPedido> {
 
                         if (index >= 0 && index < listaGrafico!.length) {
                           return Container(
-                              padding: EdgeInsets.fromLTRB(0, 30, 0, 0),
+                              padding: const EdgeInsets.fromLTRB(0, 30, 0, 0),
                               child: Transform(
                                 transform: Matrix4.rotationZ(
                                     315 * 0.0174533), // 45 grados en radianes
                                 child: Text(
                                   listaGrafico![index].fecha!,
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                       color: Colors.grey,
                                       fontWeight: FontWeight.bold),
                                 ),
                               ));
                         }
-                        return Text("");
+                        return const Text("");
                       },
                     ),
                   ),
@@ -1465,7 +1436,7 @@ class AppDashboardPedidoState extends State<AppDashboardPedido> {
                       getTitlesWidget: (value, meta) {
                         return Text(
                           value.toString(),
-                          style: TextStyle(color: Colors.grey),
+                          style: const TextStyle(color: Colors.grey),
                         );
                       },
                     ),
@@ -1476,8 +1447,8 @@ class AppDashboardPedidoState extends State<AppDashboardPedido> {
           )
         : Container(
             height: 300,
-            padding: EdgeInsets.fromLTRB(10, 20, 10, 20),
-            margin: EdgeInsets.fromLTRB(10, 10, 10, 0),
+            padding: const EdgeInsets.fromLTRB(10, 20, 10, 20),
+            margin: const EdgeInsets.fromLTRB(10, 10, 10, 0),
             width: MediaQuery.of(context).size.width - 25,
             decoration: const BoxDecoration(
                 color: Color.fromRGBO(30, 2, 90, 1),
@@ -1600,7 +1571,7 @@ class GraficoLineal {
 }
 
 class Detalle extends StatelessWidget {
-  List<AdicionalModel> listaDetalle;
+  final List<AdicionalModel> listaDetalle;
 
   Detalle({required this.listaDetalle});
 
@@ -1632,6 +1603,7 @@ class Detalle extends StatelessWidget {
 class HistoriaPastel {
   Color? color;
   String? texto;
+  double? valor;
 
-  HistoriaPastel({this.color, this.texto});
+  HistoriaPastel({this.color, this.texto, this.valor});
 }
