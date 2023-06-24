@@ -2,6 +2,7 @@ import 'package:app_jugueria/componentes/info_global.dart';
 import 'package:app_jugueria/modelos/mesaModel.dart';
 import 'package:app_jugueria/controladores/mesaController.dart';
 import 'package:app_jugueria/controladores/productoController.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:app_jugueria/componentes/app_drawer.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
@@ -63,7 +64,7 @@ class AppSeleccionarMesaState extends State<AppSeleccionarMesa> {
   void initState() {
     super.initState();
     _cargarMesas();
-    iniciarConsultaPeriodica();
+    //iniciarConsultaPeriodica();
   }
 
   Future<void> cargarNuevaInterfaz(MesaModel mesaModel) async {
@@ -120,17 +121,29 @@ class AppSeleccionarMesaState extends State<AppSeleccionarMesa> {
           appBar: AppBar(
             title: const Text("Seleccionar mesa"),
             backgroundColor: Colors.green.shade900,
-            // actions: <Widget>[
-            //   IconButton(
-            //     onPressed: () {
-            //       Navigator.of(context).pop();
-            //       Navigator.pushNamed(context, '/registrar-mesa');
-            //     },
-            //     icon: const FaIcon(FontAwesomeIcons.plus),
-            //     // hoverColor: Colors.black,
-            //   ),
-            // ],
+            actions: <Widget>[
+              IconButton(
+                onPressed: () {
+                  _cargarMesas();
+                },
+                icon: const FaIcon(FontAwesomeIcons.spinner),
+                // hoverColor: Colors.black,
+              ),
+            ],
           ),
+          // AppBar(
+          //   title: const Text("Liberar mesa"),
+          //   backgroundColor: Colors.green.shade900,
+          //   actions: <Widget>[
+          //     IconButton(
+          //       onPressed: () {
+          //         _cargarMesas();
+          //       },
+          //       icon: const FaIcon(FontAwesomeIcons.spinner),
+          //       // hoverColor: Colors.black,
+          //     ),
+          //   ],
+          // ),
           body: GridView.builder(
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2, // Dos columnas

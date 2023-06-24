@@ -10,8 +10,8 @@ import 'package:app_jugueria/modelos/categoriaModel.dart';
 import 'package:flutter/material.dart';
 
 class AppAsignarAdicional extends StatefulWidget {
-  CategoriaModel? categoria;
-  List<AdicionalModel>? adicionales;
+  final CategoriaModel? categoria;
+  final List<AdicionalModel>? adicionales;
   List<AdicionalModel>? adicionalesAsignados;
 
   AppAsignarAdicional(
@@ -25,11 +25,7 @@ class AppAsignarAdicional extends StatefulWidget {
 
 class AppAsignarAdicionalState extends State<AppAsignarAdicional> {
   late TextEditingController nombreCategoria;
-  bool _buttonDisabled = false;
-  //List<AdicionalModel> adicionalesAsignados = [];
   static List<bool> isSelected = [];
-
-  //String _estado = 'Estado inicial';
 
   void actualizarListaAdicionales(List<AdicionalModel> nuevaLista) {
     setState(() {
@@ -48,12 +44,6 @@ class AppAsignarAdicionalState extends State<AppAsignarAdicional> {
     } else {
       nombreCategoria = TextEditingController();
     }
-  }
-
-  void _disableButton() {
-    setState(() {
-      _buttonDisabled = true;
-    });
   }
 
   @override
@@ -276,8 +266,8 @@ class AppAsignarAdicionalState extends State<AppAsignarAdicional> {
 }
 
 class ModalAdicionales extends StatefulWidget {
-  List<AdicionalModel>? adicionales;
-  List<AdicionalModel>? adicionalesAsignados;
+  final List<AdicionalModel>? adicionales;
+  final List<AdicionalModel>? adicionalesAsignados;
   final Function(List<AdicionalModel>)? actualizarEstado;
 
   ModalAdicionales(

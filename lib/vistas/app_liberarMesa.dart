@@ -32,14 +32,14 @@ class AppLiberarMesaState extends State<AppLiberarMesa> {
             onPressed: () {
               Navigator.of(context).pop('Opción 1');
             },
-            child: Text(
+            child: const Text(
               'Liberar',
               style: TextStyle(color: Colors.black),
             ),
           ),
           // ),
         ),
-        SizedBox(
+        const SizedBox(
           height: 5,
         ),
         // Container(

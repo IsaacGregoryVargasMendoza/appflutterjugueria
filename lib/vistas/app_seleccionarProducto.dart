@@ -72,7 +72,7 @@ class _AppSeleccionarProductoState extends State<AppSeleccionarProducto> {
   List<int> listaCantidades = [];
   List<double> listaSubtotales = [];
   double total = 0;
-  int indice = -1;
+  static int indice = -1;
   String preguntaActual = "¿QUE PRODUCTO DESEA?";
 
   @override
@@ -136,6 +136,9 @@ class _AppSeleccionarProductoState extends State<AppSeleccionarProducto> {
         listaCantidades.add(1);
         listaSubtotales.add(_producto!.precioProducto! * 1);
       }
+
+      indice = listaProductos.indexWhere((p) => p.id == producto[0].id);
+      debugPrint(indice.toString());
 
       total = listaSubtotales
           .reduce((valorAnterior, valorActual) => valorAnterior + valorActual);
@@ -252,24 +255,24 @@ class _AppSeleccionarProductoState extends State<AppSeleccionarProducto> {
         return _buildScaffold(
             context,
             Center(
-            child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  CircularProgressIndicator(color: Colors.amber.shade900),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  const Text(
-                    "Cargando...",
-                    style: TextStyle(
-                        fontFamily: 'Roboto',
-                        fontSize: 20.0,
-                        color: Colors.black,
-                        decoration: TextDecoration.none),
-                  )
-                ]),
-          ));
+              child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    CircularProgressIndicator(color: Colors.amber.shade900),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    const Text(
+                      "Cargando...",
+                      style: TextStyle(
+                          fontFamily: 'Roboto',
+                          fontSize: 20.0,
+                          color: Colors.black,
+                          decoration: TextDecoration.none),
+                    )
+                  ]),
+            ));
       case WidgetState.LOADED:
         return _buildScaffold(
           context,
@@ -326,20 +329,100 @@ class _AppSeleccionarProductoState extends State<AppSeleccionarProducto> {
                       height: 10,
                     ),
                     (!_isAnalyzing)
-                        ? Text(
-                            (_producto != null)
-                                ? '${_producto!.nombreProducto}'
-                                : '',
-                            style: kAnalyzingTextStyle)
+                        ? Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                  (_producto != null)
+                                      ? '${_producto!.nombreProducto}'
+                                      : '',
+                                  style: kAnalyzingTextStyle),
+                              SizedBox(width: (_producto != null) ? 10 : 0),
+                              (_producto != null)
+                                  ? GestureDetector(
+                                      onTap: () {
+                                        debugPrint("Se confirmo cantidad");
+                                        setState(() {
+                                          preguntaActual =
+                                              "¿QUE PRODUCTO DESEA?";
+                                          _producto = null;
+                                        });
+                                      },
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 10, vertical: 5),
+                                        color: Colors.green,
+                                        child: const Text(
+                                          "X",
+                                          style: TextStyle(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                      ))
+                                  : const SizedBox(
+                                      width: 0,
+                                    ),
+                              SizedBox(width: (_producto != null) ? 10 : 0),
+                              (_producto != null)
+                                  ? GestureDetector(
+                                      onTap: () {
+                                        if (indice > -1) {
+                                          listaProductos.removeAt(indice);
+                                          listaCantidades.removeAt(indice);
+                                          listaSubtotales.removeAt(indice);
+
+                                          if (listaSubtotales.isNotEmpty) {
+                                            total = listaSubtotales.reduce(
+                                                (valorAnterior, valorActual) =>
+                                                    valorAnterior +
+                                                    valorActual);
+                                          } else {
+                                            total = 0;
+                                          }
+                                          InfoGlobal.mensajeConfirmacion(
+                                              context,
+                                              "Se elimino el producto.",
+                                              duracion: 2);
+
+                                          _setAnalyzing(false);
+                                          setState(() {
+                                            preguntaActual =
+                                                "¿QUE PRODUCTO DESEA?";
+                                            _producto = null;
+                                          });
+                                        } else {
+                                          InfoGlobal.mensajeFallo(
+                                              context,
+                                              "No se pudo eliminar producto.",
+                                              3);
+                                        }
+                                      },
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 10, vertical: 5),
+                                        color: Colors.red,
+                                        child: const Text(
+                                          "X",
+                                          style: TextStyle(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                      ))
+                                  : const SizedBox(
+                                      width: 0,
+                                    )
+                            ],
+                          )
                         : const Text('Analizando...',
                             style: kAnalyzingTextStyle),
                     const Text(
                       "Pedido:",
                       style: TextStyle(fontSize: 20),
                     ),
-                    DetallePedido(
-                        listaProductos: listaProductos,
-                        listaCantidades: listaCantidades),
+                    // DetallePedido(
+                    //     listaProductos: listaProductos,
+                    //     listaCantidades: listaCantidades),
+                    listaDetalle(),
                     Container(
                       width: MediaQuery.of(context).size.width,
                       padding: const EdgeInsets.fromLTRB(0, 5, 25, 0),
@@ -362,7 +445,9 @@ class _AppSeleccionarProductoState extends State<AppSeleccionarProducto> {
                             'total': total
                           });
                         } else {
-                          print("La lista de productos esta vacia.");
+                          InfoGlobal.mensajeFallo(
+                              context, "La lista de productos esta vacia.", 1);
+                          // print("La lista de productos esta vacia.");
                         }
                       },
                       child: Container(
@@ -534,16 +619,8 @@ class _AppSeleccionarProductoState extends State<AppSeleccionarProducto> {
       },
     );
   }
-}
 
-class DetallePedido extends StatelessWidget {
-  final List<ProductoModel> listaProductos;
-  final List<int> listaCantidades;
-
-  DetallePedido({required this.listaProductos, required this.listaCantidades});
-
-  @override
-  Widget build(BuildContext context) {
+  Widget listaDetalle() {
     return Container(
       width: MediaQuery.of(context).size.width,
       height: 150,
@@ -561,6 +638,21 @@ class DetallePedido extends StatelessWidget {
               onTap: () {
                 print(listaProductos[index].id);
                 print(listaProductos[index].nombreProducto);
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return eliminar(
+                        context, listaProductos[index].nombreProducto!, index);
+                  },
+                ).then((value) {
+                  if (value == 'Opción 1') {
+                    //liberarMesa(listaMesas![index].id!);
+                    debugPrint("Se elimino el producto");
+                    //onTab(latLng);
+                  } else if (value == 'Opción 2') {
+                    debugPrint("nada");
+                  }
+                });
               },
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -613,6 +705,197 @@ class DetallePedido extends StatelessWidget {
       ]),
     );
   }
+
+  Widget eliminar(BuildContext context, String producto, int index) {
+    return AlertDialog(
+      title: Text(producto),
+      actions: [
+        Container(
+          color: Colors.red.shade500,
+          width: MediaQuery.of(context).size.width,
+          child: TextButton(
+            onPressed: () {
+              Navigator.of(context).pop('Opción 1');
+              if (index > -1) {
+                listaProductos.removeAt(index);
+                listaCantidades.removeAt(index);
+                listaSubtotales.removeAt(index);
+
+                if (listaSubtotales.isNotEmpty) {
+                  total = listaSubtotales.reduce((valorAnterior, valorActual) =>
+                      valorAnterior + valorActual);
+                } else {
+                  total = 0;
+                }
+                InfoGlobal.mensajeConfirmacion(
+                    context, "Se elimino el producto.",
+                    duracion: 2);
+
+                _setAnalyzing(false);
+                setState(() {
+                  preguntaActual = "¿QUE PRODUCTO DESEA?";
+                  _producto = null;
+                });
+              } else {
+                InfoGlobal.mensajeFallo(
+                    context, "No se pudo eliminar producto.", 3);
+              }
+            },
+            child: const Text(
+              'Eliminar',
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+          // ),
+        ),
+        const SizedBox(
+          height: 5,
+        ),
+      ],
+    );
+  }
+}
+
+class DetallePedido extends StatelessWidget {
+  final List<ProductoModel> listaProductos;
+  final List<int> listaCantidades;
+
+  DetallePedido({required this.listaProductos, required this.listaCantidades});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: MediaQuery.of(context).size.width,
+      height: 150,
+      //margin: const EdgeInsets.fromLTRB(5, 5, 5, 0),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10),
+        color: Colors.grey.shade100,
+      ),
+      child: Stack(children: <Widget>[
+        ListView.builder(
+          padding: const EdgeInsets.all(2),
+          itemCount: listaProductos.length,
+          itemBuilder: (context, index) {
+            return GestureDetector(
+              onTap: () {
+                print(listaProductos[index].id);
+                print(listaProductos[index].nombreProducto);
+                // showDialog(
+                //       context: context,
+                //       builder: (BuildContext context) {
+                //         return seleccionarPunto(context);
+                //       },
+                //     ).then((value) {
+                //       if (value == 'Opción 1') {
+                //         //liberarMesa(listaMesas![index].id!);
+                //         debugPrint("Liberar mesa");
+                //         //onTab(latLng);
+                //       } else if (value == 'Opción 2') {
+                //         debugPrint("nada");
+                //       }
+                //     });
+              },
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  Container(
+                    width: MediaQuery.of(context).size.width,
+                    padding:
+                        const EdgeInsetsDirectional.fromSTEB(20, 10, 20, 10),
+                    decoration: const BoxDecoration(
+                        // color: Colors.white,
+                        // border: BorderDirectional(
+                        //   bottom: BorderSide(width: 0.5),
+                        // ),
+                        ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Container(
+                          width: 170, // Ancho máximo permitido
+                          child: Text(
+                            "${listaProductos[index].nombreProducto}",
+                            style: const TextStyle(
+                              fontSize: 16,
+                              // fontWeight: FontWeight.bold,
+                            ),
+                            textAlign: TextAlign.start,
+                            overflow: TextOverflow
+                                .ellipsis, // Recorta el texto y muestra puntos suspensivos al final
+                            maxLines: 1, // Limita el texto a una sola línea
+                          ),
+                        ),
+                        Text(
+                          ((listaCantidades[index] != null)
+                              ? "S/.${listaProductos[index].precioProducto} x ${listaCantidades[index]} = S/.${listaProductos[index].precioProducto! * listaCantidades[index]}"
+                              : "0"),
+                          style: const TextStyle(
+                            fontSize: 16,
+                            // fontWeight: FontWeight.bold,
+                          ),
+                          textAlign: TextAlign.end,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
+      ]),
+    );
+  }
+
+  // Widget seleccionarPunto(BuildContext context) {
+  //   return AlertDialog(
+  //     title: const Text('Acciones'),
+  //     actions: [
+  //       Container(
+  //         color: Colors.yellow.shade600,
+  //         width: MediaQuery.of(context).size.width,
+  //         child: TextButton(
+  //           onPressed: () {
+  //             Navigator.of(context).pop('Opción 1');
+  //             if (indice > -1) {
+  //               listaProductos.removeAt(indice);
+  //               listaCantidades.removeAt(indice);
+  //               listaSubtotales.removeAt(indice);
+
+  //               if (listaSubtotales.isNotEmpty) {
+  //                 total = listaSubtotales.reduce(
+  //                     (valorAnterior, valorActual) =>
+  //                         valorAnterior +
+  //                         valorActual);
+  //               } else {
+  //                 total = 0;
+  //               }
+  //               InfoGlobal.mensajeConfirmacion(context, "Se elimino el producto.",duracion: 2);
+
+  //               _setAnalyzing(false);
+  //               setState(() {
+  //                 preguntaActual =
+  //                     "¿QUE PRODUCTO DESEA?";
+  //                 _producto = null;
+  //               });
+  //             }else {
+  //               InfoGlobal.mensajeFallo(context, "No se pudo eliminar producto.", 3);
+  //             }
+  //           },
+  //           child: const Text(
+  //             'Eliminar',
+  //             style: TextStyle(color: Colors.black),
+  //           ),
+  //         ),
+  //         // ),
+  //       ),
+  //       const SizedBox(
+  //         height: 5,
+  //       ),
+  //     ],
+  //   );
+  // }
 }
 
 class ProductCard extends StatelessWidget {

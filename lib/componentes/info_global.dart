@@ -38,9 +38,10 @@ class InfoGlobal {
     );
   }
 
-  static void mensajeConfirmacion(BuildContext context, String mensaje) {
+  static void mensajeConfirmacion(BuildContext context, String mensaje,
+      {int? duracion}) {
     var snackBar = SnackBar(
-      duration: Duration(seconds: 7),
+      duration: Duration(seconds: (duracion == null) ? 7 : duracion),
       backgroundColor: Colors.green,
       content: Text(mensaje),
     );

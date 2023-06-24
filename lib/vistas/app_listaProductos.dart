@@ -89,6 +89,15 @@ class _AppListaProductoState extends State<AppListaProducto> {
                           precioProducto: widget.data![index].precioProducto,
                           letraProducto: widget.data![index].letraProducto,
                           imagenProducto: widget.data![index].imagenProducto);
+
+                      print(lista.length);
+                      print(productoModel.id);
+                      print(productoModel.nombreProducto);
+                      print(productoModel.descripcionProducto);
+                      print(productoModel.categoria!.id);
+                      print(productoModel.precioProducto);
+                      print(productoModel.letraProducto);
+                      print(productoModel.imagenProducto);
                       Navigator.pushNamed(
                         context,
                         '/editar-producto',
@@ -97,6 +106,11 @@ class _AppListaProductoState extends State<AppListaProducto> {
                           'productoModel': productoModel
                         },
                       );
+              //         Navigator.pushNamed(
+              //   context,
+              //   '/editar-mesa',
+              //   arguments: widget.data![index],
+              // );
                     },
                     child: Container(
                       width: MediaQuery.of(context).size.width,

@@ -72,6 +72,7 @@ class _AppRegistroProductoState extends State<AppRegistroProducto> {
   void initState() {
     super.initState();
     if (widget.productoModel != null) {
+      print(widget.productoModel!.categoria!.id!);
       tecNombreProducto =
           TextEditingController(text: widget.productoModel!.nombreProducto);
       tecDescripcion = TextEditingController(

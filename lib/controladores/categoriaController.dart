@@ -1,3 +1,4 @@
+import 'package:app_jugueria/modelos/productoModel.dart';
 import 'package:mysql1/mysql1.dart';
 import 'package:app_jugueria/modelos/categoriaModel.dart';
 import 'package:app_jugueria/controladores/conexion.dart';
@@ -11,6 +12,16 @@ class CategoriaController {
     final categorias =
         result.map((result) => CategoriaModel.fromJson(result.fields)).toList();
     return categorias;
+  }
+
+  Future<List<ProductoModel>> getProductosConCategoria(int idCategoria) async {
+    final conn = await MySqlConnection.connect(Configuracion.instancia);
+    final result =
+        await conn.query('select p.id, p.idCategoria, p.nombreProducto, p.descripcionProducto , p.precioProducto, p.imagenProducto, p.letraProducto, p.estavisible, p.estadoProducto, c.nombreCategoria from producto p inner join categoria c on p.idCategoria = c.id where estadoProducto = true and idCategoria = ?;',[idCategoria]);
+
+    final productos =
+        result.map((result) => ProductoModel.fromJson(result.fields)).toList();
+    return productos;
   }
 
   Future<void> addCategoria(CategoriaModel categoria) async {
