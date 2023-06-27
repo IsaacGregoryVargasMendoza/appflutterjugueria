@@ -6,6 +6,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:app_jugueria/componentes/app_drawer.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AppSeleccionarMesa extends StatefulWidget {
   @override
@@ -94,7 +95,111 @@ class AppSeleccionarMesaState extends State<AppSeleccionarMesa> {
             title: const Text("Seleccionar mesa"),
             backgroundColor: Colors.green.shade900,
           ),
-          drawer: AppMenuDrawer(),
+          drawer: ClipRRect(
+            borderRadius:
+                const BorderRadius.vertical(top: Radius.circular(50.0)),
+            child: Drawer(
+              child: ListView(
+                padding: EdgeInsets.zero,
+                children: <Widget>[
+                  DrawerHeader(
+                    decoration: const BoxDecoration(
+                      color: Color.fromRGBO(250, 250, 250, 0.4),
+                      border: Border(
+                          bottom: BorderSide(
+                              width: 0.2,
+                              color: Colors.black,
+                              style: BorderStyle.solid)),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Container(
+                          width: 50,
+                          height: 50,
+                          decoration: BoxDecoration(
+                            // border: Border.all(width: 0.1),
+                            borderRadius: BorderRadius.circular(100),
+                            image: const DecorationImage(
+                              image: AssetImage(
+                                  "assets/usuario_administrador.png"),
+                            ),
+                          ),
+                        ),
+                        Container(
+                          margin: const EdgeInsets.symmetric(
+                              vertical: 0, horizontal: 5),
+                          width: 200,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Flexible(
+                                child: Text(
+                                  "${InfoGlobal.clienteModel!.nombreCliente} ${InfoGlobal.clienteModel!.apellidoCliente}",
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  textAlign: TextAlign.left,
+                                ),
+                              ),
+                              Text(
+                                "${InfoGlobal.clienteModel!.numeroDocumento}",
+                                style: const TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              GestureDetector(
+                                onTap: () {
+                                  print("click en editar.");
+                                },
+                                child: const Text(
+                                  "Editar perfil",
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 11,
+                                  ),
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  ListTile(
+                    leading: const FaIcon(FontAwesomeIcons.clipboardCheck),
+                    title: const Text(
+                      'Mis pedidos',
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                    ),
+                    onTap: () async {},
+                  ),
+                  ListTile(
+                    leading: const FaIcon(FontAwesomeIcons.signOut),
+                    title: const Text(
+                      'Cerrar sesion',
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                    ),
+                    onTap: () async {
+                      final SharedPreferences prefs =
+                          await SharedPreferences.getInstance();
+                      await prefs.remove('usuarioCliente');
+                      await prefs.remove('contraseniaCliente');
+                      Navigator.of(context).pushReplacementNamed("/");
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ),
           body: Center(
             child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -130,6 +235,111 @@ class AppSeleccionarMesaState extends State<AppSeleccionarMesa> {
                 // hoverColor: Colors.black,
               ),
             ],
+          ),
+          drawer: ClipRRect(
+            borderRadius:
+                const BorderRadius.vertical(top: Radius.circular(50.0)),
+            child: Drawer(
+              child: ListView(
+                padding: EdgeInsets.zero,
+                children: <Widget>[
+                  DrawerHeader(
+                    decoration: const BoxDecoration(
+                      color: Color.fromRGBO(250, 250, 250, 0.4),
+                      border: Border(
+                          bottom: BorderSide(
+                              width: 0.2,
+                              color: Colors.black,
+                              style: BorderStyle.solid)),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Container(
+                          width: 50,
+                          height: 50,
+                          decoration: BoxDecoration(
+                            // border: Border.all(width: 0.1),
+                            borderRadius: BorderRadius.circular(100),
+                            image: const DecorationImage(
+                              image: AssetImage(
+                                  "assets/usuario_administrador.png"),
+                            ),
+                          ),
+                        ),
+                        Container(
+                          margin: const EdgeInsets.symmetric(
+                              vertical: 0, horizontal: 5),
+                          width: 200,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Flexible(
+                                child: Text(
+                                  "${InfoGlobal.clienteModel!.nombreCliente} ${InfoGlobal.clienteModel!.apellidoCliente}",
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  textAlign: TextAlign.left,
+                                ),
+                              ),
+                              Text(
+                                "${InfoGlobal.clienteModel!.numeroDocumento}",
+                                style: const TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              GestureDetector(
+                                onTap: () {
+                                  print("click en editar.");
+                                },
+                                child: const Text(
+                                  "Editar perfil",
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 11,
+                                  ),
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  ListTile(
+                    leading: const FaIcon(FontAwesomeIcons.clipboardCheck),
+                    title: const Text(
+                      'Mis pedidos',
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                    ),
+                    onTap: () async {},
+                  ),
+                  ListTile(
+                    leading: const FaIcon(FontAwesomeIcons.signOut),
+                    title: const Text(
+                      'Cerrar sesion',
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                    ),
+                    onTap: () async {
+                      final SharedPreferences prefs =
+                          await SharedPreferences.getInstance();
+                      await prefs.remove('usuarioCliente');
+                      await prefs.remove('contraseniaCliente');
+                      Navigator.of(context).pushReplacementNamed("/");
+                    },
+                  ),
+                ],
+              ),
+            ),
           ),
           // AppBar(
           //   title: const Text("Liberar mesa"),

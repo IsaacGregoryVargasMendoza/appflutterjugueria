@@ -7,6 +7,7 @@ import 'package:flutter/widgets.dart' as widgets;
 import 'package:app_jugueria/controladores/pedidoController.dart';
 import 'package:app_jugueria/componentes/info_global.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AppMenuDrawer extends StatelessWidget {
   @override
@@ -98,85 +99,19 @@ class AppMenuDrawer extends StatelessWidget {
                 ],
               ),
             ),
-            // ListTile(
-            //   leading: const FaIcon(FontAwesomeIcons.table),
-            //   title: const Text(
-            //     'Mesas',
-            //     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-            //   ),
-            //   onTap: () async {
-            //     MesaController mesaCtrll = MesaController();
-            //     final lista = await mesaCtrll.getMesas();
-            //     Navigator.of(context).pop();
-            //     Navigator.pushNamed(
-            //       context,
-            //       '/lista-mesas',
-            //       arguments: lista,
-            //     );
-            //   },
-            // ),
-            // ListTile(
-            //   leading: const FaIcon(FontAwesomeIcons.tags),
-            //   title: const Text(
-            //     'Categorias',
-            //     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-            //   ),
-            //   onTap: () async {
-            //     CategoriaController categoriaCtrll = CategoriaController();
-            //     final lista = await categoriaCtrll.getCategorias();
-            //     Navigator.of(context).pop();
-            //     Navigator.pushNamed(
-            //       context,
-            //       '/lista-categorias',
-            //       arguments: lista,
-            //     );
-            //   },
-            // ),
-            // ListTile(
-            //   leading: const FaIcon(FontAwesomeIcons.bagShopping),
-            //   title: const Text(
-            //     'Productos',
-            //     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-            //   ),
-            //   onTap: () async {
-            //     ProductoController productoCtrll = ProductoController();
-            //     final lista = await productoCtrll.getProductos();
-            //     Navigator.of(context).pop();
-            //     Navigator.pushNamed(
-            //       context,
-            //       '/lista-productos',
-            //       arguments: lista,
-            //     );
-            //   },
-            // ),
-            // ListTile(
-            //   leading: const FaIcon(FontAwesomeIcons.user),
-            //   title: const Text(
-            //     'Clientes',
-            //     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-            //   ),
-            //   onTap: () async {
-            //     ClienteController productoCtrll = ClienteController();
-            //     final lista = await productoCtrll.getClientes();
-            //     Navigator.of(context).pop();
-            //     Navigator.pushNamed(
-            //       context,
-            //       '/lista-clientes',
-            //       arguments: lista,
-            //     );
-            //   },
-            // ),
             ListTile(
               leading: const FaIcon(FontAwesomeIcons.cartShopping),
               title: const Text(
                 'Ventas',
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
               ),
-              onTap: () {
+              onTap: (){
                 // Navigator.of(context).pop();
                 // Navigator.of(context).pop();
                 InfoGlobal.incrementarVentanas();
-                Navigator.pushNamed(context, '/dashboard-pedidos');
+                debugPrint("Ventas");
+                Navigator.of(context).pushReplacementNamed("/dashboard-pedidos");
+                // Navigator.pushNamed(context, '/dashboard-pedidos');
               },
             ),
             ListTile(
@@ -189,7 +124,8 @@ class AppMenuDrawer extends StatelessWidget {
                 // Navigator.of(context).pop();
                 // Navigator.of(context).pop();
                 InfoGlobal.incrementarVentanas();
-                Navigator.pushNamed(context, '/menu-administrador');
+                // Navigator.pushNamed(context, '/menu-administrador');
+                Navigator.of(context).pushReplacementNamed("/menu-administrador");
               },
             ),
             ListTile(
@@ -202,7 +138,8 @@ class AppMenuDrawer extends StatelessWidget {
                 // Navigator.of(context).pop();
                 // Navigator.of(context).pop();
                 InfoGlobal.incrementarVentanas();
-                Navigator.pushNamed(context, '/liberar-mesas');
+                // Navigator.pushNamed(context, '/liberar-mesas');
+                Navigator.of(context).pushReplacementNamed("/liberar-mesas");
               },
             ),
             ListTile(
@@ -217,11 +154,12 @@ class AppMenuDrawer extends StatelessWidget {
                 // Navigator.of(context).pop();
                 // Navigator.of(context).pop();
                 InfoGlobal.incrementarVentanas();
-                Navigator.pushNamed(
-                  context,
-                  '/lista-pedidos',
-                  arguments: lista,
-                );
+                Navigator.of(context).pushReplacementNamed("/lista-pedidos",arguments: lista);
+                // Navigator.pushNamed(
+                //   context,
+                //   '/lista-pedidos',
+                //   arguments: lista,
+                // );
               },
             ),
             ListTile(
@@ -230,7 +168,13 @@ class AppMenuDrawer extends StatelessWidget {
                 'Cerrar sesion',
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
               ),
-              onTap: () {},
+              onTap: () async {
+                final SharedPreferences prefs =
+                    await SharedPreferences.getInstance();
+                await prefs.remove('usuarioAdministrador');
+                await prefs.remove('contraseniaAdministrador');
+                Navigator.of(context).pushReplacementNamed("/");
+              },
             ),
           ],
         ),

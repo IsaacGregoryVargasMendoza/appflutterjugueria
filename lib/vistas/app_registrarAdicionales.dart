@@ -103,6 +103,9 @@ class AppRegistroAdicionalState extends State<AppRegistroAdicional> {
 
       final lista = await adicionalCtrll.getAdicionales();
       InfoGlobal.incrementarVentanas();
+
+      Navigator.of(context).pop();
+      Navigator.of(context).pop();
       Navigator.pushNamed(
         context,
         '/lista-adicionales',
@@ -132,7 +135,7 @@ class AppRegistroAdicionalState extends State<AppRegistroAdicional> {
                 : const Text("Registrar Adicional"),
             backgroundColor: Colors.green.shade900,
           ),
-          drawer: AppMenuDrawer(),
+          // drawer: AppMenuDrawer(),
           body: Center(
             child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -162,7 +165,7 @@ class AppRegistroAdicionalState extends State<AppRegistroAdicional> {
                 : const Text("Registrar Adicional"),
             backgroundColor: Colors.green.shade900,
           ),
-          drawer: AppMenuDrawer(),
+          // drawer: AppMenuDrawer(),
           body: Container(
             width: MediaQuery.of(context).size.width,
             padding: const EdgeInsets.only(top: 50),
@@ -227,10 +230,12 @@ class AppRegistroAdicionalState extends State<AppRegistroAdicional> {
         return Scaffold(
           backgroundColor: Colors.white,
           appBar: AppBar(
-            title: const Text("Seleccionar mesa"),
+            title: (widget.adicional != null)
+                ? const Text("Editar Adicional")
+                : const Text("Registrar Adicional"),
             backgroundColor: Colors.green.shade900,
           ),
-          drawer: AppMenuDrawer(),
+          // drawer: AppMenuDrawer(),
           body: const Center(
             child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,

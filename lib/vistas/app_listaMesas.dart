@@ -31,7 +31,7 @@ class _AppListaMesaState extends State<AppListaMesa> {
         actions: <Widget>[
           IconButton(
             onPressed: () {
-              Navigator.of(context).pop();
+              // Navigator.of(context).pop();
               Navigator.pushNamed(context, '/registrar-mesa');
             },
             icon: const FaIcon(FontAwesomeIcons.plus),
@@ -39,7 +39,7 @@ class _AppListaMesaState extends State<AppListaMesa> {
           ),
         ],
       ),
-      drawer: AppMenuDrawer(),
+      // drawer: AppMenuDrawer(),
       body: GridView.builder(
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2, // Dos columnas

@@ -53,7 +53,7 @@ class _AppListaProductoState extends State<AppListaProducto> {
               CategoriaController categoriaCtrll = CategoriaController();
               final lista = await categoriaCtrll.getCategorias();
               // List<CategoriaModel> lista = listaCategorias();
-              Navigator.of(context).pop();
+              // Navigator.of(context).pop();
               Navigator.pushNamed(
                 context,
                 '/registrar-producto',
@@ -64,7 +64,7 @@ class _AppListaProductoState extends State<AppListaProducto> {
           ),
         ],
       ),
-      drawer: AppMenuDrawer(),
+      // drawer: AppMenuDrawer(),
       body: Column(
         children: [
           Expanded(

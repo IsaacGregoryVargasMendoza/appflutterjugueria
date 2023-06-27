@@ -4,6 +4,7 @@ import 'package:app_jugueria/controladores/mesaController.dart';
 import 'package:app_jugueria/controladores/productoController.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:app_jugueria/componentes/app_drawer.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 
@@ -20,6 +21,7 @@ class AppLiberarMesaState extends State<AppLiberarMesa> {
   List<MesaModel>? listaMesas = [];
   WidgetState _widgetState = WidgetState.LOADED;
   Timer? consultaTimer;
+  DateTime? lastBackPressed;
 
   Widget seleccionarPunto(BuildContext context) {
     return AlertDialog(
@@ -163,7 +165,33 @@ class AppLiberarMesaState extends State<AppLiberarMesa> {
           ),
         );
       case WidgetState.LOADED:
-        return Scaffold(
+        return WillPopScope(
+      onWillPop: () async {
+        debugPrint("se preciono dos vecsdadsaes");
+        InfoGlobal.mensajeInformativo(context, "Preciona 2 veces para salir.",
+            duracion: 1);
+
+        bool isDoubleBackPressed = false;
+        DateTime currentTime = DateTime.now();
+
+        if (lastBackPressed != null &&
+            currentTime.difference(lastBackPressed!) <=
+                Duration(milliseconds: 500)) {
+          debugPrint("Entro");
+          isDoubleBackPressed = true;
+        }
+
+        lastBackPressed = currentTime;
+
+        if (isDoubleBackPressed) {
+          SystemChannels.platform.invokeMethod('SystemNavigator.pop');
+          //Navigator.of(context).pop();
+          // Navigator.of(context).pop();
+        }
+
+        return false;
+      },
+      child: Scaffold(
           backgroundColor: Colors.white,
           appBar: AppBar(
             title: const Text("Liberar mesa"),
@@ -178,6 +206,7 @@ class AppLiberarMesaState extends State<AppLiberarMesa> {
               ),
             ],
           ),
+          drawer: AppMenuDrawer(),
           body: GridView.builder(
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2, // Dos columnas
@@ -275,7 +304,7 @@ class AppLiberarMesaState extends State<AppLiberarMesa> {
             },
           ),
           //: Text("Sin datos"),
-        );
+        ),);
       case WidgetState.ERROR:
         return Scaffold(
           backgroundColor: Colors.white,

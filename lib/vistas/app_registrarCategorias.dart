@@ -89,6 +89,9 @@ class _AppRegistroCategoriaState extends State<AppRegistroCategoria> {
 
       final lista = await categoriaCtrll.getCategorias();
       InfoGlobal.incrementarVentanas();
+
+      Navigator.of(context).pop();
+      Navigator.of(context).pop();
       Navigator.pushNamed(
         context,
         '/lista-categorias',
@@ -119,7 +122,7 @@ class _AppRegistroCategoriaState extends State<AppRegistroCategoria> {
                 : const Text("Registrar Categoria"),
             backgroundColor: Colors.green.shade900,
           ),
-          drawer: AppMenuDrawer(),
+          // drawer: AppMenuDrawer(),
           body: Center(
             child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -149,7 +152,7 @@ class _AppRegistroCategoriaState extends State<AppRegistroCategoria> {
                 : const Text("Registrar Categoria"),
             backgroundColor: Colors.green.shade900,
           ),
-          drawer: AppMenuDrawer(),
+          // drawer: AppMenuDrawer(),
           body: Container(
             width: MediaQuery.of(context).size.width,
             padding: const EdgeInsets.only(top: 50),
@@ -195,7 +198,7 @@ class _AppRegistroCategoriaState extends State<AppRegistroCategoria> {
             title: const Text("Seleccionar mesa"),
             backgroundColor: Colors.green.shade900,
           ),
-          drawer: AppMenuDrawer(),
+          // drawer: AppMenuDrawer(),
           body: const Center(
             child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,

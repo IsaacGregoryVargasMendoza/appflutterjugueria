@@ -41,7 +41,7 @@ class AppListaAdministradoresState extends State<AppListaAdministradores> {
           ),
         ],
       ),
-      drawer: AppMenuDrawer(),
+      // drawer: AppMenuDrawer(),
       body: Stack(children: <Widget>[
         ListView.builder(
           padding: const EdgeInsets.all(20),

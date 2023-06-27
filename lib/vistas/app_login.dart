@@ -6,6 +6,7 @@ import 'package:app_jugueria/componentes/app_buttons.dart';
 import 'package:app_jugueria/componentes/app_textFieldRound.dart';
 import 'package:app_jugueria/componentes/info_global.dart';
 import 'package:app_jugueria/controladores/administradorController.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 enum WidgetState { NONE, LOADING, LOADED, ERROR }
 
@@ -72,7 +73,20 @@ class _AppLoginState extends State<AppLogin> {
         administradorModel.usuario = usuarioModel;
         InfoGlobal.administradorModel = administradorModel;
         InfoGlobal.incrementarVentanas();
+        final SharedPreferences prefs = await SharedPreferences.getInstance();
+        final String? usuarioCliente = prefs.getString('usuarioCliente');
 
+        if (usuarioCliente != null) {
+          await prefs.remove('usuarioCliente');
+          await prefs.remove('contraseniaCliente');
+        }
+
+        await prefs.setString('usuarioAdministrador', nombreUsuario.text);
+        await prefs.setString(
+            'contraseniaAdministrador', contraseniaUsuario.text);
+
+        Navigator.of(context).pop();
+        Navigator.of(context).pop();
         Navigator.pushNamed(context, '/dashboard-pedidos');
 
         setState(() {

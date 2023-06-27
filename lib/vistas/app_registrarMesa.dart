@@ -70,6 +70,7 @@ class _AppRegistroMesaState extends State<AppRegistroMesa> {
       final lista = await mesaCtrll.getMesas();
 
       Navigator.of(context).pop();
+      Navigator.of(context).pop();
       Navigator.pushNamed(
         context,
         '/lista-mesas',
@@ -100,7 +101,7 @@ class _AppRegistroMesaState extends State<AppRegistroMesa> {
                 : const Text("Registrar mesa"),
             backgroundColor: Colors.green.shade900,
           ),
-          drawer: AppMenuDrawer(),
+          // drawer: AppMenuDrawer(),
           body: Center(
             child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -130,7 +131,7 @@ class _AppRegistroMesaState extends State<AppRegistroMesa> {
                 : const Text("Registrar mesa"),
             backgroundColor: Colors.green.shade900,
           ),
-          drawer: AppMenuDrawer(),
+          // drawer: AppMenuDrawer(),
           body: Container(
             width: MediaQuery.of(context).size.width,
             padding: const EdgeInsets.only(top: 50),

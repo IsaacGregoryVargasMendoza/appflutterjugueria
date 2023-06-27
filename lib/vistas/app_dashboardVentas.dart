@@ -7,6 +7,7 @@ import 'package:app_jugueria/modelos/adicionalModel.dart';
 import 'package:app_jugueria/modelos/categoriaModel.dart';
 import 'package:app_jugueria/modelos/pedidoModel.dart';
 import 'package:app_jugueria/modelos/productoModel.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'dart:math';
 import 'package:collection/collection.dart';
@@ -25,6 +26,8 @@ class AppDashboardPedidoState extends State<AppDashboardPedido> {
   List<CategoriaModel> listaCategorias = [];
   List<ProductoModel> listaProductos = [];
   List<CategoriasVendidasModel>? listaCategoriasVendidas = [];
+
+  DateTime? lastBackPressed;
 
   List<LineChartBarData> lineas = [];
 
@@ -990,348 +993,378 @@ class AppDashboardPedidoState extends State<AppDashboardPedido> {
     cargarPedidos();
   }
 
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: const Text("Dashboard ventas"),
-        backgroundColor: Colors.green.shade900,
-      ),
-      drawer: AppMenuDrawer(),
-      body: Container(
-        height: MediaQuery.of(context).size.height,
-        width: MediaQuery.of(context).size.width,
-        child: ListView(
-          children: [
-            Container(
-              width: MediaQuery.of(context).size.width,
-              padding: const EdgeInsets.fromLTRB(15, 15, 15, 0),
-              child: const Text(
-                "Reporte de ventas",
-                style: TextStyle(
-                    fontFamily: 'Roboto',
-                    fontSize: 24.0,
-                    color: Color.fromARGB(255, 10, 126, 49),
-                    decoration: TextDecoration.none,
-                    fontWeight: FontWeight.bold),
-                textAlign: TextAlign.center,
+    return WillPopScope(
+      onWillPop: () async {
+        debugPrint("se preciono dos vecsdadsaes");
+        InfoGlobal.mensajeInformativo(context, "Preciona 2 veces para salir.",
+            duracion: 1);
+
+        bool isDoubleBackPressed = false;
+        DateTime currentTime = DateTime.now();
+
+        if (lastBackPressed != null &&
+            currentTime.difference(lastBackPressed!) <=
+                Duration(milliseconds: 500)) {
+          debugPrint("Entro");
+          isDoubleBackPressed = true;
+        }
+
+        lastBackPressed = currentTime;
+
+        if (isDoubleBackPressed) {
+          SystemChannels.platform.invokeMethod('SystemNavigator.pop');
+          //Navigator.of(context).pop();
+          // Navigator.of(context).pop();
+        }
+
+        return false;
+      },
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        appBar: AppBar(
+          title: const Text("Dashboard ventas"),
+          backgroundColor: Colors.green.shade900,
+        ),
+        drawer: AppMenuDrawer(),
+        body: Container(
+          height: MediaQuery.of(context).size.height,
+          width: MediaQuery.of(context).size.width,
+          child: ListView(
+            children: [
+              Container(
+                width: MediaQuery.of(context).size.width,
+                padding: const EdgeInsets.fromLTRB(15, 15, 15, 0),
+                child: const Text(
+                  "Reporte de ventas",
+                  style: TextStyle(
+                      fontFamily: 'Roboto',
+                      fontSize: 24.0,
+                      color: Color.fromARGB(255, 10, 126, 49),
+                      decoration: TextDecoration.none,
+                      fontWeight: FontWeight.bold),
+                  textAlign: TextAlign.center,
+                ),
               ),
-            ),
-            Container(
-              width: MediaQuery.of(context).size.width,
-              padding: EdgeInsets.fromLTRB(15, 15, 10, 15),
-              child: Text(
-                "Bienvenido ${InfoGlobal.administradorModel!.nombreAdministrador}",
-                style: const TextStyle(
-                    fontFamily: 'Roboto',
-                    fontSize: 20.0,
-                    color: Colors.black,
-                    decoration: TextDecoration.none,
-                    fontWeight: FontWeight.bold),
+              Container(
+                width: MediaQuery.of(context).size.width,
+                padding: EdgeInsets.fromLTRB(15, 15, 10, 15),
+                child: Text(
+                  "Bienvenido ${InfoGlobal.administradorModel!.nombreAdministrador}",
+                  style: const TextStyle(
+                      fontFamily: 'Roboto',
+                      fontSize: 20.0,
+                      color: Colors.black,
+                      decoration: TextDecoration.none,
+                      fontWeight: FontWeight.bold),
+                ),
               ),
-            ),
-            Container(
-              color: Colors.white,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Padding(
-                    padding: EdgeInsets.fromLTRB(20, 0, 50, 0),
-                    child: Text(
-                      "Año",
-                      style: TextStyle(
-                          fontFamily: 'Roboto',
-                          fontSize: 16,
-                          color: Colors.black,
-                          decoration: TextDecoration.none,
-                          fontWeight: FontWeight.bold),
+              Container(
+                color: Colors.white,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Padding(
+                      padding: EdgeInsets.fromLTRB(20, 0, 50, 0),
+                      child: Text(
+                        "Año",
+                        style: TextStyle(
+                            fontFamily: 'Roboto',
+                            fontSize: 16,
+                            color: Colors.black,
+                            decoration: TextDecoration.none,
+                            fontWeight: FontWeight.bold),
+                      ),
                     ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(50, 0, 50, 0),
-                    child: DropdownButtonFormField(
-                      decoration:
-                          const InputDecoration(border: InputBorder.none),
-                      value: 4,
-                      // enableFeedback: false,
-                      onChanged: null,
-                      borderRadius: BorderRadius.circular(15),
-                      items: anios.map((anio) {
-                        return DropdownMenuItem(
-                            child: Text(anio), value: anios.indexOf(anio));
-                      }).toList(),
-                    ),
-                  ),
-                  const Padding(
-                    padding: EdgeInsets.fromLTRB(20, 0, 50, 0),
-                    child: Text(
-                      "Filtro",
-                      style: TextStyle(
-                          fontFamily: 'Roboto',
-                          fontSize: 16,
-                          color: Colors.black,
-                          decoration: TextDecoration.none,
-                          fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(50, 0, 50, 0),
-                    child: DropdownButtonFormField(
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(50, 0, 50, 0),
+                      child: DropdownButtonFormField(
                         decoration:
                             const InputDecoration(border: InputBorder.none),
-                        value: 0,
+                        value: 4,
+                        // enableFeedback: false,
+                        onChanged: null,
                         borderRadius: BorderRadius.circular(15),
-                        items: listaReportes!.map((reporte) {
+                        items: anios.map((anio) {
                           return DropdownMenuItem(
-                              child: Text(reporte),
-                              value: listaReportes!.indexOf(reporte));
+                              child: Text(anio), value: anios.indexOf(anio));
                         }).toList(),
-                        onChanged: (value) async {
-                          print(value);
-                          int diferencia = idFinMes - idInicioMes;
-                          if (diferencia > 0) {
-                            filtro = value!;
-                            if (filtro == 0) {
-                              cargarDatosPastel();
-                              cargarDatosGrafico();
-                            } else if (filtro == 1) {
-                              cargarDatosPastel();
-                              cargarDatosGraficoPorComprobante();
-                            } else if (filtro == 2) {
-                              obtenerCategoriasVendidas();
-                            } else if (filtro == 3) {
-                              obtenerProductosVendidos();
+                      ),
+                    ),
+                    const Padding(
+                      padding: EdgeInsets.fromLTRB(20, 0, 50, 0),
+                      child: Text(
+                        "Filtro",
+                        style: TextStyle(
+                            fontFamily: 'Roboto',
+                            fontSize: 16,
+                            color: Colors.black,
+                            decoration: TextDecoration.none,
+                            fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(50, 0, 50, 0),
+                      child: DropdownButtonFormField(
+                          decoration:
+                              const InputDecoration(border: InputBorder.none),
+                          value: 0,
+                          borderRadius: BorderRadius.circular(15),
+                          items: listaReportes!.map((reporte) {
+                            return DropdownMenuItem(
+                                child: Text(reporte),
+                                value: listaReportes!.indexOf(reporte));
+                          }).toList(),
+                          onChanged: (value) async {
+                            print(value);
+                            int diferencia = idFinMes - idInicioMes;
+                            if (diferencia > 0) {
+                              filtro = value!;
+                              if (filtro == 0) {
+                                cargarDatosPastel();
+                                cargarDatosGrafico();
+                              } else if (filtro == 1) {
+                                cargarDatosPastel();
+                                cargarDatosGraficoPorComprobante();
+                              } else if (filtro == 2) {
+                                obtenerCategoriasVendidas();
+                              } else if (filtro == 3) {
+                                obtenerProductosVendidos();
+                              }
+                            } else {
+                              InfoGlobal.mensajeFallo(
+                                  context,
+                                  "Debe seleccionar un rango de fechas valido.",
+                                  5);
                             }
-                          } else {
-                            InfoGlobal.mensajeFallo(
-                                context,
-                                "Debe seleccionar un rango de fechas valido.",
-                                5);
-                          }
-                        }),
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.fromLTRB(20, 0, 5, 0),
-                        child: Column(
-                          children: [
-                            const Text(
-                              "Desde",
-                              style: TextStyle(
-                                  fontFamily: 'Roboto',
-                                  fontSize: 16,
-                                  color: Colors.black,
-                                  decoration: TextDecoration.none,
-                                  fontWeight: FontWeight.bold),
-                            ),
-                            Container(
-                              width: MediaQuery.of(context).size.width / 2 - 50,
-                              child: DropdownButtonFormField(
-                                  decoration: const InputDecoration(
-                                      border: InputBorder.none),
-                                  value: 0,
-                                  borderRadius: BorderRadius.circular(15),
-                                  items: meses.map((mes) {
-                                    return DropdownMenuItem(
-                                        value: meses.indexOf(mes),
-                                        child: Text(mes));
-                                  }).toList(),
-                                  onChanged: (value) async {
-                                    idInicioMes = value!;
-                                    int diferencia = idFinMes - idInicioMes;
-                                    if (diferencia > 0) {
-                                      if (filtro == 0) {
-                                        llenarDatosGrafico();
-                                      } else if (filtro == 1) {
-                                        llenarDatosGraficoPorComprobante();
-                                      } else if (filtro == 2) {
-                                        llenarDatosGraficoPorCategoriasVendidas();
-                                      } else if (filtro == 3) {
-                                        llenarDatosGraficoPorCategoriasVendidas();
-                                      }
-                                      // llenarDatosGrafico();
-                                    } else {
-                                      InfoGlobal.mensajeFallo(
-                                          context,
-                                          "Debe seleccionar un rango de fechas valido.",
-                                          5);
-                                    }
-                                  }),
-                            )
-                          ],
-                        ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.fromLTRB(5, 0, 20, 0),
-                        child: Column(
-                          children: [
-                            const Text(
-                              "Hasta",
-                              style: TextStyle(
-                                  fontFamily: 'Roboto',
-                                  fontSize: 16,
-                                  color: Colors.black,
-                                  decoration: TextDecoration.none,
-                                  fontWeight: FontWeight.bold),
-                            ),
-                            Container(
-                              width: MediaQuery.of(context).size.width / 2 - 50,
-                              child: DropdownButtonFormField(
-                                  decoration: const InputDecoration(
-                                      border: InputBorder.none),
-                                  value: 11,
-                                  borderRadius: BorderRadius.circular(15),
-                                  items: meses.map((mes) {
-                                    return DropdownMenuItem(
-                                        value: meses.indexOf(mes),
-                                        child: Text(mes));
-                                  }).toList(),
-                                  onChanged: (value) async {
-                                    idFinMes = value!;
-                                    int diferencia = idFinMes - idInicioMes;
-                                    if (diferencia > 0) {
-                                      if (filtro == 0) {
-                                        llenarDatosGrafico();
-                                      } else if (filtro == 1) {
-                                        llenarDatosGraficoPorComprobante();
-                                      } else if (filtro == 2) {
-                                        llenarDatosGraficoPorCategoriasVendidas();
-                                      } else if (filtro == 3) {
-                                        llenarDatosGraficoPorCategoriasVendidas();
-                                      }
-                                    } else {
-                                      InfoGlobal.mensajeFallo(
-                                          context,
-                                          "Debe seleccionar un rango de fechas valido.",
-                                          5);
-                                    }
-                                  }),
-                            )
-                          ],
-                        ),
-                      ),
-                    ],
-                  )
-                ],
-              ),
-            ),
-            graficoLineal(),
-            Container(
-              width: MediaQuery.of(context).size.width,
-              padding: EdgeInsets.all(15),
-              child: const Text(
-                "Montos vendidos S/.",
-                style: TextStyle(
-                    fontFamily: 'Roboto',
-                    fontSize: 20.0,
-                    color: Colors.black,
-                    decoration: TextDecoration.none,
-                    fontWeight: FontWeight.bold),
-                textAlign: TextAlign.center,
-              ),
-            ),
-            Container(
-              // color: Colors.red,
-              padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-              height: 220,
-              width: MediaQuery.of(context).size.width,
-              child: Column(
-                children: [
-                  Container(
-                    padding: EdgeInsets.fromLTRB(0, 70, 0, 0),
-                    height: 150,
-                    width: 150,
-                    child: PieChart(
-                      PieChartData(
-                          borderData: FlBorderData(
-                            show: false,
-                          ),
-                          sectionsSpace: 0,
-                          centerSpaceRadius: 0,
-                          sections: sectionsChart),
+                          }),
                     ),
-                  ),
-                ],
-              ),
-            ),
-            Container(
-                height: 25,
-                padding: const EdgeInsets.fromLTRB(40, 0, 40, 0),
-                margin: const EdgeInsets.only(bottom: 5),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      (filtro == 0 || filtro == 1)
-                          ? " Comprobantes"
-                          : (filtro == 2)
-                              ? "Categorias"
-                              : "Productos",
-                      style: const TextStyle(
-                          fontSize: 18,
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold),
-                      textAlign: TextAlign.start,
-                    ),
-                    const Text(
-                      " Montos",
-                      style: TextStyle(
-                          fontSize: 18,
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold),
-                      textAlign: TextAlign.start,
-                    ),
-                  ],
-                )),
-            Container(
-              height: listaHistoriaPastel.length * 25,
-              padding: const EdgeInsets.fromLTRB(40, 0, 40, 0),
-              margin: const EdgeInsets.only(bottom: 20),
-              child: ListView.builder(
-                padding: const EdgeInsets.all(0),
-                itemCount: listaHistoriaPastel
-                    .length, // Cantidad de elementos en la lista
-                itemBuilder: (BuildContext context, int index) {
-                  return Container(
-                    height: 25,
-                    child: Row(
+                    Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Container(
-                          child: Row(
+                        Padding(
+                          padding: EdgeInsets.fromLTRB(20, 0, 5, 0),
+                          child: Column(
                             children: [
+                              const Text(
+                                "Desde",
+                                style: TextStyle(
+                                    fontFamily: 'Roboto',
+                                    fontSize: 16,
+                                    color: Colors.black,
+                                    decoration: TextDecoration.none,
+                                    fontWeight: FontWeight.bold),
+                              ),
                               Container(
-                                height: 20,
-                                width: 20,
-                                color: listaHistoriaPastel[index].color,
-                              ),
-                              Text(
-                                " ${listaHistoriaPastel[index].texto}",
-                                style: const TextStyle(
-                                    fontSize: 18, color: Colors.black),
-                                textAlign: TextAlign.start,
-                              ),
+                                width:
+                                    MediaQuery.of(context).size.width / 2 - 50,
+                                child: DropdownButtonFormField(
+                                    decoration: const InputDecoration(
+                                        border: InputBorder.none),
+                                    value: 0,
+                                    borderRadius: BorderRadius.circular(15),
+                                    items: meses.map((mes) {
+                                      return DropdownMenuItem(
+                                          value: meses.indexOf(mes),
+                                          child: Text(mes));
+                                    }).toList(),
+                                    onChanged: (value) async {
+                                      idInicioMes = value!;
+                                      int diferencia = idFinMes - idInicioMes;
+                                      if (diferencia > 0) {
+                                        if (filtro == 0) {
+                                          llenarDatosGrafico();
+                                        } else if (filtro == 1) {
+                                          llenarDatosGraficoPorComprobante();
+                                        } else if (filtro == 2) {
+                                          llenarDatosGraficoPorCategoriasVendidas();
+                                        } else if (filtro == 3) {
+                                          llenarDatosGraficoPorCategoriasVendidas();
+                                        }
+                                        // llenarDatosGrafico();
+                                      } else {
+                                        InfoGlobal.mensajeFallo(
+                                            context,
+                                            "Debe seleccionar un rango de fechas valido.",
+                                            5);
+                                      }
+                                    }),
+                              )
                             ],
                           ),
                         ),
-                        Text(
-                          " ${listaHistoriaPastel[index].valor}",
-                          style: const TextStyle(
-                              fontSize: 18,
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold),
-                          textAlign: TextAlign.start,
+                        Padding(
+                          padding: EdgeInsets.fromLTRB(5, 0, 20, 0),
+                          child: Column(
+                            children: [
+                              const Text(
+                                "Hasta",
+                                style: TextStyle(
+                                    fontFamily: 'Roboto',
+                                    fontSize: 16,
+                                    color: Colors.black,
+                                    decoration: TextDecoration.none,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                              Container(
+                                width:
+                                    MediaQuery.of(context).size.width / 2 - 50,
+                                child: DropdownButtonFormField(
+                                    decoration: const InputDecoration(
+                                        border: InputBorder.none),
+                                    value: 11,
+                                    borderRadius: BorderRadius.circular(15),
+                                    items: meses.map((mes) {
+                                      return DropdownMenuItem(
+                                          value: meses.indexOf(mes),
+                                          child: Text(mes));
+                                    }).toList(),
+                                    onChanged: (value) async {
+                                      idFinMes = value!;
+                                      int diferencia = idFinMes - idInicioMes;
+                                      if (diferencia > 0) {
+                                        if (filtro == 0) {
+                                          llenarDatosGrafico();
+                                        } else if (filtro == 1) {
+                                          llenarDatosGraficoPorComprobante();
+                                        } else if (filtro == 2) {
+                                          llenarDatosGraficoPorCategoriasVendidas();
+                                        } else if (filtro == 3) {
+                                          llenarDatosGraficoPorCategoriasVendidas();
+                                        }
+                                      } else {
+                                        InfoGlobal.mensajeFallo(
+                                            context,
+                                            "Debe seleccionar un rango de fechas valido.",
+                                            5);
+                                      }
+                                    }),
+                              )
+                            ],
+                          ),
                         ),
                       ],
-                    ),
-                  );
-                },
+                    )
+                  ],
+                ),
               ),
-            ),
-          ],
+              graficoLineal(),
+              Container(
+                width: MediaQuery.of(context).size.width,
+                padding: EdgeInsets.all(15),
+                child: const Text(
+                  "Montos vendidos S/.",
+                  style: TextStyle(
+                      fontFamily: 'Roboto',
+                      fontSize: 20.0,
+                      color: Colors.black,
+                      decoration: TextDecoration.none,
+                      fontWeight: FontWeight.bold),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              Container(
+                // color: Colors.red,
+                padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                height: 220,
+                width: MediaQuery.of(context).size.width,
+                child: Column(
+                  children: [
+                    Container(
+                      padding: EdgeInsets.fromLTRB(0, 70, 0, 0),
+                      height: 150,
+                      width: 150,
+                      child: PieChart(
+                        PieChartData(
+                            borderData: FlBorderData(
+                              show: false,
+                            ),
+                            sectionsSpace: 0,
+                            centerSpaceRadius: 0,
+                            sections: sectionsChart),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                  height: 25,
+                  padding: const EdgeInsets.fromLTRB(40, 0, 40, 0),
+                  margin: const EdgeInsets.only(bottom: 5),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        (filtro == 0 || filtro == 1)
+                            ? " Comprobantes"
+                            : (filtro == 2)
+                                ? "Categorias"
+                                : "Productos",
+                        style: const TextStyle(
+                            fontSize: 18,
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold),
+                        textAlign: TextAlign.start,
+                      ),
+                      const Text(
+                        " Montos",
+                        style: TextStyle(
+                            fontSize: 18,
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold),
+                        textAlign: TextAlign.start,
+                      ),
+                    ],
+                  )),
+              Container(
+                height: listaHistoriaPastel.length * 25,
+                padding: const EdgeInsets.fromLTRB(40, 0, 40, 0),
+                margin: const EdgeInsets.only(bottom: 20),
+                child: ListView.builder(
+                  padding: const EdgeInsets.all(0),
+                  itemCount: listaHistoriaPastel
+                      .length, // Cantidad de elementos en la lista
+                  itemBuilder: (BuildContext context, int index) {
+                    return Container(
+                      height: 25,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Container(
+                            child: Row(
+                              children: [
+                                Container(
+                                  height: 20,
+                                  width: 20,
+                                  color: listaHistoriaPastel[index].color,
+                                ),
+                                Text(
+                                  " ${listaHistoriaPastel[index].texto}",
+                                  style: const TextStyle(
+                                      fontSize: 18, color: Colors.black),
+                                  textAlign: TextAlign.start,
+                                ),
+                              ],
+                            ),
+                          ),
+                          Text(
+                            " ${listaHistoriaPastel[index].valor}",
+                            style: const TextStyle(
+                                fontSize: 18,
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold),
+                            textAlign: TextAlign.start,
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

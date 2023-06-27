@@ -60,7 +60,7 @@ class AppAsignarAdicionalState extends State<AppAsignarAdicional> {
         title: const Text("Asignar Adicionales"),
         backgroundColor: Colors.green.shade900,
       ),
-      drawer: AppMenuDrawer(),
+      // drawer: AppMenuDrawer(),
       body: ListView(
         children: [
           Container(

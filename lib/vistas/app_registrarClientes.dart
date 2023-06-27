@@ -110,6 +110,7 @@ class _AppRegistroClienteState extends State<AppRegistroCliente> {
 
       final lista = await clienteCtrll.getClientes();
       Navigator.of(context).pop();
+      Navigator.of(context).pop();
       Navigator.pushNamed(
         context,
         '/lista-clientes',
@@ -141,7 +142,7 @@ class _AppRegistroClienteState extends State<AppRegistroCliente> {
                 : const Text("Registro cliente"),
             backgroundColor: Colors.green.shade900,
           ),
-          drawer: AppMenuDrawer(),
+          // drawer: AppMenuDrawer(),
           body: Center(
             child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -171,7 +172,7 @@ class _AppRegistroClienteState extends State<AppRegistroCliente> {
                 : const Text("Registro cliente"),
             backgroundColor: Colors.green.shade900,
           ),
-          drawer: AppMenuDrawer(),
+          // drawer: AppMenuDrawer(),
           body: ListView(
             children: [
               Container(
@@ -343,7 +344,7 @@ class _AppRegistroClienteState extends State<AppRegistroCliente> {
             title: const Text("Seleccionar mesa"),
             backgroundColor: Colors.green.shade900,
           ),
-          drawer: AppMenuDrawer(),
+          // drawer: AppMenuDrawer(),
           body: const Center(
             child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,

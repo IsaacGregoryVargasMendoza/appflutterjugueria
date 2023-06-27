@@ -5,6 +5,7 @@ import 'package:app_jugueria/modelos/adicionalModel.dart';
 import 'package:app_jugueria/modelos/pedidoModel.dart';
 import 'package:flutter/material.dart';
 //import 'package:flutter_charts/flutter_charts.dart' as;
+import 'package:flutter/services.dart';
 import 'package:fl_chart/fl_chart.dart';
 
 class AppListaPedido extends StatefulWidget {
@@ -19,6 +20,7 @@ class AppListaPedido extends StatefulWidget {
 
 class AppListaPedidoState extends State<AppListaPedido> {
   List<PieChartSectionData> sectionsChart = [];
+  DateTime? lastBackPressed;
 
   final List<FlSpot> data = [
     FlSpot(0, 5),
@@ -98,180 +100,208 @@ class AppListaPedidoState extends State<AppListaPedido> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: const Text("Lista de pedidos"),
-        backgroundColor: Colors.green.shade900,
-      ),
-      drawer: AppMenuDrawer(),
-      body: Stack(children: <Widget>[
-        ListView.builder(
-          padding: const EdgeInsets.all(20),
-          itemCount: widget.data!.length,
-          itemBuilder: (context, index) {
-            return GestureDetector(
-              onTap: () async {
-                PedidoController pedidoCtrll = PedidoController();
-                final listaDetalle = await pedidoCtrll
-                    .getListDetalleOfPedido(widget.data![index].id!);
+    return WillPopScope(
+      onWillPop: () async {
+        debugPrint("se preciono dos vecsdadsaes");
+        InfoGlobal.mensajeInformativo(context, "Preciona 2 veces para salir.",
+            duracion: 1);
 
-                final listaAdicionales =
-                    await pedidoCtrll.getListAdicionales(listaDetalle);
+        bool isDoubleBackPressed = false;
+        DateTime currentTime = DateTime.now();
 
-                abrirModalDetalle(listaDetalle, listaAdicionales);
-              },
-              child: Container(
-                margin: const EdgeInsets.fromLTRB(0, 0, 0, 20),
-                padding: const EdgeInsets.fromLTRB(0, 0, 10, 10),
-                decoration: BoxDecoration(
-                    color: Colors.green.shade100,
-                    borderRadius: const BorderRadius.all(Radius.circular(10))),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: <Widget>[
-                    Container(
-                      width: MediaQuery.of(context).size.width,
-                      padding:
-                          const EdgeInsetsDirectional.fromSTEB(20, 10, 0, 10),
-                      decoration: const BoxDecoration(
-                        color: Colors.transparent,
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              const Text(
-                                "N° Pedido: ",
-                                style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.red),
-                                textAlign: TextAlign.start,
-                              ),
-                              Text(
-                                "${widget.data![index].id}",
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  //fontWeight: FontWeight.bold,
-                                ),
-                                textAlign: TextAlign.start,
-                              ),
-                            ],
-                          ),
-                          Row(
-                            children: [
-                              const Text(
-                                "Comprobante: ",
-                                style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.red),
-                                textAlign: TextAlign.start,
-                              ),
-                              Text(
-                                "${widget.data![index].comprobante!.nombreComprobante}",
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  //fontWeight: FontWeight.bold,
-                                ),
-                                textAlign: TextAlign.start,
-                              ),
-                            ],
-                          ),
-                          Row(
-                            children: [
-                              const Text(
-                                "Serie: ",
-                                style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.red),
-                                textAlign: TextAlign.start,
-                              ),
-                              Text(
-                                "${widget.data![index].seriePedido}-${widget.data![index].correlativoPedido}",
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  //fontWeight: FontWeight.bold,
-                                ),
-                                textAlign: TextAlign.start,
-                              ),
-                            ],
-                          ),
-                          Row(
-                            children: [
-                              const Text(
-                                "Fecha: ",
-                                style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.red),
-                                textAlign: TextAlign.start,
-                              ),
-                              Text(
-                                "${widget.data![index].fechaPedido}",
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  //fontWeight: FontWeight.bold,
-                                ),
-                                textAlign: TextAlign.start,
-                              ),
-                            ],
-                          ),
-                          Row(
-                            children: [
-                              const Text(
-                                "Cliente: ",
-                                style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.red),
-                                textAlign: TextAlign.start,
-                              ),
-                              Text(
-                                "${widget.data![index].cliente!.nombreCliente} ${widget.data![index].cliente!.apellidoCliente}",
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  //fontWeight: FontWeight.bold,
-                                ),
-                                textAlign: TextAlign.start,
-                              ),
-                            ],
-                          ),
-                          Row(
-                            children: [
-                              const Text(
-                                "Total: ",
-                                style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.red),
-                                textAlign: TextAlign.start,
-                              ),
-                              Text(
-                                "${widget.data![index].totalPedido}",
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  //fontWeight: FontWeight.bold,
-                                ),
-                                textAlign: TextAlign.start,
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          },
+        if (lastBackPressed != null &&
+            currentTime.difference(lastBackPressed!) <=
+                Duration(milliseconds: 500)) {
+          debugPrint("Entro");
+          isDoubleBackPressed = true;
+        }
+
+        lastBackPressed = currentTime;
+
+        if (isDoubleBackPressed) {
+          SystemChannels.platform.invokeMethod('SystemNavigator.pop');
+          //Navigator.of(context).pop();
+          // Navigator.of(context).pop();
+        }
+
+        return false;
+      },
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        appBar: AppBar(
+          title: const Text("Lista de pedidos"),
+          backgroundColor: Colors.green.shade900,
         ),
-      ]),
+        // drawer: AppMenuDrawer(),
+        body: Stack(children: <Widget>[
+          ListView.builder(
+            padding: const EdgeInsets.all(20),
+            itemCount: widget.data!.length,
+            itemBuilder: (context, index) {
+              return GestureDetector(
+                onTap: () async {
+                  PedidoController pedidoCtrll = PedidoController();
+                  final listaDetalle = await pedidoCtrll
+                      .getListDetalleOfPedido(widget.data![index].id!);
+
+                  final listaAdicionales =
+                      await pedidoCtrll.getListAdicionales(listaDetalle);
+
+                  abrirModalDetalle(listaDetalle, listaAdicionales);
+                },
+                child: Container(
+                  margin: const EdgeInsets.fromLTRB(0, 0, 0, 20),
+                  padding: const EdgeInsets.fromLTRB(0, 0, 10, 10),
+                  decoration: BoxDecoration(
+                      color: Colors.green.shade100,
+                      borderRadius:
+                          const BorderRadius.all(Radius.circular(10))),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: <Widget>[
+                      Container(
+                        width: MediaQuery.of(context).size.width,
+                        padding:
+                            const EdgeInsetsDirectional.fromSTEB(20, 10, 0, 10),
+                        decoration: const BoxDecoration(
+                          color: Colors.transparent,
+                        ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                const Text(
+                                  "N° Pedido: ",
+                                  style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.red),
+                                  textAlign: TextAlign.start,
+                                ),
+                                Text(
+                                  "${widget.data![index].id}",
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    //fontWeight: FontWeight.bold,
+                                  ),
+                                  textAlign: TextAlign.start,
+                                ),
+                              ],
+                            ),
+                            Row(
+                              children: [
+                                const Text(
+                                  "Comprobante: ",
+                                  style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.red),
+                                  textAlign: TextAlign.start,
+                                ),
+                                Text(
+                                  "${widget.data![index].comprobante!.nombreComprobante}",
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    //fontWeight: FontWeight.bold,
+                                  ),
+                                  textAlign: TextAlign.start,
+                                ),
+                              ],
+                            ),
+                            Row(
+                              children: [
+                                const Text(
+                                  "Serie: ",
+                                  style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.red),
+                                  textAlign: TextAlign.start,
+                                ),
+                                Text(
+                                  "${widget.data![index].seriePedido}-${widget.data![index].correlativoPedido}",
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    //fontWeight: FontWeight.bold,
+                                  ),
+                                  textAlign: TextAlign.start,
+                                ),
+                              ],
+                            ),
+                            Row(
+                              children: [
+                                const Text(
+                                  "Fecha: ",
+                                  style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.red),
+                                  textAlign: TextAlign.start,
+                                ),
+                                Text(
+                                  "${widget.data![index].fechaPedido}",
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    //fontWeight: FontWeight.bold,
+                                  ),
+                                  textAlign: TextAlign.start,
+                                ),
+                              ],
+                            ),
+                            Row(
+                              children: [
+                                const Text(
+                                  "Cliente: ",
+                                  style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.red),
+                                  textAlign: TextAlign.start,
+                                ),
+                                Text(
+                                  "${widget.data![index].cliente!.nombreCliente} ${widget.data![index].cliente!.apellidoCliente}",
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    //fontWeight: FontWeight.bold,
+                                  ),
+                                  textAlign: TextAlign.start,
+                                ),
+                              ],
+                            ),
+                            Row(
+                              children: [
+                                const Text(
+                                  "Total: ",
+                                  style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.red),
+                                  textAlign: TextAlign.start,
+                                ),
+                                Text(
+                                  "${widget.data![index].totalPedido}",
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    //fontWeight: FontWeight.bold,
+                                  ),
+                                  textAlign: TextAlign.start,
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        ]),
+      ),
     );
   }
 

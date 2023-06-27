@@ -32,14 +32,14 @@ class AppListaAdicionalState extends State<AppListaAdicional> {
         actions: <Widget>[
           IconButton(
             onPressed: () {
-              Navigator.of(context).pop();
+              // Navigator.of(context).pop();
               Navigator.pushNamed(context, '/registrar-adicional');
             },
             icon: const FaIcon(FontAwesomeIcons.plus),
           ),
         ],
       ),
-      drawer: AppMenuDrawer(),
+      // drawer: AppMenuDrawer(),
       body: Stack(children: <Widget>[
         ListView.builder(
           padding: const EdgeInsets.all(20),

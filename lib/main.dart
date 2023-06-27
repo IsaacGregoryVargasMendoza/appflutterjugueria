@@ -1,6 +1,9 @@
 import 'package:app_jugueria/componentes/info_global.dart';
+import 'package:app_jugueria/controladores/clienteController.dart';
+import 'package:app_jugueria/controladores/administradorController.dart';
 import 'package:app_jugueria/modelos/adicionalModel.dart';
 import 'package:app_jugueria/modelos/categoriaModel.dart';
+import 'package:app_jugueria/modelos/usuarioModel.dart';
 import 'package:app_jugueria/modelos/productoModel.dart';
 import 'package:app_jugueria/modelos/mesaModel.dart';
 import 'package:app_jugueria/modelos/clienteModel.dart';
@@ -33,6 +36,7 @@ import 'package:app_jugueria/vistas/app_registrarProductos.dart';
 import 'package:app_jugueria/vistas/app_registrarMesa.dart';
 import 'package:app_jugueria/vistas/app_registrarClientes.dart';
 import 'package:app_jugueria/vistas/app_registrarClientesLogin.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   runApp(MaterialApp(
@@ -88,7 +92,7 @@ void main() {
                 //data: listaMesas,
                 ),
           );
-          case '/liberar-mesas':
+        case '/liberar-mesas':
           return MaterialPageRoute(
             builder: (context) => AppLiberarMesa(
                 //data: listaMesas,
@@ -228,6 +232,8 @@ void main() {
   ));
 }
 
+enum WidgetState { NONE, LOADING, LOADED, ERROR }
+
 class MyApp extends StatefulWidget {
   @override
   State<MyApp> createState() {
@@ -236,74 +242,271 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  WidgetState _widgetState = WidgetState.LOADED;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    obtenerPreferencias();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: Container(
-        decoration: const BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage("assets/frutas_fondo1.jpg"),
-            // opacity: 0.9,
-            fit: BoxFit.cover,
-          ),
-        ),
-        child: Container(
-          height: MediaQuery.of(context).size.height,
-          width: MediaQuery.of(context).size.width,
-          color: Colors.black.withOpacity(0.5),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Container(
-                color: Colors.transparent,
-                height: MediaQuery.of(context).size.height / 4 * 3,
-                width: MediaQuery.of(context).size.width,
+    switch (_widgetState) {
+      case WidgetState.NONE:
+      case WidgetState.LOADING:
+        return Scaffold(
+          backgroundColor: Colors.white,
+          body: Container(
+            decoration: const BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage("assets/frutas_fondo1.jpg"),
+                // opacity: 0.9,
+                fit: BoxFit.cover,
+              ),
+            ),
+            child: Container(
+              height: MediaQuery.of(context).size.height,
+              width: MediaQuery.of(context).size.width,
+              color: Colors.black.withOpacity(0.5),
+              child: Center(
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    AppButtons(
-                        textColor: Colors.black,
-                        backgroundColor: Color.fromRGBO(241, 241, 241, 1),
-                        borderColor: Color.fromRGBO(241, 241, 241, 1),
-                        text: "Administrar",
-                        fontSize: 15,
-                        width: 250,
-                        height: 50,
-                        funcion: () {
-                          InfoGlobal.incrementarVentanas();
-                          Navigator.pushNamed(context, '/login');
-                        }),
-                    const SizedBox(height: 15),
-                    AppButtons(
-                      textColor: Colors.black,
-                      backgroundColor: Color.fromRGBO(241, 241, 241, 1),
-                      borderColor: Color.fromRGBO(241, 241, 241, 1),
-                      text: "Comprar ahora",
-                      fontSize: 15,
-                      width: 250,
-                      height: 50,
-                      funcion: () async {
-                        InfoGlobal.incrementarVentanas();
-                        Navigator.pushNamed(context, '/login-cliente');
-                      },
-                    ),
-                  ],
-                ),
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      CircularProgressIndicator(color: Colors.amber.shade900),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      const Text(
+                        "Iniciando sesion...",
+                        style: TextStyle(
+                            fontFamily: 'Roboto',
+                            fontSize: 20.0,
+                            color: Colors.white,
+                            decoration: TextDecoration.none),
+                      )
+                    ]),
               ),
-              Container(
-                padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
-                width: 150,
-                child: Image.asset("assets/devesoft_blanco.png"),
-              ),
-              const SizedBox(height: 50),
-            ],
+            ),
           ),
-        ),
-      ),
-      // body:
-    );
+        );
+      case WidgetState.LOADED:
+        return Scaffold(
+          backgroundColor: Colors.white,
+          body: Container(
+            decoration: const BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage("assets/frutas_fondo1.jpg"),
+                // opacity: 0.9,
+                fit: BoxFit.cover,
+              ),
+            ),
+            child: Container(
+              height: MediaQuery.of(context).size.height,
+              width: MediaQuery.of(context).size.width,
+              color: Colors.black.withOpacity(0.5),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Container(
+                    color: Colors.transparent,
+                    height: MediaQuery.of(context).size.height / 4 * 3,
+                    width: MediaQuery.of(context).size.width,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        AppButtons(
+                            textColor: Colors.black,
+                            backgroundColor: Color.fromRGBO(241, 241, 241, 1),
+                            borderColor: Color.fromRGBO(241, 241, 241, 1),
+                            text: "Administrar",
+                            fontSize: 15,
+                            width: 250,
+                            height: 50,
+                            funcion: () {
+                              InfoGlobal.incrementarVentanas();
+                              Navigator.pushNamed(context, '/login');
+                            }),
+                        const SizedBox(height: 15),
+                        AppButtons(
+                          textColor: Colors.black,
+                          backgroundColor: Color.fromRGBO(241, 241, 241, 1),
+                          borderColor: Color.fromRGBO(241, 241, 241, 1),
+                          text: "Comprar ahora",
+                          fontSize: 15,
+                          width: 250,
+                          height: 50,
+                          funcion: () async {
+                            InfoGlobal.incrementarVentanas();
+                            Navigator.pushNamed(context, '/login-cliente');
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+                    width: 150,
+                    child: Image.asset("assets/devesoft_blanco.png"),
+                  ),
+                  const SizedBox(height: 50),
+                ],
+              ),
+            ),
+          ),
+          // body:
+        );
+      case WidgetState.ERROR:
+        return Scaffold(
+          backgroundColor: Colors.white,
+          body: Container(
+            decoration: const BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage("assets/frutas_fondo1.jpg"),
+                // opacity: 0.9,
+                fit: BoxFit.cover,
+              ),
+            ),
+            child: Container(
+              height: MediaQuery.of(context).size.height,
+              width: MediaQuery.of(context).size.width,
+              color: Colors.black.withOpacity(0.5),
+              child: const Center(
+                  child: Text(
+                "ERROR AL INICIAR SESION!!",
+                style: TextStyle(
+                    fontFamily: 'Roboto',
+                    fontSize: 20.0,
+                    color: Colors.white,
+                    decoration: TextDecoration.none),
+              )),
+            ),
+          ),
+        );
+    }
+  }
+
+  void obtenerPreferencias() async {
+    // Obtain shared preferences.
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final String? usuarioCliente = prefs.getString('usuarioCliente');
+    final String? contraseniaCliente = prefs.getString('contraseniaCliente');
+    final String? usuarioAdministrador =
+        prefs.getString('usuarioAdministrador');
+    final String? contraseniaAdministrador =
+        prefs.getString('contraseniaAdministrador');
+
+    if (usuarioAdministrador != null) {
+      try {
+        setState(() {
+          _widgetState = WidgetState.LOADING;
+        });
+
+        AdministradorController administradorCtrl = AdministradorController();
+
+        UsuarioModel usuarioModel = UsuarioModel(
+            nombreUsuario: usuarioAdministrador,
+            contraseniaUsuario: contraseniaAdministrador);
+
+        AdministradorModel administradorModel = AdministradorModel();
+
+        List<AdministradorModel> respuesta =
+            await administradorCtrl.validarLogin(usuarioModel);
+
+        if (respuesta.length == 1) {
+          administradorModel.nombreAdministrador =
+              respuesta[0].nombreAdministrador;
+          administradorModel.apellidoAdministrador =
+              respuesta[0].apellidoAdministrador;
+          administradorModel.numeroDocumento = respuesta[0].numeroDocumento;
+          administradorModel.tipoDocumentoModel =
+              TipoDocumentoModel(id: respuesta[0].tipoDocumentoModel!.id);
+          administradorModel.telefonoAdministrador =
+              respuesta[0].telefonoAdministrador;
+          administradorModel.emailAdministrador =
+              respuesta[0].emailAdministrador;
+
+          usuarioModel.id = respuesta[0].usuario!.id;
+          administradorModel.usuario = usuarioModel;
+          InfoGlobal.administradorModel = administradorModel;
+          InfoGlobal.incrementarVentanas();
+          Navigator.of(context).pop();
+          Navigator.pushNamed(context, '/dashboard-pedidos');
+
+          setState(() {
+            _widgetState = WidgetState.LOADED;
+          });
+        } else {
+          InfoGlobal.mensajeFallo(
+              context, "Usuario y/o contraseña incorrecto.", 2);
+          setState(() {
+            _widgetState = WidgetState.LOADED;
+          });
+        }
+      } catch (e) {
+        InfoGlobal.mensajeFallo(context,
+            "Ha ocurrido un error al intentar logearse\n ${e.toString()}", 2);
+        setState(() {
+          _widgetState = WidgetState.LOADED;
+        });
+      }
+    } else if (usuarioCliente != null) {
+      try {
+        setState(() {
+          _widgetState = WidgetState.LOADING;
+        });
+        ClienteController clienteCtrll = ClienteController();
+
+        UsuarioModel usuarioModel = UsuarioModel(
+            nombreUsuario: usuarioCliente,
+            contraseniaUsuario: contraseniaCliente);
+
+        ClienteModel clienteModel = ClienteModel();
+
+        List<ClienteModel> respuesta =
+            await clienteCtrll.validarLogin(usuarioModel);
+
+        // print(respuesta[0].id);s
+        if (respuesta.length == 1) {
+          clienteModel.id = respuesta[0].id;
+          clienteModel.nombreCliente = respuesta[0].nombreCliente;
+          clienteModel.apellidoCliente = respuesta[0].apellidoCliente;
+          clienteModel.numeroDocumento = respuesta[0].numeroDocumento;
+          clienteModel.tipoDocumentoModel =
+              TipoDocumentoModel(id: respuesta[0].tipoDocumentoModel!.id);
+          clienteModel.telefonoCliente = respuesta[0].telefonoCliente;
+          clienteModel.emailCliente = respuesta[0].emailCliente;
+
+          usuarioModel.id = respuesta[0].usuario!.id;
+          clienteModel.usuario = usuarioModel;
+
+          InfoGlobal.clienteModel = clienteModel;
+
+          Navigator.of(context).pop();
+          Navigator.pushNamed(context, '/seleccionar-mesas');
+          setState(() {
+            _widgetState = WidgetState.LOADED;
+          });
+        } else {
+          InfoGlobal.mensajeFallo(
+              context, "Usuario y/o contraseña incorrecto.", 2);
+          setState(() {
+            _widgetState = WidgetState.LOADED;
+          });
+        }
+      } catch (e) {
+        InfoGlobal.mensajeFallo(context,
+            "Ha ocurrido un error al intentar logearse\n ${e.toString()}", 2);
+        setState(() {
+          _widgetState = WidgetState.LOADED;
+        });
+      }
+    } else {
+      debugPrint("No se cargo datos de administrador ni de cliente.");
+    }
   }
 }

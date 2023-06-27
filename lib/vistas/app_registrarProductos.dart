@@ -164,6 +164,8 @@ class _AppRegistroProductoState extends State<AppRegistroProducto> {
       }
       final lista = await productoCtrll.getProductos();
 
+      Navigator.of(context).pop();
+      Navigator.of(context).pop();
       Navigator.pushNamed(
         context,
         '/lista-productos',
@@ -194,7 +196,7 @@ class _AppRegistroProductoState extends State<AppRegistroProducto> {
                 : const Text("Registro producto"),
             backgroundColor: Colors.green.shade900,
           ),
-          drawer: AppMenuDrawer(),
+          // drawer: AppMenuDrawer(),
           body: Center(
             child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -225,7 +227,7 @@ class _AppRegistroProductoState extends State<AppRegistroProducto> {
                 : Text("Registro producto"),
             backgroundColor: Colors.green.shade900,
           ),
-          drawer: AppMenuDrawer(),
+          // drawer: AppMenuDrawer(),
           body: ListView(
             children: [
               Container(

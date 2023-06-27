@@ -1,5 +1,4 @@
 import 'package:app_jugueria/controladores/adicionalController.dart';
-import 'package:app_jugueria/componentes/app_drawer.dart';
 import 'package:app_jugueria/componentes/info_global.dart';
 import 'package:app_jugueria/modelos/categoriaModel.dart';
 import 'package:app_jugueria/controladores/categoriaController.dart';
@@ -14,12 +13,13 @@ class AppListaCategoria extends StatefulWidget {
   AppListaCategoria({this.data, Key? key}) : super(key: key);
   @override
   State<AppListaCategoria> createState() {
-    return _AppListaCategoriaState();
+    return AppListaCategoriaState();
   }
 }
 
-class _AppListaCategoriaState extends State<AppListaCategoria> {
+class AppListaCategoriaState extends State<AppListaCategoria> {
   WidgetState _widgetState = WidgetState.LOADED;
+  // String mensajeCargando = "";
 
   @override
   void dispose() {
@@ -53,7 +53,7 @@ class _AppListaCategoriaState extends State<AppListaCategoria> {
                       height: 10,
                     ),
                     const Text(
-                      "Cargando...",
+                      "Cargando adicionales...",
                       style: TextStyle(
                           fontFamily: 'Roboto',
                           fontSize: 20.0,
@@ -73,14 +73,13 @@ class _AppListaCategoriaState extends State<AppListaCategoria> {
             actions: <Widget>[
               IconButton(
                 onPressed: () {
-                  Navigator.of(context).pop();
+                  // Navigator.of(context).pop();
                   Navigator.pushNamed(context, '/registrar-categoria');
                 },
                 icon: const FaIcon(FontAwesomeIcons.plus),
               ),
             ],
           ),
-          drawer: AppMenuDrawer(),
           body: Stack(children: <Widget>[
             ListView.builder(
               padding: const EdgeInsets.all(20),
@@ -149,35 +148,75 @@ class _AppListaCategoriaState extends State<AppListaCategoria> {
                                         primary: Colors.green.shade600,
                                       ),
                                       onPressed: () async {
-                                        int idCategoria =
-                                            widget.data![index].id!;
-                                        CategoriaModel categoria =
-                                            CategoriaModel(
-                                                id: idCategoria,
-                                                nombreCategoria: widget
-                                                    .data![index]
-                                                    .nombreCategoria,
-                                                letraCategoria: widget
-                                                    .data![index]
-                                                    .letraCategoria);
-                                        AdicionalController adicionalCtrll =
-                                            AdicionalController();
-                                        final adicionales = await adicionalCtrll
-                                            .getAdicionales();
-                                        final adicionalesAsignados =
-                                            await adicionalCtrll
-                                                .getAdicionalesPorCategoria(
-                                                    idCategoria);
-                                        Navigator.pushNamed(
-                                          context,
-                                          '/asignar-adicionales',
-                                          arguments: {
-                                            'categoria': categoria,
-                                            'adicionales': adicionales,
-                                            'adicionalesAsignados':
-                                                adicionalesAsignados
-                                          },
-                                        );
+                                        // setState(() {
+                                        //   _widget = WidgetState.LOADING;
+                                        // });
+                                        // setState(() {
+                                        //     _widget = WidgetState.LOADING;
+                                        //   });
+                                        // Navigator.of(context).pop();
+
+                                        debugPrint("cambios");
+                                        debugPrint(
+                                            widget.data!.length.toString());
+                                        try {
+                                          int idCategoria =
+                                              widget.data![index].id!;
+
+                                          CategoriaModel categoria =
+                                              CategoriaModel(
+                                                  id: idCategoria,
+                                                  nombreCategoria:
+                                                      widget.data![index]
+                                                          .nombreCategoria,
+                                                  letraCategoria: widget
+                                                      .data![index]
+                                                      .letraCategoria);
+                                          // setState(() {
+                                          //   _widgetState = WidgetState.LOADING;
+                                          // });
+                                          AdicionalController adicionalCtrll =
+                                              AdicionalController();
+                                          final adicionales =
+                                              await adicionalCtrll
+                                                  .getAdicionales();
+                                          final adicionalesAsignados =
+                                              await adicionalCtrll
+                                                  .getAdicionalesPorCategoria(
+                                                      idCategoria);
+                                          // setState(() {
+                                          //   _widget = WidgetState.LOADED;
+                                          // });
+                                          // setState(() {
+                                          //   _widgetState = WidgetState.LOADED;
+                                          // });
+                                          // Navigator.pushNamed(context,"/");
+
+                                          // Navigator.pushNamed(
+                                          //     context, '/asignar-adicionales',
+                                          //     arguments: {
+                                          //       'categoria': categoria,
+                                          //       'adicionales': adicionales,
+                                          //       'adicionalesAsignados':
+                                          //           adicionalesAsignados
+                                          //     });
+                                          Navigator.pushNamed(
+                                            context,
+                                            '/asignar-adicionales',
+                                            arguments: {
+                                              'categoria': categoria,
+                                              'adicionales': adicionales,
+                                              'adicionalesAsignados':
+                                                  adicionalesAsignados
+                                            },
+                                          );
+                                        } catch (e) {
+                                          debugPrint(e.toString());
+                                        }
+
+                                        // setState(() {
+                                        //   _widgetState = WidgetState.LOADED;
+                                        // });
                                       },
                                       child: FaIcon(FontAwesomeIcons.pepperHot),
                                     ),
@@ -201,9 +240,9 @@ class _AppListaCategoriaState extends State<AppListaCategoria> {
                                           List<CategoriaModel> lista =
                                               await categoriaCtrll
                                                   .getCategorias();
-                                          setState(() {
-                                            widget.data = lista;
-                                          });
+                                          // setState(() {
+                                          //   widget.data = lista;
+                                          // });
                                         } else {
                                           InfoGlobal.mensajeFallo(
                                               context,

@@ -6,6 +6,7 @@ import 'package:app_jugueria/componentes/app_textFieldRound.dart';
 import 'package:app_jugueria/componentes/info_global.dart';
 import 'package:app_jugueria/modelos/clienteModel.dart';
 import 'package:app_jugueria/controladores/clienteController.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 enum WidgetState { NONE, LOADING, LOADED, ERROR }
 
@@ -80,6 +81,19 @@ class AppLoginClienteState extends State<AppLoginCliente> {
 
         InfoGlobal.clienteModel = clienteModel;
 
+        final SharedPreferences prefs = await SharedPreferences.getInstance();
+        final String? usuarioAdministrador = prefs.getString('usuarioAdministrador');
+
+        if (usuarioAdministrador != null) {
+          await prefs.remove('usuarioAdministrador');
+          await prefs.remove('contraseniaAdministrador');
+        }
+
+        await prefs.setString('usuarioCliente', nombreUsuario.text);
+        await prefs.setString('contraseniaCliente', contraseniaUsuario.text);
+
+        Navigator.of(context).pop();
+        Navigator.of(context).pop();
         Navigator.pushNamed(context, '/seleccionar-mesas');
         setState(() {
           _widgetState = WidgetState.LOADED;
@@ -126,6 +140,8 @@ class AppLoginClienteState extends State<AppLoginCliente> {
 
       InfoGlobal.clienteModel = clienteModel;
 
+      Navigator.of(context).pop();
+      Navigator.of(context).pop();
       Navigator.pushNamed(context, '/seleccionar-mesas');
       setState(() {
         _widgetState = WidgetState.LOADED;

@@ -36,7 +36,7 @@ class _AppListaClienteState extends State<AppListaCliente> {
             onPressed: () async {
               ClienteController clienteCtrll = ClienteController();
               final lista = await clienteCtrll.getTipoDocumentos();
-              Navigator.of(context).pop();
+              // Navigator.of(context).pop();
               Navigator.pushNamed(context, '/registrar-cliente',
                   arguments: lista);
             },
@@ -44,7 +44,7 @@ class _AppListaClienteState extends State<AppListaCliente> {
           ),
         ],
       ),
-      drawer: AppMenuDrawer(),
+      // drawer: AppMenuDrawer(),
       body: Stack(children: <Widget>[
         ListView.builder(
           padding: const EdgeInsets.all(20),
