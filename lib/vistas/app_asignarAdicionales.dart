@@ -310,8 +310,9 @@ class ModalAdicionalesState extends State<ModalAdicionales> {
     return Container(
       height: MediaQuery.of(context).size.height,
       //color: Colors.red,
-      padding: const EdgeInsets.fromLTRB(0, 100, 0, 0),
+      padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
       child: ListView.builder(
+        padding: EdgeInsets.all(0),
         itemCount: widget.adicionales!.length,
         itemBuilder: (context, index) {
           return GestureDetector(
