@@ -10,6 +10,7 @@ import 'package:app_jugueria/modelos/clienteModel.dart';
 import 'package:app_jugueria/modelos/administradorModel.dart';
 import 'package:app_jugueria/modelos/tipoDocumentoModel.dart';
 import 'package:app_jugueria/modelos/pedidoModel.dart';
+import 'package:app_jugueria/vistas/app_registrarManual.dart';
 import 'package:app_jugueria/vistas/app_seleccionarMesa.dart';
 import 'package:app_jugueria/vistas/app_mensajeConfirmacion.dart';
 import 'package:app_jugueria/vistas/app_confirmarPedido.dart';
@@ -50,6 +51,7 @@ void main() {
       '/menu-administrador': (context) => AppMenu(),
       '/registrar-categoria': (context) => AppRegistroCategoria(),
       '/registrar-adicional': (context) => AppRegistroAdicional(),
+      '/registrar-manual': (context) => AppRegistroManual(),
       //'/registrar-cliente': (context) => AppRegistroCliente(),
       '/registrar-mesa': (context) => AppRegistroMesa(),
       //'/mensaje-confirmacion': (context) => AppMensajeConfirmacion(),

@@ -119,7 +119,17 @@ class _AppMenuState extends State<AppMenu> {
           child: Scaffold(
             backgroundColor: Colors.white,
             appBar: AppBar(
+              // title: const Text("Lista de adicionales"),
               backgroundColor: Colors.green.shade900,
+              actions: <Widget>[
+                IconButton(
+                  onPressed: () {
+                    // Navigator.of(context).pop();
+                    Navigator.pushNamed(context, '/registrar-manual');
+                  },
+                  icon: const FaIcon(FontAwesomeIcons.book),
+                ),
+              ],
             ),
             drawer: AppMenuDrawer(),
             body: Container(
