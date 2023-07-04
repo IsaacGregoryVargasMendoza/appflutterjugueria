@@ -3,6 +3,7 @@ import 'package:app_jugueria/controladores/clienteController.dart';
 import 'package:app_jugueria/controladores/administradorController.dart';
 import 'package:app_jugueria/modelos/adicionalModel.dart';
 import 'package:app_jugueria/modelos/categoriaModel.dart';
+import 'package:app_jugueria/modelos/manualModel.dart';
 import 'package:app_jugueria/modelos/usuarioModel.dart';
 import 'package:app_jugueria/modelos/productoModel.dart';
 import 'package:app_jugueria/modelos/mesaModel.dart';
@@ -10,6 +11,8 @@ import 'package:app_jugueria/modelos/clienteModel.dart';
 import 'package:app_jugueria/modelos/administradorModel.dart';
 import 'package:app_jugueria/modelos/tipoDocumentoModel.dart';
 import 'package:app_jugueria/modelos/pedidoModel.dart';
+import 'package:app_jugueria/vistas/app_listaManual.dart';
+import 'package:app_jugueria/vistas/app_manualCliente.dart';
 import 'package:app_jugueria/vistas/app_registrarManual.dart';
 import 'package:app_jugueria/vistas/app_seleccionarMesa.dart';
 import 'package:app_jugueria/vistas/app_mensajeConfirmacion.dart';
@@ -52,8 +55,9 @@ void main() {
       '/registrar-categoria': (context) => AppRegistroCategoria(),
       '/registrar-adicional': (context) => AppRegistroAdicional(),
       '/registrar-manual': (context) => AppRegistroManual(),
-      //'/registrar-cliente': (context) => AppRegistroCliente(),
       '/registrar-mesa': (context) => AppRegistroMesa(),
+      '/manual-cliente': (context) => AppManualCliente(),
+      '/lista-manual': (context) => AppListaManual(),
       //'/mensaje-confirmacion': (context) => AppMensajeConfirmacion(),
       //'/seleccionar-productos': (context) => AppSeleccionarProducto(),
       // '/registrar-producto': (context) => AppRegistroProducto(),
@@ -63,6 +67,13 @@ void main() {
     },
     onGenerateRoute: (settings) {
       switch (settings.name) {
+        case '/editar-manual':
+          final ManualModel manualModel = settings.arguments as ManualModel;
+          return MaterialPageRoute(
+            builder: (context) => AppRegistroManual(
+              manualModel: manualModel,
+            ),
+          );
         case '/mensaje-confirmacion':
           final PedidoModel pedidoModel = settings.arguments as PedidoModel;
           return MaterialPageRoute(

@@ -13,7 +13,7 @@ class ManualController {
     return manual;
   }
 
-  Future<List<ManualModel>> getManuelClientes() async {
+  Future<List<ManualModel>> getManualClientes() async {
     final conn = await MySqlConnection.connect(Configuracion.instancia);
     final result = await conn.query(
         'select * from manual m where m.tipoManual = 0 ORDER BY m.pasoManual');
@@ -26,7 +26,7 @@ class ManualController {
   Future<void> addManual(ManualModel manualModel) async {
     final conn = await MySqlConnection.connect(Configuracion.instancia);
     await conn.query(
-        'insert into manual (pasoManual, tipoManual, descripcionManual, imagenProducto) values (?,?,?,?)',
+        'insert into manual (pasoManual, tipoManual, descripcionManual, imagenManual) values (?,?,?,?)',
         [
           manualModel.pasoManual,
           manualModel.tipoManual,

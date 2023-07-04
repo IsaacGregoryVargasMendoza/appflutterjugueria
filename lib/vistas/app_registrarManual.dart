@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:js_interop';
 import 'package:app_jugueria/componentes/app_text.dart';
 import 'package:app_jugueria/componentes/app_buttons.dart';
 import 'package:app_jugueria/componentes/app_textFieldRound.dart';
@@ -18,7 +19,9 @@ import 'package:path_provider/path_provider.dart';
 enum WidgetState { NONE, LOADING, LOADED, ERROR }
 
 class AppRegistroManual extends StatefulWidget {
-  AppRegistroManual({Key? key}) : super(key: key);
+  ManualModel? manualModel;
+
+  AppRegistroManual({this.manualModel, Key? key}) : super(key: key);
   @override
   State<AppRegistroManual> createState() {
     return AppRegistroManualState();
@@ -45,45 +48,37 @@ class AppRegistroManualState extends State<AppRegistroManual> {
     return archivo;
   }
 
-  // cargarimagen() async {
-  //   try {
-  //     if (imagen == null) {
-  //       print("Cargar imagen.");
-  //       var img = await convertirUint8ListAFile(
-  //           base64.decode(widget.productoModel!.imagenProducto!),
-  //           "${widget.productoModel!.id}${DateTime.now().millisecondsSinceEpoch}archivo.png");
-  //       setState(() {
-  //         imagen = img;
-  //       });
-  //     } else {
-  //       print("Metodo else");
-  //     }
-  //   } catch (e) {
-  //     print("ocurrio una excepcion.");
-  //   }
-  // }
+  cargarimagen() async {
+    try {
+      if (imagen == null) {
+        var img = await convertirUint8ListAFile(
+            base64.decode(widget.manualModel!.imagenManual!),
+            "${widget.manualModel!.id}${DateTime.now().millisecondsSinceEpoch}archivo.png");
+        setState(() {
+          imagen = img;
+        });
+      } else {
+        print("Metodo else");
+      }
+    } catch (e) {
+      print("ocurrio una excepcion.");
+    }
+  }
 
   @override
   void initState() {
     super.initState();
-    tecPaso = TextEditingController();
-    tecDescripcion = TextEditingController();
-    // if (widget.productoModel != null) {
-    //   print(widget.productoModel!.categoria!.id!);
-    //   tecNombreProducto =
-    //       TextEditingController(text: widget.productoModel!.nombreProducto);
-    //   tecDescripcion = TextEditingController(
-    //       text: widget.productoModel!.descripcionProducto);
-    //   tecPrecio = TextEditingController(
-    //       text: widget.productoModel!.precioProducto.toString());
-    //   tecLetra =
-    //       TextEditingController(text: widget.productoModel!.letraProducto);
-    //   idCategoria = widget.productoModel!.categoria!.id!;
-    //   cargarimagen();
-    // } else {
-    //   tecPaso = TextEditingController();
-    //   tecDescripcion = TextEditingController();
-    // }
+    if (widget.manualModel != null) {
+      tecPaso = TextEditingController(
+          text: widget.manualModel!.pasoManual.toString());
+      tecDescripcion =
+          TextEditingController(text: widget.manualModel!.descripcionManual);
+      idTipo = widget.manualModel!.tipoManual!;
+      cargarimagen();
+    } else {
+      tecPaso = TextEditingController();
+      tecDescripcion = TextEditingController();
+    }
   }
 
   @override
@@ -127,6 +122,7 @@ class AppRegistroManualState extends State<AppRegistroManual> {
           tipoManual: idTipo,
           imagenManual: _imagen64);
       await manualCtrll.addManual(manualModel);
+
       InfoGlobal.mensajeConfirmacion(
           context, "Se ha registrado correctamente.");
 
@@ -175,8 +171,9 @@ class AppRegistroManualState extends State<AppRegistroManual> {
       });
     } catch (e) {
       InfoGlobal.mensajeFallo(context, "No se pudo registrar.", 5);
+      debugPrint(e.toString());
       setState(() {
-        _widgetState = WidgetState.NONE;
+        _widgetState = WidgetState.LOADED;
       });
     }
   }
@@ -224,7 +221,7 @@ class AppRegistroManualState extends State<AppRegistroManual> {
         return Scaffold(
           backgroundColor: Colors.white,
           appBar: AppBar(
-            title: const Text("Registro instrucciones"),
+            title: Text("Registro instrucciones"),
             backgroundColor: Colors.green.shade900,
           ),
           // drawer: AppMenuDrawer(),
@@ -259,7 +256,7 @@ class AppRegistroManualState extends State<AppRegistroManual> {
                         borderRadius: BorderRadius.circular(15),
                         color: const Color.fromRGBO(217, 217, 217, 1),
                       ),
-                      child: (idTipo != 0)
+                      child: (idTipo != -1)
                           ? DropdownButtonFormField(
                               value: idTipo,
                               decoration: const InputDecoration(
@@ -286,45 +283,27 @@ class AppRegistroManualState extends State<AppRegistroManual> {
                     ),
                     const SizedBox(height: 15),
                     AppText(text: "Descripcion", width: 320),
-                    AppTextFieldRound(
-                      width: 320,
-                      isPassword: false,
-                      funcion: () {},
-                      myController: tecDescripcion,
-                    ),
                     Container(
                       margin: const EdgeInsets.all(0),
                       padding: const EdgeInsets.all(0),
-                      width: 150,
-                      height: 250,
+                      width: 320,
+                      height: 100,
                       decoration: BoxDecoration(
-                        color: Colors.blue,
+                        color: const Color.fromRGBO(217, 217, 217, 1),
                         borderRadius: BorderRadius.circular(15),
                         border: Border.all(
-                          color: Colors.blue,
+                          color: const Color.fromRGBO(217, 217, 217, 1),
                         ),
                       ),
                       child: TextField(
-                        scrollController: ScrollController(),
+                        maxLines: null,
                         keyboardType: TextInputType.multiline,
-                        enableSuggestions: false,
-                        autocorrect: false,
-                        onSubmitted: (value) {
-                          print("estoy terminando");
-                        },
-                        style: TextStyle(
-                          fontSize: 14,
-
-                          height: 2,
-                          fontWeight: FontWeight.normal,
-                          // backgroundColor: Colors.blue,
-                          color: Colors.white,
-                        ),
+                        style: const TextStyle(fontSize: 16),
                         decoration: const InputDecoration(
                             contentPadding: EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 0),
+                                horizontal: 15, vertical: 10),
                             border: InputBorder.none),
-                        controller: TextEditingController(),
+                        controller: tecDescripcion,
                       ),
                     ),
                     const SizedBox(height: 15),
@@ -379,7 +358,6 @@ class AppRegistroManualState extends State<AppRegistroManual> {
                       ),
                     ),
                     const SizedBox(height: 15),
-                    const SizedBox(height: 15),
                     AppButtons(
                       textColor: Colors.white,
                       backgroundColor: Colors.blue,
@@ -392,6 +370,7 @@ class AppRegistroManualState extends State<AppRegistroManual> {
                         await registrarActualizar();
                       },
                     ),
+                    const SizedBox(height: 15)
                   ],
                 ),
               ),

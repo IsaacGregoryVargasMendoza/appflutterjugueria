@@ -323,6 +323,17 @@ class AppSeleccionarMesaState extends State<AppSeleccionarMesa> {
                     onTap: () async {},
                   ),
                   ListTile(
+                    leading: const FaIcon(FontAwesomeIcons.book),
+                    title: const Text(
+                      'Manual de usuario',
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                    ),
+                    onTap: () async {
+                      Navigator.of(context).pushNamed("/manual-cliente");
+                    },
+                  ),
+                  ListTile(
                     leading: const FaIcon(FontAwesomeIcons.signOut),
                     title: const Text(
                       'Cerrar sesion',

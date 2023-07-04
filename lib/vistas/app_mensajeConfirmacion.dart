@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:app_jugueria/componentes/info_global.dart';
 import 'package:app_jugueria/modelos/pedidoModel.dart';
 import 'package:intl/intl.dart';
 
@@ -52,7 +51,7 @@ class AppMensajeConfirmacionState extends State<AppMensajeConfirmacion> {
               Container(
                 width: MediaQuery.of(context).size.width / 4 * 3,
                 height: MediaQuery.of(context).size.height / 4 * 2.5,
-                padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
+                padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
                 // color: Colors.white,
                 decoration: const BoxDecoration(
                     color: Colors.white,
@@ -85,7 +84,7 @@ class AppMensajeConfirmacionState extends State<AppMensajeConfirmacion> {
                     Flexible(
                       child: Text(
                         "${widget.pedidoModel.cliente!.nombreCliente} ${widget.pedidoModel.cliente!.apellidoCliente}",
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 20,
                           color: Colors.black,
                           fontWeight: FontWeight.bold,
@@ -96,12 +95,12 @@ class AppMensajeConfirmacionState extends State<AppMensajeConfirmacion> {
                     const SizedBox(height: 15),
                     Text(
                       "${widget.pedidoModel.fechaPedido}",
-                      style: TextStyle(fontSize: 16, color: Colors.black),
+                      style: const TextStyle(fontSize: 16, color: Colors.black),
                       textAlign: TextAlign.end,
                     ),
                     const SizedBox(height: 20),
                     Container(
-                      padding: EdgeInsets.symmetric(vertical: 12),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
                       decoration: BoxDecoration(
                           border: BorderDirectional(
                         bottom:
@@ -119,7 +118,8 @@ class AppMensajeConfirmacionState extends State<AppMensajeConfirmacion> {
                           ),
                           Text(
                             "${widget.pedidoModel.id}",
-                            style: TextStyle(fontSize: 16, color: Colors.black),
+                            style: const TextStyle(
+                                fontSize: 16, color: Colors.black),
                             textAlign: TextAlign.end,
                           ),
                         ],

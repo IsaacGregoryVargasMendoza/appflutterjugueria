@@ -125,7 +125,7 @@ class _AppMenuState extends State<AppMenu> {
                 IconButton(
                   onPressed: () {
                     // Navigator.of(context).pop();
-                    Navigator.pushNamed(context, '/registrar-manual');
+                    Navigator.pushNamed(context, '/lista-manual');
                   },
                   icon: const FaIcon(FontAwesomeIcons.book),
                 ),
