@@ -1,14 +1,9 @@
 import 'dart:convert';
-import 'dart:js_interop';
 import 'package:app_jugueria/componentes/app_text.dart';
 import 'package:app_jugueria/componentes/app_buttons.dart';
-import 'package:app_jugueria/componentes/app_textFieldRound.dart';
 import 'package:app_jugueria/componentes/info_global.dart';
 import 'package:app_jugueria/controladores/manualController.dart';
-import 'package:app_jugueria/modelos/categoriaModel.dart';
 import 'package:app_jugueria/modelos/manualModel.dart';
-import 'package:app_jugueria/modelos/productoModel.dart';
-import 'package:app_jugueria/controladores/productoController.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
@@ -93,18 +88,27 @@ class AppRegistroManualState extends State<AppRegistroManual> {
         _widgetState = WidgetState.LOADING;
       });
 
-      if (tecPaso.text.toString().trim().isEmpty) {
+      if (tecDescripcion.text.toString().trim().isEmpty) {
         InfoGlobal.mostrarAlerta(
-            context, "Mensaje", "Ingrese un nombre de producto valido.");
+            context, "Mensaje", "Ingrese una descripcion valido.");
         setState(() {
           _widgetState = WidgetState.LOADED;
         });
         return;
       }
 
-      if (tecDescripcion.text.toString().trim() == "0") {
+      if (tecPaso.text.toString().trim().isEmpty) {
         InfoGlobal.mostrarAlerta(
-            context, "Mensaje", "Ingrese una descrpcion valido.");
+            context, "Mensaje", "Ingrese un numero de orden valido.");
+        setState(() {
+          _widgetState = WidgetState.LOADED;
+        });
+        return;
+      }
+
+      if (imagen == null) {
+        InfoGlobal.mostrarAlerta(
+            context, "Mensaje", "Seleccione una imagen valida.");
         setState(() {
           _widgetState = WidgetState.LOADED;
         });
@@ -113,58 +117,36 @@ class AppRegistroManualState extends State<AppRegistroManual> {
 
       ManualController manualCtrll = ManualController();
 
-      List<int> bytes = await imagen!.readAsBytesSync();
-      String _imagen64 = base64.encode(bytes);
+      if (widget.manualModel != null) {
+        List<int> bytes = await imagen!.readAsBytesSync();
+        String _imagen64 = base64.encode(bytes);
 
-      ManualModel manualModel = ManualModel(
-          pasoManual: int.parse(tecPaso.text),
-          descripcionManual: tecDescripcion.text,
-          tipoManual: idTipo,
-          imagenManual: _imagen64);
-      await manualCtrll.addManual(manualModel);
+        ManualModel manualModel = ManualModel(
+            id: widget.manualModel!.id,
+            pasoManual: int.parse(tecPaso.text),
+            descripcionManual: tecDescripcion.text,
+            tipoManual: idTipo,
+            imagenManual: _imagen64);
+        await manualCtrll.updateManual(manualModel);
+        InfoGlobal.mensajeConfirmacion(
+            context, "Se ha actualizado correctamente.");
+      } else {
+        List<int> bytes = await imagen!.readAsBytesSync();
+        String _imagen64 = base64.encode(bytes);
 
-      InfoGlobal.mensajeConfirmacion(
-          context, "Se ha registrado correctamente.");
+        ManualModel manualModel = ManualModel(
+            pasoManual: int.parse(tecPaso.text),
+            descripcionManual: tecDescripcion.text,
+            tipoManual: idTipo,
+            imagenManual: _imagen64);
+        await manualCtrll.addManual(manualModel);
+        InfoGlobal.mensajeConfirmacion(
+            context, "Se ha registrado correctamente.");
+      }
 
-      // if (widget.productoModel != null) {
-      //   List<int> bytes = await imagen!.readAsBytesSync();
-      //   String _imagen64 = base64.encode(bytes);
-
-      //   ProductoModel productoModel = ProductoModel(
-      //       id: widget.productoModel!.id,
-      //       nombreProducto: tecNombreProducto.text,
-      //       categoria: CategoriaModel(id: idCategoria),
-      //       descripcionProducto: tecDescripcion.text,
-      //       precioProducto: double.parse(tecPrecio.text),
-      //       imagenProducto: _imagen64,
-      //       letraProducto: tecLetra.text);
-      //   await productoCtrll.updateProducto(productoModel);
-      //   InfoGlobal.mensajeConfirmacion(
-      //       context, "Se ha actualizado correctamente.");
-      // } else {
-      //   List<int> bytes = await imagen!.readAsBytesSync();
-      //   String _imagen64 = base64.encode(bytes);
-
-      //   ProductoModel productoModel = ProductoModel(
-      //       nombreProducto: tecNombreProducto.text,
-      //       categoria: CategoriaModel(id: idCategoria),
-      //       descripcionProducto: tecDescripcion.text,
-      //       precioProducto: double.parse(tecPrecio.text),
-      //       imagenProducto: _imagen64,
-      //       letraProducto: tecLetra.text);
-      //   await productoCtrll.addProducto(productoModel);
-      //   InfoGlobal.mensajeConfirmacion(
-      //       context, "Se ha registrado correctamente.");
-      // }
-      // final lista = await productoCtrll.getProductos();
-
-      // Navigator.of(context).pop();
-      // Navigator.of(context).pop();
-      // Navigator.pushNamed(
-      //   context,
-      //   '/lista-productos',
-      //   arguments: lista,
-      // );
+      Navigator.of(context).pop();
+      Navigator.of(context).pop();
+      Navigator.pushNamed(context, '/lista-manual');
 
       setState(() {
         _widgetState = WidgetState.LOADED;
@@ -192,7 +174,9 @@ class AppRegistroManualState extends State<AppRegistroManual> {
           //   backgroundColor: Colors.green.shade900,
           // ),
           appBar: AppBar(
-            title: const Text("Registro instrucciones"),
+            title: Text((widget.manualModel == null)
+                ? "Registro instrucciones"
+                : "Editar instrucciones"),
             backgroundColor: Colors.green.shade900,
           ),
           // drawer: AppMenuDrawer(),
@@ -221,7 +205,9 @@ class AppRegistroManualState extends State<AppRegistroManual> {
         return Scaffold(
           backgroundColor: Colors.white,
           appBar: AppBar(
-            title: Text("Registro instrucciones"),
+            title: Text((widget.manualModel == null)
+                ? "Registro instrucciones"
+                : "Editar instrucciones"),
             backgroundColor: Colors.green.shade900,
           ),
           // drawer: AppMenuDrawer(),
@@ -229,7 +215,7 @@ class AppRegistroManualState extends State<AppRegistroManual> {
             children: [
               Container(
                 width: MediaQuery.of(context).size.width,
-                padding: const EdgeInsets.only(top: 50),
+                padding: const EdgeInsets.only(top: 20),
                 child: Column(
                   children: [
                     InkWell(
@@ -282,7 +268,7 @@ class AppRegistroManualState extends State<AppRegistroManual> {
                               }),
                     ),
                     const SizedBox(height: 15),
-                    AppText(text: "Descripcion", width: 320),
+                    AppText(text: "Instruccion", width: 320),
                     Container(
                       margin: const EdgeInsets.all(0),
                       padding: const EdgeInsets.all(0),
@@ -362,7 +348,9 @@ class AppRegistroManualState extends State<AppRegistroManual> {
                       textColor: Colors.white,
                       backgroundColor: Colors.blue,
                       borderColor: Colors.blue,
-                      text: "Registrar",
+                      text: (widget.manualModel == null)
+                          ? "Registrar"
+                          : "Guardar cambios",
                       fontSize: 15,
                       width: 140,
                       height: 50,
