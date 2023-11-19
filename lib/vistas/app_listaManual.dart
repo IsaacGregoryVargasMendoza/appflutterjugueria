@@ -142,93 +142,113 @@ class AppListaManualState extends State<AppListaManual> {
                     itemBuilder: (context, index) {
                       return GestureDetector(
                         onTap: () async {
-                          debugPrint("dasdasda");
-                          showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return seleccionarPunto(context);
-                            },
-                          ).then((value) {
-                            if (value == 'Opción 1') {
-                              Navigator.pushNamed(context, "/editar-manual",
-                                  arguments: data[index]);
-                              
-                              debugPrint("Liberar mesa");
-                            } else if (value == 'Opción 2') {
-                              debugPrint("nada");
-                            }
-                          });
+                          try {
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return seleccionarPunto(context);
+                              },
+                            ).then((value) async {
+                              if (value == 'Opción 1') {
+                                Navigator.pushNamed(context, "/editar-manual",
+                                    arguments: data[index]);
+
+                                debugPrint("Liberar mesa");
+                              } else if (value == 'Opción 2') {
+                                setState(() {
+                                  _widgetState = WidgetState.LOADING;
+                                });
+                                ManualController manualController =
+                                    ManualController();
+                                await manualController
+                                    .deleteManual(data[index].id!);
+                                obtenerInstrucciones();
+                              }
+                            });
+                          } catch (e) {
+                            debugPrint(e.toString());
+                            setState(() {
+                              _widgetState = WidgetState.LOADED;
+                            });
+                          }
                         },
                         child: Container(
-                          width: MediaQuery.of(context).size.width,
-                          padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
-                          decoration: BoxDecoration(
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.grey.withOpacity(0.5),
-                                spreadRadius: 2,
-                                blurRadius: 7,
-                                offset: const Offset(
-                                    0, 3), // cambia la posición de la sombra
+                            width: MediaQuery.of(context).size.width,
+                            padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
+                            decoration: BoxDecoration(
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.5),
+                                  spreadRadius: 2,
+                                  blurRadius: 7,
+                                  offset: const Offset(
+                                      0, 3), // cambia la posición de la sombra
+                                ),
+                              ],
+                              borderRadius: BorderRadius.circular(25),
+                              border: Border.all(
+                                style: BorderStyle.solid,
+                                width: 0.5,
+                                color: Colors.white,
                               ),
-                            ],
-                            borderRadius: BorderRadius.circular(25),
-                            border: Border.all(
-                              style: BorderStyle.solid,
-                              width: 0.5,
                               color: Colors.white,
                             ),
-                            color: Colors.white,
-                          ),
-                          margin: const EdgeInsets.fromLTRB(10, 20, 10, 0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Container(
-                                width: 100,
-                                height: 100,
-                                margin: const EdgeInsets.all(5),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(10),
-                                  image: DecorationImage(
-                                    image: MemoryImage(
-                                      base64.decode(
-                                        data[index].imagenManual!,
-                                      ),
-                                    ),
-                                    fit: BoxFit.fill,
-                                  ),
-                                ),
-                              ),
-                              Container(
-                                width: MediaQuery.of(context).size.width - 150,
-                                height: 100,
-                                padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
-                                // color: Colors.blue,
-                                child: Column(
+                            margin: const EdgeInsets.fromLTRB(10, 20, 10, 0),
+                            child: Stack(
+                              children: [
+                                Row(
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text("PASO ${data[index].pasoManual!}",
-                                        style: const TextStyle(
-                                            fontWeight: FontWeight.bold),
-                                        textAlign: TextAlign.left),
-                                    Flexible(
-                                      child: Text(
-                                        "${data[index].descripcionManual!}",
-                                        style: const TextStyle(
-                                          color: Colors.black,
+                                    Container(
+                                      width: 100,
+                                      height: 100,
+                                      margin: const EdgeInsets.all(5),
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(10),
+                                        image: DecorationImage(
+                                          image: MemoryImage(
+                                            base64.decode(
+                                              data[index].imagenManual!,
+                                            ),
+                                          ),
+                                          fit: BoxFit.fill,
                                         ),
-                                        textAlign: TextAlign.left,
+                                      ),
+                                    ),
+                                    Container(
+                                      width: MediaQuery.of(context).size.width -
+                                          150,
+                                      height: 100,
+                                      padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
+                                      // color: Colors.blue,
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                              "PASO ${data[index].pasoManual!}",
+                                              style: const TextStyle(
+                                                  fontWeight: FontWeight.bold),
+                                              textAlign: TextAlign.left),
+                                          Flexible(
+                                            child: Text(
+                                              "${data[index].descripcionManual!}",
+                                              style: const TextStyle(
+                                                color: Colors.black,
+                                              ),
+                                              textAlign: TextAlign.left,
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ),
                                   ],
                                 ),
-                              ),
-                            ],
-                          ),
-                        ),
+                              ],
+                            )),
                       );
                     },
                   ),

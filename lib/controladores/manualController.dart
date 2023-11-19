@@ -47,4 +47,9 @@ class ManualController {
           manualModel.id
         ]);
   }
+
+  Future<void> deleteManual(int id) async {
+    final conn = await MySqlConnection.connect(Configuracion.instancia);
+    await conn.query('delete from manual where id=?', [id]);
+  }
 }
